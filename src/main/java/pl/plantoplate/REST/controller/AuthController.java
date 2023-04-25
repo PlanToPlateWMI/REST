@@ -28,17 +28,22 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.JwtResponse;
-import pl.plantoplate.REST.dto.LoginRequest;
-import pl.plantoplate.REST.dto.SignupDto;
-import pl.plantoplate.REST.dto.SimpleResponse;
+import pl.plantoplate.REST.dto.*;
+import pl.plantoplate.REST.entity.Group;
+import pl.plantoplate.REST.entity.InviteCode;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.mail.MailParams;
+import pl.plantoplate.REST.mail.MailSenderService;
+import pl.plantoplate.REST.repository.GroupRepository;
+import pl.plantoplate.REST.repository.InviteCodeRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.security.JwtUtils;
 import pl.plantoplate.REST.security.UserDetailsImpl;
+import pl.plantoplate.REST.service.GroupService;
 
 import javax.crypto.SecretKey;
+import java.util.Random;
 
 @RestController
 @RequestMapping("api/auth/")
@@ -52,10 +57,19 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
+    private InviteCodeRepository inviteCodeRepository;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
     private PasswordEncoder encoder;
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private MailSenderService mailSenderService;
 
     /**
      * Create User's account. Before it we should check if user with this login and email already
@@ -66,7 +80,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("signup")
-    public ResponseEntity<SimpleResponse> registerUser(@RequestBody SignupDto userSignupInfo){
+    public ResponseEntity registerUser(@RequestBody SignupDto userSignupInfo){
 
         if(userRepository.existsByEmail(userSignupInfo.getEmail()) && userRepository.existsByEmail(userSignupInfo.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -83,14 +97,22 @@ public class AuthController {
         // save new User in DB
         userRepository.save(user.getEmail(), user.getLogin(), user.getPassword(), user.getRole().name());
 
-        //TODO generate 4-number code and send it by email
+        //
+        Integer code = generateCode();
+        mailSenderService.send(new MailParams(code, userSignupInfo.getEmail()));
 
 
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         String secretString = Encoders.BASE64.encode(key.getEncoded());
         System.out.println(secretString);
 
-        return ResponseEntity.ok(new SimpleResponse("User registered successfully"));
+        return ResponseEntity.ok(new ActivationCodeDto(code));
+    }
+
+    private static Integer generateCode() {
+        Random r = new Random();
+        int fourDigit = 1000 + r.nextInt(8999);
+        return fourDigit;
     }
 
 
@@ -99,7 +121,7 @@ public class AuthController {
      * @param loginRequest
      * @return
      */
-    @PostMapping("test")
+    @PostMapping("signin")
     public ResponseEntity authenticateUser(@RequestBody LoginRequest loginRequest){
 
 //        if (!userRepository.existsByLogin(loginRequest.getLogin())) {
@@ -119,6 +141,39 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getLogin(),
                 role));
-
     }
+
+    /**
+     * Generate and send code to the email
+     * @param email
+     * @return
+     */
+    @GetMapping("/code")
+    public ResponseEntity<ActivationCodeDto> generateCodeToEmail(@RequestParam("email") String email){
+        int code = generateCode();
+        mailSenderService.send(new MailParams(code, email));
+        return ResponseEntity.ok(new ActivationCodeDto(code));
+    }
+
+
+    //TODO - add user to group and send JWT token
+//    /**
+//     * If user wants to join group when app sends his email to identify user and group code
+//     * If such group code exists then we add user to this group and send back jwt token
+//     * @param data
+//     * @return
+//     */
+//    @GetMapping("/group/code")
+//    public ResponseEntity checkGroupCodeAndAddToGroup(AddToExistingGroupDto data){
+//        boolean isCodeExists = inviteCodeRepository.existsByCode(data.getGroupCode());
+//        if(isCodeExists){
+//            InviteCode inviteCode = inviteCodeRepository.getByCode(data.getGroupCode());
+//            long groupId = inviteCode.getGroup().getId();
+//            groupService.addUserToGroup(groupId, data.getEmail());
+//
+//
+//        }
+//
+//
+//    }
 }

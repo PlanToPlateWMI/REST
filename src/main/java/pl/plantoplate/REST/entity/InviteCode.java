@@ -39,8 +39,8 @@ public class InviteCode {
     private int code;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     @Column(name = "expired_time", columnDefinition = "varchar(8)")
     private LocalTime expiredTime;
@@ -51,7 +51,7 @@ public class InviteCode {
         return "InviteCode{" +
                 "id=" + id +
                 ", code=" + code +
-                ", group=" + user +
+                ", group=" + group +
                 '}';
     }
 }

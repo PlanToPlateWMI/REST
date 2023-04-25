@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     /**
-     * Just test JWT token validation
+     * Just test JWT token validation and send back login
      * @return
      */
     @GetMapping("/test")

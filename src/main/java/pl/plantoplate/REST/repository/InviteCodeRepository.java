@@ -6,4 +6,8 @@ import pl.plantoplate.REST.entity.InviteCode;
 
 @Repository
 public interface InviteCodeRepository extends JpaRepository<InviteCode, Long> {
+
+    boolean existsByCode(int code);
+
+    InviteCode getByCode(int code);
 }
