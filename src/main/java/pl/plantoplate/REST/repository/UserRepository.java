@@ -13,16 +13,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByLogin(String login);
-
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
 
-    boolean existsByLogin(String login);
-
-    @Modifying
-    @Transactional
-    @Query(value = "insert into app_user (email,login,password,role) values (:email,:login,:password,:role) ",nativeQuery = true)
-    int save(@Param("email") String email, @Param("login") String login, @Param("password")String password, @Param("role")String role);
+//    @Modifying
+//    @Transactional
+//    @Query(value = "insert into app_user (email,username,password,role) values (:email,:username,:password,:role) ",nativeQuery = true)
+//    int save(@Param("email") String email, @Param("username") String username, @Param("password")String password, @Param("role")String role);
 }

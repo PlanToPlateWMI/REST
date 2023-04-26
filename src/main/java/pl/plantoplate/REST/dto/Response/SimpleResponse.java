@@ -13,7 +13,7 @@ express or implied. See the License for the specific language
 governing permissions and limitations under the License.
  */
 
-package pl.plantoplate.REST.dto;
+package pl.plantoplate.REST.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

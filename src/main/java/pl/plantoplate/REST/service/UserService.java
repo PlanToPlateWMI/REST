@@ -15,53 +15,35 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.plantoplate.REST.entity.Group;
-import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
-import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 
 @Service
-@Slf4j
-public class GroupService {
-
-    private final GroupRepository groupRepository;
+public class UserService {
 
     private final UserRepository userRepository;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository) {
-        this.groupRepository = groupRepository;
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
 
-    // TODO create custom Exception
-    /**
-     * Create new group and add user as admin to this group
-     * @param email
-     */
-    public void createGroupAndAddAdmin(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException());
-        user.setRole(Role.ROLE_ADMIN);
-        user.setActive(true);
+    public User save(User user){
+        return userRepository.save(user);
+    }
 
-        Group group = new Group();
-        group.addUser(user);
-        Group savedGroup = groupRepository.save(group);
-
-        log.info("User with email [" + email +"] created group with id [" + savedGroup.getId() +"]");
-
-
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     // TODO create custom Exception
     @Transactional(readOnly = true)
-    public Group findById(long id){
-        return groupRepository.findById(id).orElseThrow(() -> new RuntimeException());
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException());
     }
 }

@@ -1,4 +1,4 @@
-package pl.plantoplate.REST.dto;
+package pl.plantoplate.REST.dto.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AddToExistingGroupDto {
+public class addToGroupByInviteCodeRequest {
 
+    private int code;
     private String email;
-    private int groupCode;
 }

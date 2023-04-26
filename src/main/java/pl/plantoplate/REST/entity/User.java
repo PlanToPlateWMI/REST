@@ -35,9 +35,6 @@ public class User {
     private Long id;
 
     @Column
-    private String login;
-
-    @Column
     private String username;
 
     @Column(unique = true)
@@ -54,8 +51,11 @@ public class User {
     @Column
     private String password;
 
-    public User(String login, String password, String email) {
-        this.login = login;
+    @Column(name = "is_active")
+    private boolean isActive;
+
+    public User(String username, String password, String email) {
+        this.username = username;
         this.password = password;
         this.email = email;
     }

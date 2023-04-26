@@ -36,9 +36,11 @@ public class Group {
     @Id
     private Long id;
 
-    @Column
-    private String name;
-
     @OneToMany(mappedBy = "userGroup")
     private List<User> users = new ArrayList<>();
+
+    public void addUser(User user){
+        users.add(user);
+        user.setUserGroup(this);
+    }
 }

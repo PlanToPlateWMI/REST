@@ -14,6 +14,7 @@ governing permissions and limitations under the License.
  */
 package pl.plantoplate.REST.mail;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,6 +22,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MailSenderServiceImpl implements MailSenderService{
 
     @Value("${spring.mail.username}")
@@ -33,10 +35,14 @@ public class MailSenderServiceImpl implements MailSenderService{
         this.mailSender = mailSender;
     }
 
+    /**
+     * Send email to email address from MailParams with code
+     * @param mailParams
+     */
     @Override
     public void send(MailParams mailParams) {
         String mailSubject = "Activate account in PlanToPlate mobile app";
-        String messageBody = getActivationMailBody(mailParams.getCode());
+        String messageBody = String.format("To confirm your email address use code :\n%d", mailParams.getCode());
         String emailTo = mailParams.getEmailTo();
 
         SimpleMailMessage message = new SimpleMailMessage();
@@ -46,12 +52,8 @@ public class MailSenderServiceImpl implements MailSenderService{
         message.setText(messageBody);
 
         mailSender.send(message);
+
+        log.info("Code ["+ mailParams.getCode() +"] was sent to email [" + mailParams.getEmailTo()+"]");
     }
 
-    private String getActivationMailBody(Integer code) {
-
-        String msg = String.format("To confirm your email address use code :\n%d",
-                code);
-        return msg;
-    }
 }

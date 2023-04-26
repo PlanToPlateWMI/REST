@@ -38,12 +38,22 @@ public class InviteCode {
     @Column
     private int code;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @ManyToOne()
     @JoinColumn(name = "group_id")
     private Group group;
 
     @Column(name = "expired_time", columnDefinition = "varchar(8)")
     private LocalTime expiredTime;
+
+    public InviteCode(int code, Group group, Role role, LocalTime expiredTime) {
+        this.code = code;
+        this.group = group;
+        this.role = role;
+        this.expiredTime = expiredTime;
+    }
 
 
     @Override

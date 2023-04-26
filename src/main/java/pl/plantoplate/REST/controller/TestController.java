@@ -25,14 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     /**
-     * Just test JWT token validation and send back login
+     * Just test JWT token validation and send back email
      * @return
      */
     @GetMapping("/test")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity testJwtToken(){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(login);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(email);
     }
 
 }

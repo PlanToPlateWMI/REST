@@ -15,165 +15,133 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.controller;
 
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.*;
-import pl.plantoplate.REST.entity.Group;
-import pl.plantoplate.REST.entity.InviteCode;
+import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
+import pl.plantoplate.REST.dto.Request.EmailRequest;
+import pl.plantoplate.REST.dto.Request.LoginRequest;
+import pl.plantoplate.REST.dto.Request.SignupRequest;
+import pl.plantoplate.REST.dto.Response.CodeResponse;
+import pl.plantoplate.REST.dto.Response.JwtResponse;
+import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
-import pl.plantoplate.REST.repository.GroupRepository;
-import pl.plantoplate.REST.repository.InviteCodeRepository;
-import pl.plantoplate.REST.repository.UserRepository;
-import pl.plantoplate.REST.security.JwtUtils;
-import pl.plantoplate.REST.security.UserDetailsImpl;
 import pl.plantoplate.REST.service.GroupService;
-
-import javax.crypto.SecretKey;
-import java.util.Random;
+import pl.plantoplate.REST.service.UserService;
 
 @RestController
 @RequestMapping("api/auth/")
+@Slf4j
 public class AuthController {
 
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final ControllerJwtUtils controllerUtils;
+    private final UserService userService;
+    private final GroupService groupService;
+    private final PasswordEncoder encoder;
+    private final MailSenderService mailSenderService;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private InviteCodeRepository inviteCodeRepository;
-
-    @Autowired
-    private GroupService groupService;
-
-    @Autowired
-    private PasswordEncoder encoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @Autowired
-    private MailSenderService mailSenderService;
+    public AuthController(ControllerJwtUtils controllerUtils, UserService userService, GroupService groupService, PasswordEncoder encoder, MailSenderService mailSenderService) {
+        this.controllerUtils = controllerUtils;
+        this.userService = userService;
+        this.groupService = groupService;
+        this.encoder = encoder;
+        this.mailSenderService = mailSenderService;
+    }
 
     /**
-     * Create User's account. Before it we should check if user with this login and email already
+     * Create User's account. Before it check if user with this email already
      * exists in DB. If it is so when we returns HttpStatus.CONFLICT.
-     * If user with login and email are not used by other user when return code what we send to user's email
-     * to submit his email address
+     * If user with email are not used by other user when send code to user's email and
+     * return this code to mobile app
      * @param userSignupInfo
-     * @return
+     * @return verification code send to email address
      */
     @PostMapping("signup")
-    public ResponseEntity registerUser(@RequestBody SignupDto userSignupInfo){
+    public ResponseEntity registerUser(@RequestBody SignupRequest userSignupInfo){
 
-        if(userRepository.existsByEmail(userSignupInfo.getEmail()) && userRepository.existsByEmail(userSignupInfo.getEmail())){
+        if(userService.existsByEmail(userSignupInfo.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new SimpleResponse(String.format("User with login %s or %s email already exists", userSignupInfo.getLogin(), userSignupInfo.getEmail())));
+                    .body(new SimpleResponse(String.format("User with login %s or %s email already exists", userSignupInfo.getUsername(),
+                            userSignupInfo.getEmail())));
         }
 
         // create User
-        User user  = new User(userSignupInfo.getLogin(),
+        User user  = new User(userSignupInfo.getUsername(),
                 encoder.encode(userSignupInfo.getPassword()), userSignupInfo.getEmail());
-        // set User's role to USER
+        // set User's role to USER, isActivated - false
         user.setRole(Role.ROLE_USER);
-        user.setUsername(userSignupInfo.getLogin());
+        user.setActive(false);
 
         // save new User in DB
-        userRepository.save(user.getEmail(), user.getLogin(), user.getPassword(), user.getRole().name());
+        userService.save(user);
 
-        //
-        Integer code = generateCode();
+        //generate code and send it to user's email address
+        int code = controllerUtils.generateCode(1000, 8999);
         mailSenderService.send(new MailParams(code, userSignupInfo.getEmail()));
 
+        log.info("User with email [ " + userSignupInfo.getEmail() +"] started registration");
 
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        String secretString = Encoders.BASE64.encode(key.getEncoded());
-        System.out.println(secretString);
-
-        return ResponseEntity.ok(new ActivationCodeDto(code));
-    }
-
-    private static Integer generateCode() {
-        Random r = new Random();
-        int fourDigit = 1000 + r.nextInt(8999);
-        return fourDigit;
+        return ResponseEntity.ok(new CodeResponse(code));
     }
 
 
+    // TODO exception what user with this email doesn't exists and password is wrong
     /**
-     * Generate JWT token by user login and password
+     * Generate JWT token by user email and password
      * @param loginRequest
-     * @return
+     * @return JWT token and role
      */
     @PostMapping("signin")
     public ResponseEntity authenticateUser(@RequestBody LoginRequest loginRequest){
 
-//        if (!userRepository.existsByLogin(loginRequest.getLogin())) {
+        if (!userService.existsByEmail(loginRequest.getEmail())) {
+            return new ResponseEntity<>(
+                    new SimpleResponse(String.format("User with email %s doesn't exists", loginRequest.getEmail())), HttpStatus.UNAUTHORIZED);
+       }
+//        else if(!userService.findByEmail(loginRequest.getEmail()).isActive()){
 //            return new ResponseEntity<>(
-//                    new SimpleResponse(String.format("User with login %s doesn't exists", loginRequest.getLogin())), HttpStatus.UNAUTHORIZED);
+//                    new SimpleResponse(String.format("User with email %s has not activated account", loginRequest.getEmail())), HttpStatus.UNAUTHORIZED);
 //        }
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+        log.info("User with email [ " + loginRequest.getEmail() +"] try to signin");
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String role = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().get();
-
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getLogin(),
-                role));
+        return controllerUtils.generateJwtToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
     /**
      * Generate and send code to the email
      * @param email
-     * @return
+     * @return generated code
      */
     @GetMapping("/code")
-    public ResponseEntity<ActivationCodeDto> generateCodeToEmail(@RequestParam("email") String email){
-        int code = generateCode();
+    public ResponseEntity<CodeResponse> generateCodeToEmail(@RequestParam("email") String email){
+        int code = controllerUtils.generateCode(1000, 8999);
         mailSenderService.send(new MailParams(code, email));
-        return ResponseEntity.ok(new ActivationCodeDto(code));
+        log.info("For user with email ["+email+"] was generated code ["+code+"] to confirm email");
+        return ResponseEntity.ok(new CodeResponse(code));
     }
 
 
-    //TODO - add user to group and send JWT token
-//    /**
-//     * If user wants to join group when app sends his email to identify user and group code
-//     * If such group code exists then we add user to this group and send back jwt token
-//     * @param data
-//     * @return
-//     */
-//    @GetMapping("/group/code")
-//    public ResponseEntity checkGroupCodeAndAddToGroup(AddToExistingGroupDto data){
-//        boolean isCodeExists = inviteCodeRepository.existsByCode(data.getGroupCode());
-//        if(isCodeExists){
-//            InviteCode inviteCode = inviteCodeRepository.getByCode(data.getGroupCode());
-//            long groupId = inviteCode.getGroup().getId();
-//            groupService.addUserToGroup(groupId, data.getEmail());
-//
-//
-//        }
-//
-//
-//    }
+    // TODO fix Forbidden
+    /**
+     * Create new group for user provided by email. Set this user Role - Role.ADMIN
+     * @return jwt token and role
+     */
+    @PostMapping("/group")
+    public ResponseEntity<JwtResponse> createGroup(@RequestBody EmailRequest emailRequest){
+        groupService.createGroupAndAddAdmin(emailRequest.getEmail());
+        User user = userService.findByEmail(emailRequest.getEmail());
+
+        return controllerUtils.generateJwtToken(user.getEmail(), user.getPassword());
+    }
+
+
 }

@@ -26,12 +26,16 @@ import pl.plantoplate.REST.repository.UserRepository;
 @Component
 public class UserDetailServiceImpl implements UserDetailsService {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserDetailServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = userRepository.findByLogin(s).orElseThrow(()-> new UsernameNotFoundException("User with login : " + s + " not found."));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("User with email : " + email + " not found."));
         return UserDetailsImpl.build(user);
     }
 }

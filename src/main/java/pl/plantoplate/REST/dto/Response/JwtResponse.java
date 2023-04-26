@@ -13,20 +13,17 @@ express or implied. See the License for the specific language
 governing permissions and limitations under the License.
  */
 
-package pl.plantoplate.REST.dto;
+package pl.plantoplate.REST.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class SignupDto {
+public class JwtResponse {
 
-    private String email;
-    private String password;
-    private String login;
+    private String token;
+    private String role;
 }

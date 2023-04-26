@@ -34,12 +34,23 @@ import java.io.IOException;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
+    private final UserDetailServiceImpl userDetailsService;
 
     @Autowired
-    private UserDetailServiceImpl userDetailsService;
+    public AuthTokenFilter(JwtUtils jwtUtils, UserDetailServiceImpl userDetailsService) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
+    /**
+     * UsernamePasswordAuthenticationFilter. Get JWT token from header Authorization and set Authentication
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
