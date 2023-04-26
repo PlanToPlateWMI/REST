@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
-import pl.plantoplate.REST.dto.Request.EmailRequest;
+import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.LoginRequest;
 import pl.plantoplate.REST.dto.Request.SignupRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
@@ -130,17 +130,15 @@ public class AuthController {
     }
 
 
-    // TODO fix Forbidden
     /**
      * Create new group for user provided by email. Set this user Role - Role.ADMIN
      * @return jwt token and role
      */
     @PostMapping("/group")
-    public ResponseEntity<JwtResponse> createGroup(@RequestBody EmailRequest emailRequest){
+    public ResponseEntity<JwtResponse> createGroup(@RequestBody EmailPasswordRequest emailRequest){
         groupService.createGroupAndAddAdmin(emailRequest.getEmail());
-        User user = userService.findByEmail(emailRequest.getEmail());
 
-        return controllerUtils.generateJwtToken(user.getEmail(), user.getPassword());
+        return controllerUtils.generateJwtToken(emailRequest.getEmail(), emailRequest.getPassword());
     }
 
 

@@ -2,13 +2,15 @@ package pl.plantoplate.REST.dto.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class addToGroupByInviteCodeRequest {
+@NoArgsConstructor
+public class EmailPasswordRequest {
 
-    private int code;
     private String email;
+    private String password;
 }

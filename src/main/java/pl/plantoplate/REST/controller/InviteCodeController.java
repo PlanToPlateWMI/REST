@@ -23,9 +23,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
-import pl.plantoplate.REST.dto.Request.addToGroupByInviteCodeRequest;
+import pl.plantoplate.REST.dto.Request.AddToGroupByInviteCodeRequest;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
+import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.Role;
+import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -48,22 +50,26 @@ public class InviteCodeController {
     }
 
 
-    // TODO fix problem with Forbidden
     /**
      * If inviteCode exists - add user to group of this code. Send back JWT token
+     * If invite code is wrong than - return  BadRequest status
      * @param addToGroupByInviteCodeRequest
      * @return JWT token
      */
     @PostMapping()
-    public ResponseEntity<JwtResponse> addUserToGroupByInviteCode(@RequestBody addToGroupByInviteCodeRequest addToGroupByInviteCodeRequest){
-        inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
-        String wrongPassword = userService.findByEmail(addToGroupByInviteCodeRequest.getEmail()).getPassword();
-        return controllerUtils.generateJwtToken(addToGroupByInviteCodeRequest.getEmail(), wrongPassword);
+    public ResponseEntity addUserToGroupByInviteCode(@RequestBody AddToGroupByInviteCodeRequest addToGroupByInviteCodeRequest){
+        try {
+            inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
+        }catch (WrongInviteCode e){
+            return ResponseEntity.badRequest().body(new SimpleResponse("Invite code is wrong"));
+        }
+
+        return controllerUtils.generateJwtToken(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getPassword());
     }
 
 
     /**
-     * Admin can generate invite code to group to the ADMIn or USER.
+     * Admin can generate invite code to group to the ADMIN or USER.
      * @param role - ADMIN or USER
      * @return generated code
      */

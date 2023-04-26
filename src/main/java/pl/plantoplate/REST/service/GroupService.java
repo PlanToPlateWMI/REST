@@ -50,11 +50,13 @@ public class GroupService {
         user.setRole(Role.ROLE_ADMIN);
         user.setActive(true);
 
-        Group group = new Group();
-        group.addUser(user);
-        Group savedGroup = groupRepository.save(group);
+        if(user.getUserGroup() == null) {
+            Group group = new Group();
+            group.addUser(user);
+            Group savedGroup = groupRepository.save(group);
 
-        log.info("User with email [" + email +"] created group with id [" + savedGroup.getId() +"]");
+            log.info("User with email [" + email + "] created group with id [" + savedGroup.getId() + "]");
+        }
 
 
     }
