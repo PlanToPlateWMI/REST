@@ -15,6 +15,11 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +39,8 @@ import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.UserService;
+
+
 
 @RestController
 @RequestMapping("api/auth/")
@@ -65,12 +72,17 @@ public class AuthController {
      * @return verification code send to email address
      */
     @PostMapping("signup")
+    @Operation(summary="Create an account",description = "User can create an account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully registered and API sends back code that it sends yo user's email",content = @Content(
+                                                            schema = @Schema(implementation = CodeResponse.class))),
+            @ApiResponse(responseCode = "409", description = "Email is already taken", content = @Content(
+                                                            schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity registerUser(@RequestBody SignupRequest userSignupInfo){
 
         if(userService.existsByEmail(userSignupInfo.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new SimpleResponse(String.format("User with login %s or %s email already exists", userSignupInfo.getUsername(),
-                            userSignupInfo.getEmail())));
+                    .body(new SimpleResponse(String.format("User with email already exists", userSignupInfo.getEmail())));
         }
 
         // create User
@@ -100,11 +112,17 @@ public class AuthController {
      * @return JWT token and role
      */
     @PostMapping("signin")
+    @Operation(summary="Sigin",description = "User can login.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User successfully login and API sends back JWT Token and role", content = @Content(
+                                                                                            schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist", content = @Content(
+                                                                                            schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity authenticateUser(@RequestBody LoginRequest loginRequest){
 
         if (!userService.existsByEmail(loginRequest.getEmail())) {
             return new ResponseEntity<>(
-                    new SimpleResponse(String.format("User with email %s doesn't exists", loginRequest.getEmail())), HttpStatus.UNAUTHORIZED);
+                    new SimpleResponse(String.format("User with email %s doesn't exist", loginRequest.getEmail())), HttpStatus.BAD_REQUEST);
        }
 //        else if(!userService.findByEmail(loginRequest.getEmail()).isActive()){
 //            return new ResponseEntity<>(
@@ -116,18 +134,6 @@ public class AuthController {
         return controllerUtils.generateJwtToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
-    /**
-     * Generate and send code to the email
-     * @param email
-     * @return generated code
-     */
-    @GetMapping("/code")
-    public ResponseEntity<CodeResponse> generateCodeToEmail(@RequestParam("email") String email){
-        int code = controllerUtils.generateCode(1000, 8999);
-        mailSenderService.send(new MailParams(code, email));
-        log.info("For user with email ["+email+"] was generated code ["+code+"] to confirm email");
-        return ResponseEntity.ok(new CodeResponse(code));
-    }
 
 
     /**
@@ -135,7 +141,19 @@ public class AuthController {
      * @return jwt token and role
      */
     @PostMapping("/group")
-    public ResponseEntity<JwtResponse> createGroup(@RequestBody EmailPasswordRequest emailRequest){
+    @Operation(summary="Create new group",description = "User can create his own group and he will have ROLE_ADMIN ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "API sends back JWT Token and role",  content = @Content(
+                                                                    schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
+                                                                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailRequest){
+
+        if (!userService.existsByEmail(emailRequest.getEmail())) {
+            return new ResponseEntity(
+                    new SimpleResponse(String.format("User with email %s doesn't exist", emailRequest.getEmail())), HttpStatus.BAD_REQUEST);
+        }
+
         groupService.createGroupAndAddAdmin(emailRequest.getEmail());
 
         return controllerUtils.generateJwtToken(emailRequest.getEmail(), emailRequest.getPassword());

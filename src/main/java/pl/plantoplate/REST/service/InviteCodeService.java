@@ -63,10 +63,12 @@ public class InviteCodeService {
                     inviteCodeRepository.delete(code);
 
                     log.info("User with email ["+userEmail+"] use invite Code ["+inviteCode+"] and join group with id ["+group.getId()+"]");
-                }
+                    return;
 
-                log.info("User with email ["+userEmail+"] try to use invite Code ["+inviteCode+"] but it isn't expired");
-                return;
+                }else{
+                    log.info("User with email ["+userEmail+"] try to use invite Code ["+inviteCode+"] but it is expired");
+                    throw new WrongInviteCode(Integer.toString(inviteCode));
+                }
             }
 
             log.info("User with email ["+userEmail+"] try to use invite Code ["+inviteCode+"] but it isn't valid");

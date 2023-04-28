@@ -15,15 +15,22 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
-import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Request.AddToGroupByInviteCodeRequest;
+import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.Role;
@@ -31,9 +38,13 @@ import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
-@RequestMapping("invite_code")
+@RequestMapping("api/invite-codes")
 @Slf4j
 public class InviteCodeController {
 
@@ -57,11 +68,23 @@ public class InviteCodeController {
      * @return JWT token
      */
     @PostMapping()
+    @Operation(summary="Join group",description = "User can join group by invite code ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "API sends back JWT Token and role",  content = @Content(
+                                schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invite code is wrong or user with this email doesn't exist",  content = @Content(
+                                schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity addUserToGroupByInviteCode(@RequestBody AddToGroupByInviteCodeRequest addToGroupByInviteCodeRequest){
+
+        if(!userService.existsByEmail(addToGroupByInviteCodeRequest.getEmail())){
+            return new ResponseEntity(
+                    new SimpleResponse(String.format("User with email %s doesn't exist", addToGroupByInviteCodeRequest.getEmail())), HttpStatus.BAD_REQUEST);
+        }
+
         try {
             inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
         }catch (WrongInviteCode e){
-            return ResponseEntity.badRequest().body(new SimpleResponse("Invite code is wrong"));
+            return ResponseEntity.badRequest().body(new SimpleResponse("Invite code is wrong or expired"));
         }
 
         return controllerUtils.generateJwtToken(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getPassword());
@@ -75,7 +98,20 @@ public class InviteCodeController {
      */
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CodeResponse> generateInviteCode(@RequestParam("role") String role){
+    @Operation(summary="Generate code to invite new user as ADMIN or USER",description = "User with role ADMIN can invite user to his group by invite code. Invite code has expiration time ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "API sends back invite code",  content = @Content(
+                            schema = @Schema(implementation = CodeResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Role value is wrong",  content = @Content(
+                            schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity generateInviteCode(@RequestParam("role") @Parameter(schema = @Schema(description = "role",type = "string", allowableValues = {"USER", "ROLE"})) String role){
+
+        List<String> availableRoles = Arrays.stream(Role.values()).map(Enum::name).collect(Collectors.toList());
+
+        if(!availableRoles.contains("ROLE_" + role)){
+            return ResponseEntity.badRequest().body(new SimpleResponse("Role value is wrong. Available roles : ADMIN, USER"));
+        }
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         int generateCode = controllerUtils.generateCode(100000, 899999);
