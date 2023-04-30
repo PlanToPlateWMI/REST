@@ -35,6 +35,7 @@ import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.GroupService;
@@ -124,10 +125,6 @@ public class AuthController {
             return new ResponseEntity<>(
                     new SimpleResponse(String.format("User with email %s doesn't exist", loginRequest.getEmail())), HttpStatus.BAD_REQUEST);
        }
-//        else if(!userService.findByEmail(loginRequest.getEmail()).isActive()){
-//            return new ResponseEntity<>(
-//                    new SimpleResponse(String.format("User with email %s has not activated account", loginRequest.getEmail())), HttpStatus.UNAUTHORIZED);
-//        }
 
         log.info("User with email [ " + loginRequest.getEmail() +"] try to signin");
 
@@ -149,12 +146,12 @@ public class AuthController {
                                                                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailRequest){
 
-        if (!userService.existsByEmail(emailRequest.getEmail())) {
+        try {
+            groupService.createGroupAndAddAdmin(emailRequest.getEmail());
+        }catch (UserNotFound e){
             return new ResponseEntity(
-                    new SimpleResponse(String.format("User with email %s doesn't exist", emailRequest.getEmail())), HttpStatus.BAD_REQUEST);
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-
-        groupService.createGroupAndAddAdmin(emailRequest.getEmail());
 
         return controllerUtils.generateJwtToken(emailRequest.getEmail(), emailRequest.getPassword());
     }

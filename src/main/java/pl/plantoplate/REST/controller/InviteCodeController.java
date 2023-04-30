@@ -34,6 +34,8 @@ import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.Role;
+import pl.plantoplate.REST.exception.GroupNotFound;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
@@ -83,7 +85,7 @@ public class InviteCodeController {
 
         try {
             inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
-        }catch (WrongInviteCode e){
+        }catch (WrongInviteCode | UserNotFound e){
             return ResponseEntity.badRequest().body(new SimpleResponse("Invite code is wrong or expired"));
         }
 
@@ -115,9 +117,19 @@ public class InviteCodeController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         int generateCode = controllerUtils.generateCode(100000, 899999);
-        long groupId = userService.findByEmail(email).getUserGroup().getId();
+        long groupId = 0;
 
-        inviteCodeService.saveCode(generateCode, groupId, Role.valueOf("ROLE_" + role));
+        try {
+            groupId = userService.findByEmail(email).getUserGroup().getId();
+        }catch (UserNotFound e){
+            return ResponseEntity.badRequest().body(new SimpleResponse(e.getMessage()));
+        }
+
+        try {
+            inviteCodeService.saveCode(generateCode, groupId, Role.valueOf("ROLE_" + role));
+        }catch (GroupNotFound e){
+            return ResponseEntity.badRequest().body(new SimpleResponse(e.getMessage()));
+        }
 
         return ResponseEntity.ok(new CodeResponse(generateCode));
     }

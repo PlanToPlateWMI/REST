@@ -22,6 +22,8 @@ import pl.plantoplate.REST.entity.Group;
 import pl.plantoplate.REST.entity.InviteCode;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.exception.GroupNotFound;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
@@ -48,7 +50,7 @@ public class InviteCodeService {
      * @param userEmail
      * @param inviteCode
      */
-    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) throws WrongInviteCode {
+    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) throws WrongInviteCode, UserNotFound {
             if(inviteCodeRepository.existsByCode(inviteCode)){
                 InviteCode code = inviteCodeRepository.getByCode(inviteCode);
 
@@ -72,6 +74,7 @@ public class InviteCodeService {
             }
 
             log.info("User with email ["+userEmail+"] try to use invite Code ["+inviteCode+"] but it isn't valid");
+
             throw new WrongInviteCode(Integer.toString(inviteCode));
 
     }
@@ -82,8 +85,10 @@ public class InviteCodeService {
      * @param groupId
      * @param role
      */
-    public void saveCode(int code, long groupId, Role role) {
+    public void saveCode(int code, long groupId, Role role) throws GroupNotFound {
+
         Group group = groupService.findById(groupId);
+
         LocalTime time = LocalTime.now().plusMinutes(30);
         InviteCode inviteCode = new InviteCode(code, group, role, time);
         inviteCodeRepository.save(inviteCode);

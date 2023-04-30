@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Hidden
 @RestController
-@RequestMapping("/test")
+@RequestMapping("api/test")
 public class TestController {
 
     /**
@@ -49,6 +49,11 @@ public class TestController {
     public ResponseEntity testJwtTokenAdmin(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(email);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity all(){
+        return ResponseEntity.ok("OK");
     }
 
 }

@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.Group;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.exception.GroupNotFound;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 
@@ -39,31 +41,29 @@ public class GroupService {
         this.userRepository = userRepository;
     }
 
-
-    // TODO create custom Exception
     /**
      * Create new group and add user as admin to this group
      * @param email
      */
-    public void createGroupAndAddAdmin(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException());
-        user.setRole(Role.ROLE_ADMIN);
+    public void createGroupAndAddAdmin(String email) throws UserNotFound {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ " + email + "] wasn't found"));
         user.setActive(true);
 
         if(user.getUserGroup() == null) {
+            user.setRole(Role.ROLE_ADMIN);
             Group group = new Group();
             group.addUser(user);
             Group savedGroup = groupRepository.save(group);
 
-            log.info("User with email [" + email + "] created group with id [" + savedGroup.getId() + "]");
+            log.info("User with email [" + email + "] created new group");
         }
 
 
     }
 
-    // TODO create custom Exception
+
     @Transactional(readOnly = true)
-    public Group findById(long id){
-        return groupRepository.findById(id).orElseThrow(() -> new RuntimeException());
+    public Group findById(long id) throws GroupNotFound {
+        return groupRepository.findById(id).orElseThrow(() -> new GroupNotFound("Group with id [" +id + "] not found"));
     }
 }

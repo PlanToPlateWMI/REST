@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 
 @Service
@@ -41,9 +42,9 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    // TODO create custom Exception
+
     @Transactional(readOnly = true)
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException());
+    public User findByEmail(String email) throws UserNotFound {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ "  + email + " ] not found"));
     }
 }
