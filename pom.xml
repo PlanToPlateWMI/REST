@@ -34,7 +34,7 @@
 		</dependency>
 
 
-						<!-- Swagger UI -->
+							<!-- Swagger UI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
@@ -116,6 +116,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.0.204</version>
 			<scope>test</scope>
 		</dependency>
 

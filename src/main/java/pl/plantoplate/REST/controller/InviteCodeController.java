@@ -28,7 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
+import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.dto.Request.AddToGroupByInviteCodeRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
@@ -53,10 +53,10 @@ public class InviteCodeController {
 
     private final InviteCodeService inviteCodeService;
     private final UserService userService;
-    private final ControllerJwtUtils controllerUtils;
+    private final ControllerUtils controllerUtils;
 
     @Autowired
-    public InviteCodeController(InviteCodeService inviteCodeService, UserService userService, ControllerJwtUtils controllerUtils) {
+    public InviteCodeController(InviteCodeService inviteCodeService, UserService userService, ControllerUtils controllerUtils) {
         this.inviteCodeService = inviteCodeService;
         this.userService = userService;
         this.controllerUtils = controllerUtils;
@@ -104,9 +104,9 @@ public class InviteCodeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API sends back invite code",  content = @Content(
                             schema = @Schema(implementation = CodeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Role value is wrong",  content = @Content(
+            @ApiResponse(responseCode = "400", description = "Role value is wrong or group of user not found",  content = @Content(
                             schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity generateInviteCode(@RequestParam("role") @Parameter(schema = @Schema(description = "role",type = "string", allowableValues = {"USER", "ROLE"})) String role){
+    public ResponseEntity generateInviteCode(@RequestParam("role") @Parameter(schema = @Schema(description = "role",type = "string", allowableValues = {"USER", "ADMIN"})) String role){
 
         List<String> availableRoles = Arrays.stream(Role.values()).map(Enum::name).collect(Collectors.toList());
 

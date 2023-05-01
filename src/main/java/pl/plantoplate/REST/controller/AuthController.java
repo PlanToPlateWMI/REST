@@ -20,14 +20,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
-import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
+import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.dto.Request.LoginRequest;
 import pl.plantoplate.REST.dto.Request.SignupRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
@@ -49,14 +49,14 @@ import pl.plantoplate.REST.service.UserService;
 public class AuthController {
 
 
-    private final ControllerJwtUtils controllerUtils;
+    private final ControllerUtils controllerUtils;
     private final UserService userService;
     private final GroupService groupService;
     private final PasswordEncoder encoder;
     private final MailSenderService mailSenderService;
 
     @Autowired
-    public AuthController(ControllerJwtUtils controllerUtils, UserService userService, GroupService groupService, PasswordEncoder encoder, MailSenderService mailSenderService) {
+    public AuthController(ControllerUtils controllerUtils, UserService userService, GroupService groupService, PasswordEncoder encoder, MailSenderService mailSenderService) {
         this.controllerUtils = controllerUtils;
         this.userService = userService;
         this.groupService = groupService;
@@ -97,7 +97,7 @@ public class AuthController {
         userService.save(user);
 
         //generate code and send it to user's email address
-        int code = controllerUtils.generateCode(1000, 8999);
+        int code = ControllerUtils.generateCode(1000, 8999);
         mailSenderService.send(new MailParams(code, userSignupInfo.getEmail()));
 
         log.info("User with email [ " + userSignupInfo.getEmail() +"] started registration");
@@ -106,7 +106,6 @@ public class AuthController {
     }
 
 
-    // TODO exception what user with this email doesn't exists and password is wrong
     /**
      * Generate JWT token by user email and password
      * @param loginRequest
@@ -144,16 +143,16 @@ public class AuthController {
                                                                     schema = @Schema(implementation = JwtResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                                                                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailRequest){
+    public ResponseEntity createGroup(@RequestBody LoginRequest loginRequest){
 
         try {
-            groupService.createGroupAndAddAdmin(emailRequest.getEmail());
+            groupService.createGroupAndAddAdmin(loginRequest.getEmail());
         }catch (UserNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        return controllerUtils.generateJwtToken(emailRequest.getEmail(), emailRequest.getPassword());
+        return controllerUtils.generateJwtToken(loginRequest.getEmail(), loginRequest.getPassword());
     }
 
 

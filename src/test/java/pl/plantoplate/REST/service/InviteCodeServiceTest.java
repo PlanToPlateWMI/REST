@@ -83,7 +83,7 @@ public class InviteCodeServiceTest {
     }
 
     @Test
-    @DisplayName("throws exception if code s expired")
+    @DisplayName("throws exception if code is expired")
     void shouldThrowExceptionIfInviteIsExpired(){
         //given
         int code = 1111;

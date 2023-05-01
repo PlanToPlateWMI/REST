@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.plantoplate.REST.controller.utils.ControllerJwtUtils;
+import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.mail.MailParams;
@@ -68,7 +68,7 @@ public class MailController {
                     new SimpleResponse(String.format("User with email %s doesn't exist", email)), HttpStatus.BAD_REQUEST);
         }
 
-        int code = ControllerJwtUtils.generateCode(1000, 8999);
+        int code = ControllerUtils.generateCode(1000, 8999);
         mailSenderService.send(new MailParams(code, email));
         log.info("For user with email ["+email+"] was generated code ["+code+"] to confirm email");
         return ResponseEntity.ok(new CodeResponse(code));

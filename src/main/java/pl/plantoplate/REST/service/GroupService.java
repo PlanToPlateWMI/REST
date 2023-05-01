@@ -53,7 +53,7 @@ public class GroupService {
             user.setRole(Role.ROLE_ADMIN);
             Group group = new Group();
             group.addUser(user);
-            Group savedGroup = groupRepository.save(group);
+            groupRepository.save(group);
 
             log.info("User with email [" + email + "] created new group");
         }

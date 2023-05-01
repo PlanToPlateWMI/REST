@@ -30,13 +30,13 @@ import pl.plantoplate.REST.security.UserDetailsImpl;
 import java.util.Random;
 
 @Component
-public class ControllerJwtUtils {
+public class ControllerUtils {
 
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public ControllerJwtUtils(JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
+    public ControllerUtils(JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
     }
