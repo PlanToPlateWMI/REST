@@ -17,12 +17,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Request.LoginRequest;
+import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.SignupRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.entity.Role;
 import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -154,7 +155,7 @@ public class AuthControllerTest {
         String password = "password";
         String username = "username";
         when(userService.existsByEmail(email)).thenReturn(true);
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
         User user = new User(username, encoder.encode(password), email);
         user.setActive(true);
@@ -164,7 +165,7 @@ public class AuthControllerTest {
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signin")
-                .content(mapper.writeValueAsString(loginRequest))
+                .content(mapper.writeValueAsString(emailPasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -186,7 +187,7 @@ public class AuthControllerTest {
         String password = "password";
         String username = "username";
         when(userService.existsByEmail(email)).thenReturn(true);
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
         User user = new User(username, encoder.encode(password), email);
         user.setActive(false); // user is not active
@@ -195,7 +196,7 @@ public class AuthControllerTest {
 
         //when, then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signin")
-                .content(mapper.writeValueAsString(loginRequest))
+                .content(mapper.writeValueAsString(emailPasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -211,12 +212,12 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String password = "password";
         when(userService.existsByEmail(email)).thenReturn(false);
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
 
         //when, then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signin")
-                .content(mapper.writeValueAsString(loginRequest))
+                .content(mapper.writeValueAsString(emailPasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -232,7 +233,7 @@ public class AuthControllerTest {
         String password = "password";
         String username = "username";
         when(userService.existsByEmail(email)).thenReturn(true);
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
         User user = new User(username, encoder.encode(password), email);
         user.setActive(true);
@@ -242,7 +243,7 @@ public class AuthControllerTest {
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/group")
-                .content(mapper.writeValueAsString(loginRequest))
+                .content(mapper.writeValueAsString(emailPasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -264,15 +265,62 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String password = "password";
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/group")
-                .content(mapper.writeValueAsString(loginRequest))
+                .content(mapper.writeValueAsString(emailPasswordRequest))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    @DisplayName("BadRequest if user with email not exists")
+    void shouldReturnBadRequestIfUserWithEmailNotExist() throws Exception{
+
+        //get
+        String email = "test@gmail.com";
+        String password = "password";
+
+        doThrow(UserNotFound.class).when(userService).resetPassword(anyString(), anyString());
+
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
+
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/password/reset")
+                .content(mapper.writeValueAsString(emailPasswordRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @DisplayName("Update password")
+    void shouldUpdatePassword() throws Exception{
+        //get
+        String email = "test@gmail.com";
+        String password = "password";
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
+
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/password/reset")
+                .content(mapper.writeValueAsString(emailPasswordRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(userService).resetPassword(anyString(), anyString());
+
+    }
+
+
+
 
 }

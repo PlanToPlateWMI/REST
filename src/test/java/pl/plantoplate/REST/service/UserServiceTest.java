@@ -84,4 +84,28 @@ public class UserServiceTest {
         //then
         assertTrue(e.getMessage().contains(email));
     }
+
+
+    @Test
+    @DisplayName("Should update password")
+    void shouldUpdatePassword() throws UserNotFound {
+        //given
+        String email = "test@gmail.com";
+        String newPassword = "new";
+        String oldPassword = "old";
+
+        User user = new User();
+        user.setPassword(oldPassword);
+        user.setEmail(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+
+
+        //when
+        userService.resetPassword(email, newPassword);
+
+        //then
+        assertEquals(user.getPassword(), newPassword);
+
+    }
 }

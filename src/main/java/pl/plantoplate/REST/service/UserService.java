@@ -47,4 +47,11 @@ public class UserService {
     public User findByEmail(String email) throws UserNotFound {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ "  + email + " ] not found"));
     }
+
+    public void resetPassword(String email, String newPassword) throws UserNotFound {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ "  + email + " ] not found"));
+        user.setPassword(newPassword);
+        userRepository.save(user);
+
+    }
 }

@@ -22,7 +22,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class LoginRequest {
+public class EmailPasswordRequest {
 
     private String email;
     private String password;

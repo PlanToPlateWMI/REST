@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.dto.Request.LoginRequest;
+import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.SignupRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
@@ -108,7 +107,7 @@ public class AuthController {
 
     /**
      * Generate JWT token by user email and password
-     * @param loginRequest
+     * @param emailPasswordRequest
      * @return JWT token and role
      */
     @PostMapping("signin")
@@ -118,16 +117,16 @@ public class AuthController {
                                                                                             schema = @Schema(implementation = JwtResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist", content = @Content(
                                                                                             schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity authenticateUser(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity authenticateUser(@RequestBody EmailPasswordRequest emailPasswordRequest){
 
-        if (!userService.existsByEmail(loginRequest.getEmail())) {
+        if (!userService.existsByEmail(emailPasswordRequest.getEmail())) {
             return new ResponseEntity<>(
-                    new SimpleResponse(String.format("User with email %s doesn't exist", loginRequest.getEmail())), HttpStatus.BAD_REQUEST);
+                    new SimpleResponse(String.format("User with email %s doesn't exist", emailPasswordRequest.getEmail())), HttpStatus.BAD_REQUEST);
        }
 
-        log.info("User with email [ " + loginRequest.getEmail() +"] try to signin");
+        log.info("User with email [ " + emailPasswordRequest.getEmail() +"] try to signin");
 
-        return controllerUtils.generateJwtToken(loginRequest.getEmail(), loginRequest.getPassword());
+        return controllerUtils.generateJwtToken(emailPasswordRequest.getEmail(), emailPasswordRequest.getPassword());
     }
 
 
@@ -143,17 +142,46 @@ public class AuthController {
                                                                     schema = @Schema(implementation = JwtResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                                                                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity createGroup(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailPasswordRequest){
 
         try {
-            groupService.createGroupAndAddAdmin(loginRequest.getEmail());
+            groupService.createGroupAndAddAdmin(emailPasswordRequest.getEmail());
         }catch (UserNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        return controllerUtils.generateJwtToken(loginRequest.getEmail(), loginRequest.getPassword());
+        return controllerUtils.generateJwtToken(emailPasswordRequest.getEmail(), emailPasswordRequest.getPassword());
     }
+
+    /**
+     * Send email and new password and user's password with this email updated
+     * @param emailPasswordRequest
+     * @return
+     */
+    @PostMapping("/password/reset")
+    @Operation(summary="Reset password",description = "User can reset password if doesn't remember his password ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "API update password",  content = @Content(
+                    schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity resetPassword(@RequestBody EmailPasswordRequest emailPasswordRequest){
+
+        String encodedPassword = encoder.encode(emailPasswordRequest.getPassword());
+
+        log.info("User with email [" + emailPasswordRequest.getPassword() + "] try to reset password");
+
+        try{
+            userService.resetPassword(emailPasswordRequest.getEmail(), encodedPassword);
+        }catch (UserNotFound e){
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok("Password was successfully updated");
+    }
+
 
 
 }
