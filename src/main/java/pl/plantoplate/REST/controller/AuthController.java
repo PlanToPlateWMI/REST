@@ -179,7 +179,7 @@ public class AuthController {
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity.ok("Password was successfully updated");
+        return ResponseEntity.ok(new SimpleResponse("Password was successfully updated"));
     }
 
 
