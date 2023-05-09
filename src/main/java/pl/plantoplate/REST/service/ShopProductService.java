@@ -1,6 +1,7 @@
 package pl.plantoplate.REST.service;
 
 import org.springframework.stereotype.Service;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
 import pl.plantoplate.REST.repository.ShopProductGroupRepository;
 

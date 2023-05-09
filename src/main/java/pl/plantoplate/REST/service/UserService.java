@@ -18,6 +18,7 @@ package pl.plantoplate.REST.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -53,5 +54,10 @@ public class UserService {
         user.setPassword(newPassword);
         userRepository.save(user);
 
+    }
+
+
+    public Group findGroupOfUser(String email) throws UserNotFound {
+        return this.findByEmail(email).getUserGroup();
     }
 }
