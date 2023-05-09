@@ -20,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
 
 @Component

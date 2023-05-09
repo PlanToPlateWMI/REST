@@ -33,7 +33,7 @@ import pl.plantoplate.REST.dto.Request.AddToGroupByInviteCodeRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.entity.Role;
+import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.exception.GroupNotFound;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;

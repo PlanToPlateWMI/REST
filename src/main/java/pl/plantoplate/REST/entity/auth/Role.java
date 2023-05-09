@@ -1,4 +1,4 @@
-package pl.plantoplate.REST.entity;
+package pl.plantoplate.REST.entity.auth;
 
 public enum Role {
     ROLE_USER,

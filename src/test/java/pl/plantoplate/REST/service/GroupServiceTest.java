@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import pl.plantoplate.REST.entity.Group;
-import pl.plantoplate.REST.entity.Role;
-import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.auth.Role;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.GroupNotFound;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
@@ -77,7 +77,6 @@ public class GroupServiceTest {
         Group userGroup = groupArgumentCaptor.getValue();
 
         assertTrue(userGroup.getUsers().contains(user));
-
     }
 
 

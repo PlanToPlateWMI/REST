@@ -13,55 +13,62 @@ express or implied. See the License for the specific language
 governing permissions and limitations under the License.
  */
 
-package pl.plantoplate.REST.entity;
+package pl.plantoplate.REST.entity.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.auth.Role;
 
 import javax.persistence.*;
-import java.time.LocalTime;
 
 @Entity
-@Table(name = "invite_code")
+@Table(name = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InviteCode {
+public class User {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private int code;
+    private String username;
+
+    @Column(unique = true)
+    private String email;
 
     @Enumerated(EnumType.STRING)
+    @Column
     private Role role;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "group_id")
-    private Group group;
+    private Group userGroup;
 
-    @Column(name = "expired_time", columnDefinition = "varchar(8)")
-    private LocalTime expiredTime;
+    @Column
+    private String password;
 
-    public InviteCode(int code, Group group, Role role, LocalTime expiredTime) {
-        this.code = code;
-        this.group = group;
-        this.role = role;
-        this.expiredTime = expiredTime;
+    @Column(name = "is_active")
+    private boolean isActive;
+
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
     }
-
 
     @Override
     public String toString() {
-        return "InviteCode{" +
+        return "User{" +
                 "id=" + id +
-                ", code=" + code +
-                ", group=" + group +
+                ", role=" + role +
+                ", group=" + userGroup +
+                ", password='" + password + '\'' +
                 '}';
     }
 }

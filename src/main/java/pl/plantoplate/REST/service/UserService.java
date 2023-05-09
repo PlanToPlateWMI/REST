@@ -18,7 +18,7 @@ package pl.plantoplate.REST.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 

@@ -3,7 +3,7 @@ package pl.plantoplate.REST.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 

@@ -14,12 +14,13 @@ governing permissions and limitations under the License.
  */
 
 
-package pl.plantoplate.REST.entity;
+package pl.plantoplate.REST.entity.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

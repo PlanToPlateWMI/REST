@@ -13,7 +13,7 @@ express or implied. See the License for the specific language
 governing permissions and limitations under the License.
  */
 
-package pl.plantoplate.REST.entity;
+package pl.plantoplate.REST.entity.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,52 +21,47 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "app_user")
+@Table(name = "invite_code")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class InviteCode {
 
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
 
     @Column
-    private String username;
-
-    @Column(unique = true)
-    private String email;
+    private int code;
 
     @Enumerated(EnumType.STRING)
-    @Column
     private Role role;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "group_id")
-    private Group userGroup;
+    private Group group;
 
-    @Column
-    private String password;
+    @Column(name = "expired_time", columnDefinition = "varchar(8)")
+    private LocalTime expiredTime;
 
-    @Column(name = "is_active")
-    private boolean isActive;
-
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public InviteCode(int code, Group group, Role role, LocalTime expiredTime) {
+        this.code = code;
+        this.group = group;
+        this.role = role;
+        this.expiredTime = expiredTime;
     }
+
 
     @Override
     public String toString() {
-        return "User{" +
+        return "InviteCode{" +
                 "id=" + id +
-                ", role=" + role +
-                ", group=" + userGroup +
-                ", password='" + password + '\'' +
+                ", code=" + code +
+                ", group=" + group +
                 '}';
     }
 }

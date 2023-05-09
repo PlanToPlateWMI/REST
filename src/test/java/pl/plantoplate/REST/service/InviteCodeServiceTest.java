@@ -1,15 +1,13 @@
 package pl.plantoplate.REST.service;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import pl.plantoplate.REST.entity.Group;
-import pl.plantoplate.REST.entity.InviteCode;
-import pl.plantoplate.REST.entity.Role;
-import pl.plantoplate.REST.entity.User;
+import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.auth.InviteCode;
+import pl.plantoplate.REST.entity.auth.Role;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.GroupNotFound;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
