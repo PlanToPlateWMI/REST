@@ -1,5 +1,7 @@
 INSERT INTO user_group VALUES (1);
 
+SELECT setval('user_group_id_seq', 1, true);
+
 INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
 ('marianamariana1509@gmail.com', 'maryana', '$2a$12$6C3AdGX37TU14oycAAfegOEUKhVpVYZkD5lL4yG4Ke8D2dlIpmxQ.',
  'ROLE_ADMIN', 1, true);
@@ -26,29 +28,28 @@ INSERT INTO category (category) VALUES
 
 
 
-INSERT INTO product (name, category_id, group_id) VALUES
-('Mleko', 2, 1),
-('Jogurt', 2, 1),
-('Kefir', 2, 1),
-('Maślanka', 2, 1),
-('Śmietanka', 2, 1),
-('Śmietana', 2, 1),
-('Ser', 2, 1),
+INSERT INTO product (name, category_id, group_created_id, unit) VALUES
+('Mleko', 2, 1, 'L'),
+('Jogurt', 2, 1, 'L'),
+('Kefir', 2, 1, 'L'),
+('Maślanka', 2, 1, 'L'),
+('Śmietanka', 2, 1, 'G'),
+('Śmietana', 2, 1, 'L'),
+('Ser', 2, 1, 'G'),
 
-('Kajzerki', 3, 1),
-('Chleb żytni', 3, 1),
+('Kajzerki', 3, 1, 'SZTUKA'),
+('Chleb żytni', 3, 1, 'G'),
 
-('Pierś kurczaka', 4, 1),
-('Boczek', 4, 1),
-('Wędlina', 4, 1),
+('Pierś kurczaka', 4, 1, 'KG'),
+('Boczek', 4, 1, 'KG'),
+('Wędlina', 4, 1, 'KG'),
 
-('Banan', 5, 1),
-('Jabłko', 5, 1),
-('Pomarańcza', 5, 1),
+('Banan', 5, 1, 'SZTUKA'),
+('Jabłko', 5, 1, 'G'),
+('Pomarańcza', 5, 1, 'G');
 
-('Banan', 5, 1),
-('Jabłko', 5, 1),
-('Pomarańcza', 5, 1),
+
+INSERT INTO product (name, category_id, group_created_id) VALUES
 
 ('Ogórek', 6, 1),
 ('Pomidor', 6, 1),

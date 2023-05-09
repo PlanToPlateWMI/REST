@@ -22,6 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.entity.product.Category;
+import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.GroupNotFound;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
@@ -35,14 +39,25 @@ public class GroupService {
 
     private final UserRepository userRepository;
 
+    private final CategoryService categoryService;
+
+    private final ProductService productService;
+
+    private final ShopProductService shopProductService;
+
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, CategoryService categoryService, ProductService productService, ShopProductService shopProductService) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
+
+        this.categoryService = categoryService;
+        this.productService = productService;
+        this.shopProductService = shopProductService;
     }
 
     /**
-     * Create new group and add user as admin to this group
+     * Create new group and add user as admin to this group. Add custom product - "miód wielokwiatowy".
+     * Dodanie do ShopProductGroup 2 produkty.
      * @param email
      */
     public void createGroupAndAddAdmin(String email) throws UserNotFound {
@@ -51,9 +66,43 @@ public class GroupService {
 
         if(user.getUserGroup() == null) {
             user.setRole(Role.ROLE_ADMIN);
+
             Group group = new Group();
             group.addUser(user);
+
             groupRepository.save(group);
+
+            // create custom product for this new group
+            String categoryName = "Inne";
+            Category category = categoryService.findByName(categoryName);
+
+            Product customProduct = new Product();
+            customProduct.setName("Miód wielokwiatowy");
+            customProduct.setCategory(category);
+            customProduct.setUnit(Unit.G);
+            customProduct.setCreated_by(group);
+
+            productService.save(customProduct);
+
+            // add 2 products to shopping list of this group
+            String productName1 = "Mleko";
+            String productName2 = "Boczek";
+            Product product1 = productService.findByName(productName1);
+            Product product2 = productService.findByName(productName2);
+
+            ShopProductGroup shopProductGroup = new ShopProductGroup();
+            shopProductGroup.setProduct(product1);
+            shopProductGroup.setGroup(group);
+            shopProductGroup.setAmount(2);
+
+            shopProductService.save(shopProductGroup);
+
+            ShopProductGroup shopProductGroup2 = new ShopProductGroup();
+            shopProductGroup2.setProduct(product2);
+            shopProductGroup2.setGroup(group);
+            shopProductGroup2.setAmount(3);
+
+            shopProductService.save(shopProductGroup2);
 
             log.info("User with email [" + email + "] created new group");
         }

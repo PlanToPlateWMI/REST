@@ -23,12 +23,18 @@ public class GroupServiceTest {
     private GroupRepository groupRepository;
     private UserRepository userRepository;
     private GroupService groupService;
+    private CategoryService categoryService;
+    private ProductService productService;
+    private ShopProductService shopProductGroup;
 
     @BeforeEach
     void setUp(){
         groupRepository = mock(GroupRepository.class);
         userRepository = mock(UserRepository.class);
-        groupService = new GroupService(groupRepository, userRepository);
+        categoryService = mock(CategoryService.class);
+        productService = mock(ProductService.class);
+        shopProductGroup = mock(ShopProductService.class);
+        groupService = new GroupService(groupRepository, userRepository,categoryService, productService, shopProductGroup);
     }
 
 

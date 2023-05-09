@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
 
 import javax.persistence.*;
 
@@ -27,7 +28,11 @@ public class Product {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @JoinColumn(name = "group_created_id")
+    private Group created_by;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Unit unit;
 
 }
