@@ -80,9 +80,9 @@ alter table product
 
 
 alter table shop_product_group
-    add constraint group_owner_shop_productFK foreign key (id) references user_group;
+    add constraint group_owner_shop_productFK foreign key (group_owner_id) references user_group;
 
 alter table shop_product_group
-    add constraint product_shopFK foreign key (id) references product;
+    add constraint product_shopFK foreign key (product_id) references product;
 
 

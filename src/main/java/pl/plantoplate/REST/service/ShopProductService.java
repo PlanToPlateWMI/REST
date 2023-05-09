@@ -18,4 +18,5 @@ public class ShopProductService {
     public void save(ShopProductGroup shopProductGroup){
         shopProductGroupRepository.save(shopProductGroup);
     }
+
 }
