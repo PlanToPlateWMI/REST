@@ -46,48 +46,45 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 
 ('Banan', 5, 1, 'SZTUKA'),
 ('Jabłko', 5, 1, 'G'),
-('Pomarańcza', 5, 1, 'G');
+('Pomarańcza', 5, 1, 'G'),
+
+('Ogórek', 6, 1, 'KG'),
+('Pomidor', 6, 1, 'KG'),
+('Ziemniaki', 6, 1, 'KG'),
+('Marchew', 6, 1, 'KG'),
+('Cebula', 6, 1, 'KG'),
+
+('Mąka', 7, 1, 'KG'),
+('Ryż', 7, 1, 'KG'),
+('Owsianka', 7, 1, 'KG'),
+('Spaghetti', 7, 1, 'KG'),
 
 
-INSERT INTO product (name, category_id, group_created_id) VALUES
-
-('Ogórek', 6, 1),
-('Pomidor', 6, 1),
-('Ziemniaki', 6, 1),
-('Marchew', 6, 1),
-('Cebula', 6, 1),
-
-('Mąka', 7, 1),
-('Ryż', 7, 1),
-('Owsianka', 7, 1),
-('Spaghetti', 7, 1),
+('Dorsz', 8, 1, 'KG'),
+('Karp', 8, 1, 'KG'),
+('Łosoś', 8, 1, 'KG'),
+('Krewetki', 8, 1, 'KG'),
+('Ośmiornica', 8, 1, 'KG'),
 
 
-('Dorsz', 8, 1),
-('Karp', 8, 1),
-('Łosoś', 8, 1),
-('Krewetki', 8, 1),
-('Ośmiornica', 8, 1),
+('Pieprz czerwony mielony', 9, 1, 'G'),
+('Sól', 9, 1, 'KG'),
+('Papryka ostra melona', 9, 1, 'G'),
+('Papryka słodka melona', 9, 1, 'G'),
+('Cukier', 9, 1, 'KG'),
 
 
-('Pieprz czerwony mielony', 9, 1),
-('Sól', 9, 1),
-('Papryka ostra melona', 9, 1),
-('Papryka słodka melona', 9, 1),
-('Cukier', 9, 1),
+('Orzechy włoskie', 10, 1, 'G'),
+('Nerkowiec', 10, 1, 'G'),
+('Orzechy ziemne', 10, 1, 'G'),
+('Rodzynki', 10, 1, 'G'),
+('Morele suszone', 10, 1, 'G'),
 
-
-('Orzechy włoskie', 10, 1),
-('Nerkowiec', 10, 1),
-('Orzechy ziemne', 10, 1),
-('Rodzynki', 10, 1),
-('Morele suszone', 10, 1),
-
-('Woda niegazowana', 11, 1),
-('Woda gazowana', 11, 1),
-('Sok pomarańczowy', 11, 1),
-('Piwo ciemne', 11, 1),
-('Piwo jasne', 11, 1);
+('Woda niegazowana', 11, 1, 'L'),
+('Woda gazowana', 11, 1, 'L'),
+('Sok pomarańczowy', 11, 1, 'L'),
+('Piwo ciemne', 11, 1, 'L'),
+('Piwo jasne', 11, 1, 'L');
 
 
 -- miód wielokwiatowy
