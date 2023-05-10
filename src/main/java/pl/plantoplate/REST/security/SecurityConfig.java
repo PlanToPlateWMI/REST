@@ -82,7 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/api/auth/**", "/invite_code", "api/test/all").permitAll();
+                .antMatchers("/api/auth/**", "/invite_code", "api/test/all", "/api/mail/code").permitAll()
+                        .and()
+                .authorizeRequests().anyRequest().authenticated();
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }

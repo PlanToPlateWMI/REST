@@ -10,8 +10,8 @@ import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
 @ToString
 public class ShoppingProductDto {
 
-    private String product;
     private Long id;
+    private String product;
     private int amount;
     private String unit;
 
@@ -22,4 +22,5 @@ public class ShoppingProductDto {
         this.amount = productGroup.getAmount();
         this.unit = productGroup.getProduct().getUnit().name();
     }
+
 }

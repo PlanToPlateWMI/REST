@@ -1,7 +1,20 @@
+/*
+Copyright 2023 the original author or authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You
+may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ */
 package pl.plantoplate.REST.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,8 +26,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.plantoplate.REST.dto.Response.BaseOfProductsDto;
-import pl.plantoplate.REST.dto.Response.ProductDto;
-import pl.plantoplate.REST.dto.Response.ShoppingProductDto;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
@@ -22,7 +33,6 @@ import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -61,18 +71,7 @@ public class ProductController {
         List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
         List<Product> generalProducts = productService.getProductsOfGroup(1L);
 
-        List<ProductDto> productsOfGroupDto = new ArrayList<>();
-        List<ProductDto> generalProductsDto = new ArrayList<>();
-
-        for(Product p:productsOfGroup){
-            productsOfGroupDto.add(new ProductDto(p));
-        }
-
-        for(Product p:generalProducts){
-            generalProductsDto.add(new ProductDto(p));
-        }
-
-        BaseOfProductsDto baseOfProductsDto = new BaseOfProductsDto(generalProductsDto, productsOfGroupDto);
+        BaseOfProductsDto baseOfProductsDto = new BaseOfProductsDto(generalProducts, productsOfGroup);
 
         return new ResponseEntity(baseOfProductsDto, HttpStatus.OK);
 
