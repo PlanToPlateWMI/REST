@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/shopping")
-public class ShoppingListController {
+public class ShoppingListProductsController {
 
 
     private final ShopProductService shopProductService;
@@ -34,7 +34,7 @@ public class ShoppingListController {
 
 
     @Autowired
-    public ShoppingListController(ShopProductService shopProductService, UserService userService) {
+    public ShoppingListProductsController(ShopProductService shopProductService, UserService userService) {
         this.shopProductService = shopProductService;
         this.userService = userService;
     }

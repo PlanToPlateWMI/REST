@@ -37,12 +37,14 @@ public class BaseOfProductsDto {
     @AllArgsConstructor
     static class ProductDto {
 
+        private long id;
         private String name;
         private String unit;
 
         public ProductDto (Product product){
             this.name = product.getName();
             this.unit = product.getUnit().name();
+            this.id = product.getId();
         }
     }
 }

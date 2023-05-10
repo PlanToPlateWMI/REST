@@ -34,4 +34,7 @@ public class ShopProductService {
         shopProductGroupRepository.save(shopProductGroup);
     }
 
+    public void deleteProductByGroupIdAndProductId(Long productId, Long groupId) {
+        shopProductGroupRepository.deleteProductByGroupIdAndProductId(productId, groupId);
+    }
 }

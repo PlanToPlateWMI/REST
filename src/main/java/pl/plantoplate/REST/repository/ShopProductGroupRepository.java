@@ -13,6 +13,6 @@ public interface ShopProductGroupRepository extends JpaRepository<ShopProductGro
 
     @Modifying
     @Transactional
-    @Query(nativeQuery = true, value  = "INSERT INTO shop_product_group(product_id, group_owner_id, amount) VALUES (:product_id, :group_id, :amount)")
-    void mySafe(@Param("product_id")long productID,@Param("group_id") Long GroupId,@Param("amount") int amount);
+    @Query(nativeQuery = true, value  = "DELETE FROM shop_product_group WHERE product_id = :product_id and group_owner_id = :group_id")
+    void deleteProductByGroupIdAndProductId(@Param("product_id")long productID,@Param("group_id") Long GroupId);
 }

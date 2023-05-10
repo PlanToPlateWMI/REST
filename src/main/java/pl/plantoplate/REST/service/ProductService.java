@@ -15,21 +15,26 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.exception.DeleteGeneralProduct;
 import pl.plantoplate.REST.repository.ProductRepository;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ShopProductService shopProductService;
 
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ShopProductService shopProductService) {
         this.productRepository = productRepository;
+        this.shopProductService = shopProductService;
     }
 
     public void save(Product product){
@@ -46,7 +51,21 @@ public class ProductService {
     }
 
 
+    public void deleteById(Long productId, Long groupId) throws DeleteGeneralProduct {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
+
+        long groupCreatedById = product.getCreated_by().getId();
+
+        if(groupCreatedById == 1L || groupCreatedById != groupId ){
+
+            log.info("User try to delete general product or product not his group");
+            throw new DeleteGeneralProduct("User cannot delete general products or product not of his group");
+        }
 
 
+        shopProductService.deleteProductByGroupIdAndProductId(productId, groupId);
+        productRepository.deleteById(productId);
 
+        log.info("Product with id [" + productId + "] was deleted");
+    }
 }
