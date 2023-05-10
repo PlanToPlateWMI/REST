@@ -12,12 +12,12 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BaseOfProductsDto {
+public class BaseOfProductsResponse {
 
     private List<ProductDto> general;
     private List<ProductDto> group;
 
-    public BaseOfProductsDto(List<Product> general, List<Product> group){
+    public BaseOfProductsResponse(List<Product> general, List<Product> group){
 
         this.general = new ArrayList<>();
         this.group = new ArrayList<>();
@@ -39,12 +39,14 @@ public class BaseOfProductsDto {
 
         private long id;
         private String name;
+        private String category;
         private String unit;
 
         public ProductDto (Product product){
             this.name = product.getName();
             this.unit = product.getUnit().name();
             this.id = product.getId();
+            this.category = product.getCategory().getCategory();
         }
     }
 }

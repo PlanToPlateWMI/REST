@@ -26,6 +26,7 @@ import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
+import pl.plantoplate.REST.exception.CategoryNotFound;
 import pl.plantoplate.REST.exception.GroupNotFound;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
@@ -74,7 +75,12 @@ public class GroupService {
 
             // create custom product for this new group
             String categoryName = "Inne";
-            Category category = categoryService.findByName(categoryName);
+            Category category = null;
+            try {
+                category = categoryService.findByName(categoryName);
+            } catch (CategoryNotFound categoryNotFound) {
+                categoryNotFound.printStackTrace();
+            }
 
             Product customProduct = new Product();
             customProduct.setName("Miód wielokwiatowy");

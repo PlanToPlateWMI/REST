@@ -18,11 +18,18 @@ package pl.plantoplate.REST.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
+import pl.plantoplate.REST.exception.AddTheSameProduct;
+import pl.plantoplate.REST.exception.CategoryNotFound;
 import pl.plantoplate.REST.exception.DeleteGeneralProduct;
 import pl.plantoplate.REST.repository.ProductRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -30,11 +37,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ShopProductService shopProductService;
+    private final CategoryService categoryService;
 
 
-    public ProductService(ProductRepository productRepository, ShopProductService shopProductService) {
+    public ProductService(ProductRepository productRepository, ShopProductService shopProductService, CategoryService categoryService) {
         this.productRepository = productRepository;
         this.shopProductService = shopProductService;
+        this.categoryService = categoryService;
     }
 
     public void save(Product product){
@@ -67,5 +76,24 @@ public class ProductService {
         productRepository.deleteById(productId);
 
         log.info("Product with id [" + productId + "] was deleted");
+    }
+
+    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, CategoryNotFound {
+
+        List<Product> products = productRepository.findProductsByGroup(group.getId());
+        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
+        List<Product> allProduct = Stream.concat(products.stream(), productsGeneral.stream()).collect(Collectors.toList());
+
+        if(allProduct.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))){
+            throw new AddTheSameProduct("Product with name [" + name + "] and unit ["+unit + "] already exists.");
+        }
+
+        Category categoryOfProduct = categoryService.findByName(categoryName);
+        Product product = new Product(name, categoryOfProduct, group, Unit.valueOf(unit));
+
+        productRepository.save(product);
+
+        log.info("Product : [ " + name +" ] , [ " + categoryName +"] was saved.");
+
     }
 }

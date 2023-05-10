@@ -8,19 +8,21 @@ import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ShoppingProductDto {
+public class ShoppingProductResponse {
 
     private Long id;
     private String product;
+    private String category;
     private int amount;
     private String unit;
 
 
-    public ShoppingProductDto(ShopProductGroup productGroup){
+    public ShoppingProductResponse(ShopProductGroup productGroup){
         this.product = productGroup.getProduct().getName();
         this.id = productGroup.getId();
         this.amount = productGroup.getAmount();
         this.unit = productGroup.getProduct().getUnit().name();
+        this.category = productGroup.getProduct().getCategory().getCategory();
     }
 
 }

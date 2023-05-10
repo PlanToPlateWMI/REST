@@ -24,15 +24,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.Response.BaseOfProductsDto;
+import pl.plantoplate.REST.dto.Request.ProductRequest;
+import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
+import pl.plantoplate.REST.exception.AddTheSameProduct;
+import pl.plantoplate.REST.exception.CategoryNotFound;
 import pl.plantoplate.REST.exception.DeleteGeneralProduct;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -52,7 +57,7 @@ public class BaseProductsController {
     @Operation(summary="Get all products from base",description = "User can get list of all product in base - general and group custom products ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "2 lists of products - general and group products",  content = @Content(
-                    schema = @Schema(implementation = BaseOfProductsDto.class))),
+                    schema = @Schema(implementation = BaseOfProductsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<Object> getAllProduct(){
@@ -71,9 +76,45 @@ public class BaseProductsController {
         List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
         List<Product> generalProducts = productService.getProductsOfGroup(1L);
 
-        BaseOfProductsDto baseOfProductsDto = new BaseOfProductsDto(generalProducts, productsOfGroup);
+        BaseOfProductsResponse baseOfProductsResponse = new BaseOfProductsResponse(generalProducts, productsOfGroup);
 
-        return new ResponseEntity<Object>(baseOfProductsDto, HttpStatus.OK);
+        return new ResponseEntity<Object>(baseOfProductsResponse, HttpStatus.OK);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary="Add new product to group",description = "User with Role ADMIN can add new product to group")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product successfully added ",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class))),
+            @ApiResponse(responseCode = "400", description = "User try to add product what already exists (the same name and unit) or category or unit are not correct",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity addProductToGroup(@RequestBody ProductRequest productRequest){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Group group = null;
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity<>(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(productRequest.getUnit()))){
+            return new ResponseEntity<>(
+                    new SimpleResponse("Unit is not correct. Available units : " + Arrays.toString(Unit.values())), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            productService.save(productRequest.getName(), productRequest.getCategory(), productRequest.getUnit(), group);
+        } catch (AddTheSameProduct | CategoryNotFound e) {
+            return new ResponseEntity<>(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity(new SimpleResponse("Product was saved"), HttpStatus.OK);
+
     }
 
 

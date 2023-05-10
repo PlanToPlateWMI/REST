@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.plantoplate.REST.dto.Response.ShoppingProductDto;
+import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
@@ -44,7 +44,7 @@ public class ShoppingListProductsController {
     @Operation(summary="Get shopping products list",description = "User can get list of products he wants to buy ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products",  content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity shoppingListOfGroup(){
@@ -59,9 +59,9 @@ public class ShoppingListProductsController {
         }
 
         List<ShopProductGroup> productShopList = group.getShopProductList();
-        List<ShoppingProductDto> productDtoList = new ArrayList<>();
+        List<ShoppingProductResponse> productDtoList = new ArrayList<>();
         for(ShopProductGroup p: productShopList){
-            productDtoList.add(new ShoppingProductDto(p));
+            productDtoList.add(new ShoppingProductResponse(p));
         }
 
         System.out.println(productDtoList);

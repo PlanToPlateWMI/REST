@@ -50,4 +50,12 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Unit unit;
 
+
+    public Product(String name, Category category, Group created_by, Unit unit){
+        this.category = category;
+        this.created_by = created_by;
+        this.unit = unit;
+        this.name = name;
+    }
+
 }
