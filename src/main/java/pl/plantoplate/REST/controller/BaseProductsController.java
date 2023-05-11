@@ -25,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.dto.Request.ProductRequest;
+import pl.plantoplate.REST.dto.Request.UpdateProductRequest;
 import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
@@ -32,7 +33,7 @@ import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.CategoryNotFound;
-import pl.plantoplate.REST.exception.DeleteGeneralProduct;
+import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
@@ -81,6 +82,41 @@ public class BaseProductsController {
         return new ResponseEntity<Object>(baseOfProductsResponse, HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product successfully updated ",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class))),
+            @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
+                    " general product of product not of his group",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity updateProduct(@PathVariable long id, @RequestBody UpdateProductRequest updateProductRequest) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = null;
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity<>(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(updateProductRequest.getUnit())) && updateProductRequest.getUnit()!=null){
+            return new ResponseEntity<>(
+                    new SimpleResponse("Unit is not correct. Available units : " + Arrays.toString(Unit.values())), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            productService.updateProduct(updateProductRequest, group, id);
+        } catch (CategoryNotFound | AddTheSameProduct |ModifyGeneralProduct e) {
+            return new ResponseEntity<>(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().body(new SimpleResponse("Product was updated"));
+    }
+
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary="Add new product to group",description = "User with Role ADMIN can add new product to group")
@@ -120,7 +156,7 @@ public class BaseProductsController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Delete group product",description = "User with Role ADMIN can delete group product")
+    @Operation(summary="Delete group product - form list of group products and from shopping list",description = "User with Role ADMIN can delete group product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully deleted ",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class))),
@@ -140,8 +176,8 @@ public class BaseProductsController {
 
         try {
             productService.deleteById(id, groupId);
-        } catch (DeleteGeneralProduct deleteGeneralProduct) {
-            return new ResponseEntity<>(new SimpleResponse(deleteGeneralProduct.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (ModifyGeneralProduct modifyGeneralProduct) {
+            return new ResponseEntity<>(new SimpleResponse(modifyGeneralProduct.getMessage()), HttpStatus.BAD_REQUEST);
 
         }
         return ResponseEntity.ok(new SimpleResponse("Product with id [" + id + "] was deleted"));

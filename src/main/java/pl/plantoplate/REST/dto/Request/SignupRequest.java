@@ -15,10 +15,7 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.dto.Request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter

@@ -18,13 +18,14 @@ package pl.plantoplate.REST.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.plantoplate.REST.dto.Request.UpdateProductRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.CategoryNotFound;
-import pl.plantoplate.REST.exception.DeleteGeneralProduct;
+import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.repository.ProductRepository;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class ProductService {
     }
 
 
-    public void deleteById(Long productId, Long groupId) throws DeleteGeneralProduct {
+    public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
 
         long groupCreatedById = product.getCreated_by().getId();
@@ -68,7 +69,7 @@ public class ProductService {
         if(groupCreatedById == 1L || groupCreatedById != groupId ){
 
             log.info("User try to delete general product or product not his group");
-            throw new DeleteGeneralProduct("User cannot delete general products or product not of his group");
+            throw new ModifyGeneralProduct("User cannot delete general products or product not of his group");
         }
 
 
@@ -80,11 +81,9 @@ public class ProductService {
 
     public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, CategoryNotFound {
 
-        List<Product> products = productRepository.findProductsByGroup(group.getId());
-        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
-        List<Product> allProduct = Stream.concat(products.stream(), productsGeneral.stream()).collect(Collectors.toList());
+        List<Product> allProducts = generalAndProductsOfGroup(group.getId());
 
-        if(allProduct.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))){
+        if(allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))){
             throw new AddTheSameProduct("Product with name [" + name + "] and unit ["+unit + "] already exists.");
         }
 
@@ -95,5 +94,60 @@ public class ProductService {
 
         log.info("Product : [ " + name +" ] , [ " + categoryName +"] was saved.");
 
+    }
+
+    //TODO - CustomException
+    public void updateProduct(UpdateProductRequest updateProductRequest, Group group, long productId) throws CategoryNotFound, AddTheSameProduct, ModifyGeneralProduct {
+        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
+
+        long groupCreatedById = product.getCreated_by().getId();
+
+        if(groupCreatedById == 1L || groupCreatedById != group.getId() ){
+            log.info("User try to update general product or product not his group");
+            throw new ModifyGeneralProduct("User cannot update general products or product not of his group");
+        }
+
+
+        if(updateProductRequest.getUnit()!= null && updateProductRequest.getName()!=null){
+            existsProductWithNameAndUnit(updateProductRequest.getName(), updateProductRequest.getUnit(), group.getId());
+        }else if(updateProductRequest.getName()!=null && updateProductRequest.getUnit()==null ){
+            existsProductWithNameAndUnit(updateProductRequest.getName(), product.getUnit().name(), group.getId());
+        }else if(updateProductRequest.getUnit()!= null && updateProductRequest.getName() == null){
+            existsProductWithNameAndUnit(product.getName(), updateProductRequest.getUnit(),group.getId());
+        }
+
+        if(updateProductRequest.getName()!=null)
+            product.setName(updateProductRequest.getName());
+        if(updateProductRequest.getCategory()!= null)
+            product.setCategory(categoryService.findByName(updateProductRequest.getCategory()));
+        if(updateProductRequest.getUnit()!=null)
+            product.setUnit(Unit.valueOf(updateProductRequest.getUnit()));
+
+        productRepository.save(product);
+
+        log.info("Product was update. New Product [" + updateProductRequest.getName() + "] [" + updateProductRequest.getUnit() +"] [" +
+                updateProductRequest.getCategory() + "]");
+    }
+
+
+    /**
+     * Return general products nad products of group
+     * @param groupId - id of group
+     * @return
+     */
+    private List<Product> generalAndProductsOfGroup(long groupId){
+        List<Product> products = productRepository.findProductsByGroup(groupId);
+        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
+        return Stream.concat(products.stream(), productsGeneral.stream()).collect(Collectors.toList());
+    }
+
+
+    private void existsProductWithNameAndUnit(String name, String unit, long groupId) throws AddTheSameProduct {
+        List<Product> allProducts = generalAndProductsOfGroup(groupId);
+        if (allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))) {
+            throw new AddTheSameProduct("Product with name [" + name + "] and unit [" + unit + "] already exists.");
+        }
     }
 }
