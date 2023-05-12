@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
+import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
@@ -21,8 +21,9 @@ import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ShopProductService;
 import pl.plantoplate.REST.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/shopping")
@@ -41,13 +42,14 @@ public class ShoppingListProductsController {
 
 
     @GetMapping("")
-    @Operation(summary="Get shopping products list",description = "User can get list of products he wants to buy ")
+    @Operation(summary="Get shopping products - 2 lists - bought and toBuy",description = "User can get list of products he wants to buy and he bought ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products",  content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductsResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity shoppingListOfGroup(){
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = null;
 
@@ -59,14 +61,13 @@ public class ShoppingListProductsController {
         }
 
         List<ShopProductGroup> productShopList = group.getShopProductList();
-        List<ShoppingProductResponse> productDtoList = new ArrayList<>();
-        for(ShopProductGroup p: productShopList){
-            productDtoList.add(new ShoppingProductResponse(p));
-        }
+        Map<Boolean, List<ShopProductGroup>> mapOfBoughtAndToBuyProducts = productShopList.stream().
+                collect(Collectors.partitioningBy(x -> x.isBought()));
 
-        System.out.println(productDtoList);
+        ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(true),
+                mapOfBoughtAndToBuyProducts.get(false));
 
-        return new ResponseEntity(productDtoList, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
 
     }
 }

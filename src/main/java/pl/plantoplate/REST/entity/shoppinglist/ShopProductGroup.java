@@ -45,4 +45,7 @@ public class ShopProductGroup {
 
     @Column
     private int amount;
+
+    @Column(name = "is_bought")
+    private boolean isBought;
 }

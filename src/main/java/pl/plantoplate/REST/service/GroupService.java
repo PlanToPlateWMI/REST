@@ -100,6 +100,7 @@ public class GroupService {
             shopProductGroup.setProduct(product1);
             shopProductGroup.setGroup(group);
             shopProductGroup.setAmount(2);
+            shopProductGroup.setBought(false);
 
             shopProductService.save(shopProductGroup);
 
@@ -107,6 +108,7 @@ public class GroupService {
             shopProductGroup2.setProduct(product2);
             shopProductGroup2.setGroup(group);
             shopProductGroup2.setAmount(3);
+            shopProductGroup2.setBought(false);
 
             shopProductService.save(shopProductGroup2);
 
