@@ -16,7 +16,7 @@ import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
-import pl.plantoplate.REST.exception.AddToShoppingListWrongProduct;
+import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ShopProductService;
 import pl.plantoplate.REST.service.UserService;
@@ -93,11 +93,34 @@ public class ShoppingListProductsController {
 
         try {
             shopProductService.addProductToList(productRequest, group);
-        } catch (AddToShoppingListWrongProduct e) {
+        } catch (WrongProductInShoppingList e) {
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().body(new SimpleResponse("Product with id [" + productRequest.getId() + "] was successfully added"));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteProductFromShoppingList(@PathVariable long id){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = null;
+
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            shopProductService.deleteProduct(id, group);
+        } catch (WrongProductInShoppingList e) {
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().body(new SimpleResponse("Product was deleted from shopping list"));
     }
 }

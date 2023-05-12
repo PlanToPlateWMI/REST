@@ -25,6 +25,8 @@ public interface ShopProductGroupRepository extends JpaRepository<ShopProductGro
 
     Optional<ShopProductGroup> findByProductAndGroup(Product product, Group group);
 
+    List<ShopProductGroup> findByGroup(Group group);
+
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value  = "SELECT * FROM shop_product_group WHERE is_bought = :is_bought and group_owner_id = :group_id")

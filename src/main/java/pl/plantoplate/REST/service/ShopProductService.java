@@ -21,7 +21,7 @@ import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
-import pl.plantoplate.REST.exception.AddToShoppingListWrongProduct;
+import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ShopProductGroupRepository;
 
 import java.util.List;
@@ -48,14 +48,14 @@ public class ShopProductService {
         shopProductGroupRepository.deleteProductByGroupIdAndProductId(productId, groupId);
     }
 
-    public void addProductToList(AddShopProductRequest productRequest, Group group) throws AddToShoppingListWrongProduct {
+    public void addProductToList(AddShopProductRequest productRequest, Group group) throws WrongProductInShoppingList {
 
         Product product = productService.findById(productRequest.getId());
         List<Product> productsOfGroup = productService.generalAndProductsOfGroup(group.getId());
 
         if(productsOfGroup.stream().noneMatch(p -> p.getId() == productRequest.getId())){
             log.info("User try to add product not from his list to shopping list");
-            throw new AddToShoppingListWrongProduct("User try to add product to shopping list not from his list");
+            throw new WrongProductInShoppingList("User try to add product to shopping list not from his list");
         }
 
         // check if product with the same name nad unit already exists in shopping list and
@@ -74,4 +74,18 @@ public class ShopProductService {
         }
 
     }
+
+    public void deleteProduct(long id, Group group) throws WrongProductInShoppingList {
+
+        List<ShopProductGroup> shopProductsOfGroup = shopProductGroupRepository.findByGroup(group);
+
+        if(shopProductsOfGroup.stream().noneMatch(p -> p.getId() == id)){
+            log.info("User try to delete product not from his shopping list or product not exists");
+            throw new WrongProductInShoppingList("User try to delete product not from his shopping list");
+        }
+
+        ShopProductGroup productGroup = shopProductGroupRepository.findById(id).get();
+        shopProductGroupRepository.delete(productGroup);
+    }
+
 }
