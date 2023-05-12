@@ -4,16 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.plantoplate.REST.entity.shoppinglist.Unit;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRequest {
+public class AddShopProductRequest {
 
-    private String name;
-    private String unit;
-    private String category;
-
+    private long id;
+    private int amount;
 }

@@ -48,4 +48,11 @@ public class ShopProductGroup {
 
     @Column(name = "is_bought")
     private boolean isBought;
+
+    public ShopProductGroup(Product product, Group group, int amount, boolean isBought) {
+        this.product = product;
+        this.group = group;
+        this.amount = amount;
+        this.isBought = isBought;
+    }
 }

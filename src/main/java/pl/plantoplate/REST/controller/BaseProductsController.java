@@ -24,8 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.Request.ProductRequest;
-import pl.plantoplate.REST.dto.Request.UpdateProductRequest;
+import pl.plantoplate.REST.dto.Request.BaseProductRequest;
 import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
@@ -90,7 +89,7 @@ public class BaseProductsController {
             @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
                     " general product of product not of his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity updateProduct(@PathVariable long id, @RequestBody UpdateProductRequest updateProductRequest) {
+    public ResponseEntity updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = null;
@@ -125,7 +124,7 @@ public class BaseProductsController {
                     schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "User try to add product what already exists (the same name and unit) or category or unit are not correct",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity addProductToGroup(@RequestBody ProductRequest productRequest){
+    public ResponseEntity addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -137,13 +136,13 @@ public class BaseProductsController {
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(productRequest.getUnit()))){
+        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(baseProductRequest.getUnit()))){
             return new ResponseEntity<>(
                     new SimpleResponse("Unit is not correct. Available units : " + Arrays.toString(Unit.values())), HttpStatus.BAD_REQUEST);
         }
 
         try {
-            productService.save(productRequest.getName(), productRequest.getCategory(), productRequest.getUnit(), group);
+            productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
         } catch (AddTheSameProduct | CategoryNotFound e) {
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);

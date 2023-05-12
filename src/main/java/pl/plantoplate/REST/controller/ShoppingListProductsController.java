@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.exception.AddToShoppingListWrongProduct;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ShopProductService;
 import pl.plantoplate.REST.service.UserService;
@@ -62,12 +62,42 @@ public class ShoppingListProductsController {
 
         List<ShopProductGroup> productShopList = group.getShopProductList();
         Map<Boolean, List<ShopProductGroup>> mapOfBoughtAndToBuyProducts = productShopList.stream().
-                collect(Collectors.partitioningBy(x -> x.isBought()));
+                collect(Collectors.partitioningBy(ShopProductGroup::isBought));
 
         ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(true),
                 mapOfBoughtAndToBuyProducts.get(false));
 
         return new ResponseEntity(response, HttpStatus.OK);
+    }
 
+
+    @PostMapping()
+    @Operation(summary= "Add Product to Shopping list by product id and amount",description = "User can add product to shopping list ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product was successfully added",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to add product not of his group",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> addProductToShoppingListFromBase(@RequestBody AddShopProductRequest productRequest) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = null;
+
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+
+        try {
+            shopProductService.addProductToList(productRequest, group);
+        } catch (AddToShoppingListWrongProduct e) {
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().body(new SimpleResponse("Product with id [" + productRequest.getId() + "] was successfully added"));
     }
 }

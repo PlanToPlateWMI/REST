@@ -18,7 +18,7 @@ package pl.plantoplate.REST.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.plantoplate.REST.dto.Request.UpdateProductRequest;
+import pl.plantoplate.REST.dto.Request.BaseProductRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -27,6 +27,7 @@ import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.CategoryNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.repository.ProductRepository;
+import pl.plantoplate.REST.repository.ShopProductGroupRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,11 +38,11 @@ import java.util.stream.Stream;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopProductService shopProductService;
+    private final ShopProductGroupRepository shopProductService;
     private final CategoryService categoryService;
 
 
-    public ProductService(ProductRepository productRepository, ShopProductService shopProductService, CategoryService categoryService) {
+    public ProductService(ProductRepository productRepository, ShopProductGroupRepository shopProductService, CategoryService categoryService) {
         this.productRepository = productRepository;
         this.shopProductService = shopProductService;
         this.categoryService = categoryService;
@@ -53,6 +54,10 @@ public class ProductService {
 
     public Product findByName(String productName){
         return productRepository.findByName(productName).orElseThrow(RuntimeException::new);
+    }
+
+    public Product findById(long productId){
+        return productRepository.findById(productId).orElseThrow(RuntimeException::new);
     }
 
     @Transactional(readOnly = true)
@@ -97,7 +102,7 @@ public class ProductService {
     }
 
     //TODO - CustomException
-    public void updateProduct(UpdateProductRequest updateProductRequest, Group group, long productId) throws CategoryNotFound, AddTheSameProduct, ModifyGeneralProduct {
+    public void updateProduct(BaseProductRequest updateProductRequest, Group group, long productId) throws CategoryNotFound, AddTheSameProduct, ModifyGeneralProduct {
         List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
 
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
@@ -137,7 +142,7 @@ public class ProductService {
      * @param groupId - id of group
      * @return
      */
-    private List<Product> generalAndProductsOfGroup(long groupId){
+    public List<Product> generalAndProductsOfGroup(long groupId){
         List<Product> products = productRepository.findProductsByGroup(groupId);
         List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
         return Stream.concat(products.stream(), productsGeneral.stream()).collect(Collectors.toList());

@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateProductRequest {
+public class BaseProductRequest {
+
     private String name;
     private String unit;
     private String category;
+
 }
