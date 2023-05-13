@@ -50,6 +50,10 @@ public class ShopProductService {
 
     public void addProductToList(AddShopProductRequest productRequest, Group group) throws WrongProductInShoppingList {
 
+        if(productRequest.getAmount() <= 0 ){
+            throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
+        }
+
         Product product = productService.findById(productRequest.getId());
         List<Product> productsOfGroup = productService.generalAndProductsOfGroup(group.getId());
 
@@ -68,10 +72,14 @@ public class ShopProductService {
             shopProductGroup.setAmount(shopProductGroup.getAmount() + productRequest.getAmount());
 
             shopProductGroupRepository.save(shopProductGroup);
+            log.info("Product with id [" + productRequest.getId() + "] exists in shopping list. Modified his amount.");
         }else{
             ShopProductGroup shopProductGroup = new ShopProductGroup(product,group, productRequest.getAmount(), false);
             shopProductGroupRepository.save(shopProductGroup);
+            log.info("Product with id [" + productRequest.getId() + "] added to shopping list.");
         }
+
+
 
     }
 
@@ -86,6 +94,23 @@ public class ShopProductService {
 
         ShopProductGroup productGroup = shopProductGroupRepository.findById(id).get();
         shopProductGroupRepository.delete(productGroup);
+        log.info("Product with id [" + id + "] was deleted from shopping list");
     }
 
+    public void modifyAmount(long id, Group group, int amount) throws WrongProductInShoppingList {
+
+        if(amount <= 0 ){
+            throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
+        }
+
+        List<ShopProductGroup> toBuyProductOfGroup = shopProductGroupRepository.findAllByIsBoughtAndGroupId(false, group.getId());
+        if(toBuyProductOfGroup.stream().noneMatch(p -> p.getId() == id)){
+            log.info("User try to modify product not from toBuy list");
+            throw new WrongProductInShoppingList("User try to modify product not from toBuyList ");
+        }
+
+        ShopProductGroup productGroup = shopProductGroupRepository.findById(id).get();
+        productGroup.setAmount(amount);
+        shopProductGroupRepository.save(productGroup);
+    }
 }

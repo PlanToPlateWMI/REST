@@ -85,7 +85,7 @@ public class GroupService {
             Product customProduct = new Product();
             customProduct.setName("Miód wielokwiatowy");
             customProduct.setCategory(category);
-            customProduct.setUnit(Unit.G);
+            customProduct.setUnit(Unit.GR);
             customProduct.setCreated_by(group);
 
             productService.save(customProduct);

@@ -1,3 +1,18 @@
+/*
+Copyright 2023 the original author or authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You
+may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ */
+
 package pl.plantoplate.REST.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
+import pl.plantoplate.REST.dto.Request.AmountRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
@@ -70,13 +86,46 @@ public class ShoppingListProductsController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    @Operation(summary="Modify product amount in toBuy shopping list section",
+            description = "User modify amount of product of toBuy list ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Amount was modifies",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductsResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to modify product not from toBuy list or" +
+                    "amount is negative or 0",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> modifyShopProductAmount(@RequestBody AmountRequest amountRequest, @PathVariable long id) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = null;
+
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            shopProductService.modifyAmount(id, group, amountRequest.getAmount());
+        } catch (WrongProductInShoppingList e) {
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().body(new SimpleResponse("Product amount was modified"));
+    }
+
+
 
     @PostMapping()
     @Operation(summary= "Add Product to Shopping list by product id and amount",description = "User can add product to shopping list ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully added",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
-            @ApiResponse(responseCode = "400", description = "User try to add product not of his group",  content = @Content(
+            @ApiResponse(responseCode = "400", description = "User try to add product not of his group " +
+                    "or amount is negative or 0",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<SimpleResponse> addProductToShoppingListFromBase(@RequestBody AddShopProductRequest productRequest) {
 
@@ -102,6 +151,13 @@ public class ShoppingListProductsController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary= "Delete product from shopping list ",description = "User can add delete to shopping list ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product was successfully deleted",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to delete product not of his group " +
+                    "or amount is negative or 0",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity deleteProductFromShoppingList(@PathVariable long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

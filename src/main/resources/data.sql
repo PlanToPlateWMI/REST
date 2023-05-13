@@ -33,20 +33,20 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Jogurt', 2, 1, 'L'),
 ('Kefir', 2, 1, 'L'),
 ('Maślanka', 2, 1, 'L'),
-('Śmietanka', 2, 1, 'G'),
+('Śmietanka', 2, 1, 'GR'),
 ('Śmietana', 2, 1, 'L'),
-('Ser', 2, 1, 'G'),
+('Ser', 2, 1, 'GR'),
 
-('Kajzerki', 3, 1, 'SZTUKA'),
-('Chleb żytni', 3, 1, 'G'),
+('Kajzerki', 3, 1, 'SZT'),
+('Chleb żytni', 3, 1, 'GR'),
 
 ('Pierś kurczaka', 4, 1, 'KG'),
 ('Boczek', 4, 1, 'KG'),
 ('Wędlina', 4, 1, 'KG'),
 
-('Banan', 5, 1, 'SZTUKA'),
-('Jabłko', 5, 1, 'G'),
-('Pomarańcza', 5, 1, 'G'),
+('Banan', 5, 1, 'SZT'),
+('Jabłko', 5, 1, 'GR'),
+('Pomarańcza', 5, 1, 'GR'),
 
 ('Ogórek', 6, 1, 'KG'),
 ('Pomidor', 6, 1, 'KG'),
@@ -67,18 +67,18 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Ośmiornica', 8, 1, 'KG'),
 
 
-('Pieprz czerwony mielony', 9, 1, 'G'),
+('Pieprz czerwony mielony', 9, 1, 'GR'),
 ('Sól', 9, 1, 'KG'),
-('Papryka ostra melona', 9, 1, 'G'),
-('Papryka słodka melona', 9, 1, 'G'),
+('Papryka ostra melona', 9, 1, 'GR'),
+('Papryka słodka melona', 9, 1, 'GR'),
 ('Cukier', 9, 1, 'KG'),
 
 
-('Orzechy włoskie', 10, 1, 'G'),
-('Nerkowiec', 10, 1, 'G'),
-('Orzechy ziemne', 10, 1, 'G'),
-('Rodzynki', 10, 1, 'G'),
-('Morele suszone', 10, 1, 'G'),
+('Orzechy włoskie', 10, 1, 'GR'),
+('Nerkowiec', 10, 1, 'GR'),
+('Orzechy ziemne', 10, 1, 'GR'),
+('Rodzynki', 10, 1, 'GR'),
+('Morele suszone', 10, 1, 'GR'),
 
 ('Woda niegazowana', 11, 1, 'L'),
 ('Woda gazowana', 11, 1, 'L'),
