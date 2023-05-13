@@ -179,4 +179,35 @@ public class ShoppingListProductsController {
 
         return ResponseEntity.ok().body(new SimpleResponse("Product was deleted from shopping list"));
     }
+
+
+    @PutMapping("/{id}")
+    @Operation(summary= "Change is_bought parameter of product in shopping list. ",description = "User can change is_bought parameter of product in shopping list ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product was successfully change is_bought parametr",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to change product not of his group",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse>  changeIsBoughtOfProductInShoppingList(@PathVariable long id){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = null;
+
+        try{
+            group = userService.findGroupOfUser(email);
+        }catch (UserNotFound e){
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            shopProductService.changeIsBought(id, group);
+        } catch (WrongProductInShoppingList e) {
+            return new ResponseEntity(
+                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        return ResponseEntity.ok().body(new SimpleResponse("Product with id [" + id + "] changed is_bought"));
+    }
+
 }

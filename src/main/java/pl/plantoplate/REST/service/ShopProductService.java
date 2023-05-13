@@ -113,4 +113,25 @@ public class ShopProductService {
         productGroup.setAmount(amount);
         shopProductGroupRepository.save(productGroup);
     }
+
+    public void changeIsBought(long id, Group group) throws WrongProductInShoppingList {
+
+        List<ShopProductGroup> shopProductsOfGroup = shopProductGroupRepository.findByGroup(group);
+
+        if(shopProductsOfGroup.stream().noneMatch(p -> p.getId() == id)){
+            log.info("User try to change product not from his shopping list or product not exists");
+            throw new WrongProductInShoppingList("User try to change product not from his shopping list");
+        }
+
+        ShopProductGroup shopProductGroup = shopProductGroupRepository.findById(id).get();
+
+        if (shopProductGroup.isBought()) {
+            shopProductGroup.setBought(false);
+            log.info("Product with id [" +id + "] was moved to Trzeba kupić section");
+        } else {
+            shopProductGroup.setBought(true);
+            log.info("Product with id [" +id + "] was moved to Kupione section");
+        }
+        shopProductGroupRepository.save(shopProductGroup);
+    }
 }
