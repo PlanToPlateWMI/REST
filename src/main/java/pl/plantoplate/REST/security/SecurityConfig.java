@@ -82,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/api/auth/**", "/invite_codes", "/api/test/*", "/api/mail/*").permitAll()
+                .antMatchers("/api/auth/**", "/api/invite-codes", "/api/test/*", "/api/mail/*").permitAll()
                         .and()
                 .authorizeRequests().anyRequest().authenticated();
 

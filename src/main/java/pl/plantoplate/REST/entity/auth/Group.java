@@ -38,6 +38,9 @@ public class Group {
     @Id
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @OneToMany(mappedBy = "userGroup")
     private List<User> users = new ArrayList<>();
 

@@ -16,9 +16,12 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.dto.Request.BaseProductRequest;
+import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -26,9 +29,11 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.CategoryNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
+import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ProductRepository;
 import pl.plantoplate.REST.repository.ShopProductGroupRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -84,7 +89,11 @@ public class ProductService {
         log.info("Product with id [" + productId + "] was deleted");
     }
 
-    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, CategoryNotFound {
+    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, CategoryNotFound, WrongProductInShoppingList {
+
+        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(unit))){
+            throw new WrongProductInShoppingList("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
+        }
 
         List<Product> allProducts = generalAndProductsOfGroup(group.getId());
 

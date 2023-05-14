@@ -30,10 +30,7 @@ import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.exception.AddTheSameProduct;
-import pl.plantoplate.REST.exception.CategoryNotFound;
-import pl.plantoplate.REST.exception.ModifyGeneralProduct;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.*;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -136,14 +133,9 @@ public class BaseProductsController {
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(baseProductRequest.getUnit()))){
-            return new ResponseEntity<>(
-                    new SimpleResponse("Unit is not correct. Available units : " + Arrays.toString(Unit.values())), HttpStatus.BAD_REQUEST);
-        }
-
         try {
             productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-        } catch (AddTheSameProduct | CategoryNotFound e) {
+        } catch (AddTheSameProduct | CategoryNotFound | WrongProductInShoppingList e) {
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

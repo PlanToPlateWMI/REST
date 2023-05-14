@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,13 +24,17 @@ import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.security.JwtUtils;
+import pl.plantoplate.REST.service.CategoryService;
 import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.UserService;
+
+import java.util.ArrayList;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -42,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("AuthController test")
+@Sql({"/schema-test.sql", "/data-test.sql"})
 public class AuthControllerTest {
 
     @Autowired
@@ -62,6 +68,8 @@ public class AuthControllerTest {
     private MailSenderService mailSenderService;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private CategoryService categoryService;
 
     @SpyBean
     private GroupService groupService;
@@ -227,10 +235,13 @@ public class AuthControllerTest {
     void shouldCreateGroupForValidUserAndReturnValidToken() throws Exception{
 
         //get
+        Category category = new Category(1,"Inne", new ArrayList<>());
         String email = "test@gmail.com";
         String password = "password";
         String username = "username";
         when(userService.existsByEmail(email)).thenReturn(true);
+        when(categoryService.findByName("Inne")).thenReturn(category);
+
         EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
         User user = new User(username, encoder.encode(password), email);
@@ -251,6 +262,7 @@ public class AuthControllerTest {
         String jwtToken = mapper.readValue(mvcResult.getResponse().getContentAsString(), JwtResponse.class).getToken();
         assertTrue(utils.isJwtTokenValid(jwtToken));
         verify(groupService).createGroupAndAddAdmin(email);
+
     }
 
 
