@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 
 @Service
@@ -45,19 +45,19 @@ public class UserService {
 
 
     @Transactional(readOnly = true)
-    public User findByEmail(String email) throws UserNotFound {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ "  + email + " ] not found"));
+    public User findByEmail(String email) throws EntityNotFound {
+        return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
     }
 
-    public void resetPassword(String email, String newPassword) throws UserNotFound {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ "  + email + " ] not found"));
+    public void resetPassword(String email, String newPassword) throws EntityNotFound {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
         user.setPassword(newPassword);
         userRepository.save(user);
 
     }
 
 
-    public Group findGroupOfUser(String email) throws UserNotFound {
+    public Group findGroupOfUser(String email) throws EntityNotFound {
         return this.findByEmail(email).getUserGroup();
     }
 }

@@ -27,7 +27,7 @@ import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
-import pl.plantoplate.REST.exception.CategoryNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ProductRepository;
@@ -57,12 +57,16 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public Product findByName(String productName){
-        return productRepository.findByName(productName).orElseThrow(RuntimeException::new);
+    @Transactional(readOnly = true)
+    public Product findByName(String productName) throws EntityNotFound {
+        return productRepository.findByName(productName).orElseThrow(() -> new EntityNotFound("Product [ " + productName
+         + " not found."));
     }
 
-    public Product findById(long productId){
-        return productRepository.findById(productId).orElseThrow(RuntimeException::new);
+    @Transactional(readOnly = true)
+    public Product findById(long productId) throws EntityNotFound {
+        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
+                + " not found."));
     }
 
     @Transactional(readOnly = true)
@@ -71,8 +75,10 @@ public class ProductService {
     }
 
 
-    public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
+    public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct, EntityNotFound {
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
+                + " not found."));
 
         long groupCreatedById = product.getCreated_by().getId();
 
@@ -89,11 +95,9 @@ public class ProductService {
         log.info("Product with id [" + productId + "] was deleted");
     }
 
-    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, CategoryNotFound, WrongProductInShoppingList {
+    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, EntityNotFound, WrongProductInShoppingList {
 
-        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(unit))){
-            throw new WrongProductInShoppingList("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
-        }
+        isUnitCorrect(unit);
 
         List<Product> allProducts = generalAndProductsOfGroup(group.getId());
 
@@ -110,11 +114,13 @@ public class ProductService {
 
     }
 
-    //TODO - CustomException
-    public void updateProduct(BaseProductRequest updateProductRequest, Group group, long productId) throws CategoryNotFound, AddTheSameProduct, ModifyGeneralProduct {
-        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
 
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException());
+    public void updateProduct(String name, String unit, String category, Group group, long productId) throws EntityNotFound, AddTheSameProduct, ModifyGeneralProduct, WrongProductInShoppingList {
+
+        isUnitCorrect(unit);
+
+        Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
+                + " not found."));
 
         long groupCreatedById = product.getCreated_by().getId();
 
@@ -124,25 +130,25 @@ public class ProductService {
         }
 
 
-        if(updateProductRequest.getUnit()!= null && updateProductRequest.getName()!=null){
-            existsProductWithNameAndUnit(updateProductRequest.getName(), updateProductRequest.getUnit(), group.getId());
-        }else if(updateProductRequest.getName()!=null && updateProductRequest.getUnit()==null ){
-            existsProductWithNameAndUnit(updateProductRequest.getName(), product.getUnit().name(), group.getId());
-        }else if(updateProductRequest.getUnit()!= null && updateProductRequest.getName() == null){
-            existsProductWithNameAndUnit(product.getName(), updateProductRequest.getUnit(),group.getId());
+        if(unit!= null && name!=null){
+            existsProductWithNameAndUnit(name, unit, group.getId());
+        }else if(name!=null){
+            existsProductWithNameAndUnit(name, product.getUnit().name(), group.getId());
+        }else if(unit != null){
+            existsProductWithNameAndUnit(product.getName(), unit,group.getId());
         }
 
-        if(updateProductRequest.getName()!=null)
-            product.setName(updateProductRequest.getName());
-        if(updateProductRequest.getCategory()!= null)
-            product.setCategory(categoryService.findByName(updateProductRequest.getCategory()));
-        if(updateProductRequest.getUnit()!=null)
-            product.setUnit(Unit.valueOf(updateProductRequest.getUnit()));
+        if(name!=null)
+            product.setName(name);
+        if(category!= null)
+            product.setCategory(categoryService.findByName(category));
+        if(unit!=null)
+            product.setUnit(Unit.valueOf(unit));
 
         productRepository.save(product);
 
-        log.info("Product was update. New Product [" + updateProductRequest.getName() + "] [" + updateProductRequest.getUnit() +"] [" +
-                updateProductRequest.getCategory() + "]");
+        log.info("Product was update. New Product [" + name + "] [" + unit +"] [" +
+                category + "]");
     }
 
 
@@ -162,6 +168,12 @@ public class ProductService {
         List<Product> allProducts = generalAndProductsOfGroup(groupId);
         if (allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))) {
             throw new AddTheSameProduct("Product with name [" + name + "] and unit [" + unit + "] already exists.");
+        }
+    }
+
+    private void isUnitCorrect(String unit) throws WrongProductInShoppingList{
+        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(unit)) && unit!=null){
+            throw new WrongProductInShoppingList("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
         }
     }
 }

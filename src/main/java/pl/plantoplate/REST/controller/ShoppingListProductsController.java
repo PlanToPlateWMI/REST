@@ -32,8 +32,8 @@ import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
-import pl.plantoplate.REST.exception.UserNotFound;
 import pl.plantoplate.REST.service.ShopProductService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -71,7 +71,7 @@ public class ShoppingListProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -102,7 +102,7 @@ public class ShoppingListProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -134,7 +134,7 @@ public class ShoppingListProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -142,7 +142,7 @@ public class ShoppingListProductsController {
 
         try {
             shopProductService.addProductToList(productRequest, group);
-        } catch (WrongProductInShoppingList e) {
+        } catch (WrongProductInShoppingList|EntityNotFound e) {
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -165,7 +165,7 @@ public class ShoppingListProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -195,7 +195,7 @@ public class ShoppingListProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }

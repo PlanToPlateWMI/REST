@@ -17,7 +17,7 @@ package pl.plantoplate.REST.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.product.Category;
-import pl.plantoplate.REST.exception.CategoryNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.CategoryRepository;
 
 import java.util.List;
@@ -33,8 +33,8 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public Category findByName(String name) throws CategoryNotFound {
-        return categoryRepository.findByCategory(name).orElseThrow(() -> new CategoryNotFound("Category [ " + name + "] not found"));
+    public Category findByName(String name) throws EntityNotFound {
+        return categoryRepository.findByCategory(name).orElseThrow(() -> new EntityNotFound("Category [ " + name + "] not found"));
     }
 
     @Transactional(readOnly = true)

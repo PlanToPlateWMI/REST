@@ -26,9 +26,7 @@ import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.exception.CategoryNotFound;
-import pl.plantoplate.REST.exception.GroupNotFound;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 
@@ -61,8 +59,8 @@ public class GroupService {
      * Dodanie do ShopProductGroup 2 produkty.
      * @param email
      */
-    public void createGroupAndAddAdmin(String email) throws UserNotFound {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFound("User with email [ " + email + "] wasn't found"));
+    public void createGroupAndAddAdmin(String email) throws EntityNotFound {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ " + email + "] wasn't found"));
         user.setActive(true);
 
         if(user.getUserGroup() == null) {
@@ -78,7 +76,7 @@ public class GroupService {
             Category category = null;
             try {
                 category = categoryService.findByName(categoryName);
-            } catch (CategoryNotFound categoryNotFound) {
+            } catch (EntityNotFound categoryNotFound) {
                 categoryNotFound.printStackTrace();
             }
 
@@ -120,7 +118,7 @@ public class GroupService {
 
 
     @Transactional(readOnly = true)
-    public Group findById(long id) throws GroupNotFound {
-        return groupRepository.findById(id).orElseThrow(() -> new GroupNotFound("Group with id [" +id + "] not found"));
+    public Group findById(long id) throws EntityNotFound {
+        return groupRepository.findById(id).orElseThrow(() -> new EntityNotFound("Group with id [" +id + "] not found"));
     }
 }

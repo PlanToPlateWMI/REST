@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +55,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Find User by Email")
-    void shouldFindUserByEmail() throws UserNotFound {
+    void shouldFindUserByEmail() throws EntityNotFound {
 
         //given
         String email = "test@gamil.com";
@@ -79,7 +79,7 @@ public class UserServiceTest {
         when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.ofNullable(null));
 
         //when
-        UserNotFound e = assertThrows(UserNotFound.class, () -> userService.findByEmail(email));
+        EntityNotFound e = assertThrows(EntityNotFound.class, () -> userService.findByEmail(email));
 
         //then
         assertTrue(e.getMessage().contains(email));
@@ -88,7 +88,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Should update password")
-    void shouldUpdatePassword() throws UserNotFound {
+    void shouldUpdatePassword() throws EntityNotFound {
         //given
         String email = "test@gmail.com";
         String newPassword = "new";

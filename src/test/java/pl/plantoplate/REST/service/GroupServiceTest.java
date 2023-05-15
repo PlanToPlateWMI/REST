@@ -7,8 +7,7 @@ import org.mockito.ArgumentCaptor;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.GroupNotFound;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 
@@ -43,13 +42,13 @@ public class GroupServiceTest {
     void shouldThrowExceptionIfGroupNotExist(){
 
         long groupId = 1L;
-        assertThrows(GroupNotFound.class, () -> groupService.findById(groupId));
+        assertThrows(EntityNotFound.class, () -> groupService.findById(groupId));
         verify(groupRepository).findById(groupId);
     }
 
     @Test
     @DisplayName("Return correct group by id")
-    void shouldReturnCorrectGroupById() throws GroupNotFound {
+    void shouldReturnCorrectGroupById() throws EntityNotFound {
         //given
         long groupId = 1L;
         Group group = new Group();
@@ -65,7 +64,7 @@ public class GroupServiceTest {
 
 
     @Test
-    void shouldCreateNewGroupAndAddUserAsAdminIfUserHasNoGroup() throws UserNotFound {
+    void shouldCreateNewGroupAndAddUserAsAdminIfUserHasNoGroup() throws EntityNotFound {
         //given
         String email = "test@gmail.com";
         User user = new User();

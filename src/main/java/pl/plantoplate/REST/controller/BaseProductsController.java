@@ -63,7 +63,7 @@ public class BaseProductsController {
 
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -92,19 +92,14 @@ public class BaseProductsController {
         Group group = null;
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(updateProductRequest.getUnit())) && updateProductRequest.getUnit()!=null){
-            return new ResponseEntity<>(
-                    new SimpleResponse("Unit is not correct. Available units : " + Arrays.toString(Unit.values())), HttpStatus.BAD_REQUEST);
-        }
-
         try {
-            productService.updateProduct(updateProductRequest, group, id);
-        } catch (CategoryNotFound | AddTheSameProduct |ModifyGeneralProduct e) {
+            productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
+        } catch (EntityNotFound | AddTheSameProduct |ModifyGeneralProduct| WrongProductInShoppingList e) {
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -128,14 +123,14 @@ public class BaseProductsController {
         Group group = null;
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e){
+        }catch (EntityNotFound e){
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
         try {
             productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-        } catch (AddTheSameProduct | CategoryNotFound | WrongProductInShoppingList e) {
+        } catch (AddTheSameProduct | EntityNotFound | WrongProductInShoppingList e) {
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -159,7 +154,7 @@ public class BaseProductsController {
         Group group = null;
         try{
             group = userService.findGroupOfUser(email);
-        }catch (UserNotFound e) {
+        }catch (EntityNotFound e) {
             return new ResponseEntity<>(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -167,8 +162,8 @@ public class BaseProductsController {
 
         try {
             productService.deleteById(id, groupId);
-        } catch (ModifyGeneralProduct modifyGeneralProduct) {
-            return new ResponseEntity<>(new SimpleResponse(modifyGeneralProduct.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (ModifyGeneralProduct|EntityNotFound e) {
+            return new ResponseEntity<>(new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 
         }
         return ResponseEntity.ok(new SimpleResponse("Product with id [" + id + "] was deleted"));

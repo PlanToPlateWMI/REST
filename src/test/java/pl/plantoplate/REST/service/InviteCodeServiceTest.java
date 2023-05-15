@@ -8,8 +8,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.InviteCode;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.GroupNotFound;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
@@ -36,7 +35,7 @@ public class InviteCodeServiceTest {
 
 
     @Test
-    void shouldSaveCodeToCorrectGroupWithCorrectRole() throws GroupNotFound {
+    void shouldSaveCodeToCorrectGroupWithCorrectRole() throws EntityNotFound {
 
         //given
         long groupId = 1L;
@@ -103,7 +102,7 @@ public class InviteCodeServiceTest {
 
     @Test
     @DisplayName("add user to group by invite code")
-    void shouldAddUserToGroupAndSetIsActiveAndSetRoleIfInviteCodeIsCorrect() throws UserNotFound, WrongInviteCode {
+    void shouldAddUserToGroupAndSetIsActiveAndSetRoleIfInviteCodeIsCorrect() throws EntityNotFound, WrongInviteCode {
         //given
         int code = 1111;
         String email = "test@gmail.com";

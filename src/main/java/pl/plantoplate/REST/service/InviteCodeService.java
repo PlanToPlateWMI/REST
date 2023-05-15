@@ -22,8 +22,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.InviteCode;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.GroupNotFound;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
@@ -50,7 +49,7 @@ public class InviteCodeService {
      * @param userEmail
      * @param inviteCode
      */
-    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) throws WrongInviteCode, UserNotFound {
+    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) throws WrongInviteCode, EntityNotFound {
             if(inviteCodeRepository.existsByCode(inviteCode)){
                 InviteCode code = inviteCodeRepository.getByCode(inviteCode);
 
@@ -85,7 +84,7 @@ public class InviteCodeService {
      * @param groupId
      * @param role
      */
-    public void saveCode(int code, long groupId, Role role) throws GroupNotFound {
+    public void saveCode(int code, long groupId, Role role) throws EntityNotFound {
 
         Group group = groupService.findById(groupId);
 

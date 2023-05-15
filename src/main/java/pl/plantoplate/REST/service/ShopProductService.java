@@ -21,6 +21,7 @@ import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ShopProductGroupRepository;
 
@@ -44,11 +45,8 @@ public class ShopProductService {
         shopProductGroupRepository.save(shopProductGroup);
     }
 
-    public void deleteProductByGroupIdAndProductId(Long productId, Long groupId) {
-        shopProductGroupRepository.deleteProductByGroupIdAndProductId(productId, groupId);
-    }
 
-    public void addProductToList(AddShopProductRequest productRequest, Group group) throws WrongProductInShoppingList {
+    public void addProductToList(AddShopProductRequest productRequest, Group group) throws WrongProductInShoppingList, EntityNotFound {
 
         if(productRequest.getAmount() <= 0 ){
             throw new WrongProductInShoppingList("Product amount cannot be negative or 0");

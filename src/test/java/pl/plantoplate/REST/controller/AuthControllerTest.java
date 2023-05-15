@@ -25,7 +25,7 @@ import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.entity.product.Category;
-import pl.plantoplate.REST.exception.UserNotFound;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -36,6 +36,7 @@ import pl.plantoplate.REST.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -295,7 +296,7 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String password = "password";
 
-        doThrow(UserNotFound.class).when(userService).resetPassword(anyString(), anyString());
+        doThrow(EntityNotFound.class).when(userService).resetPassword(anyString(), anyString());
 
         EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
 
