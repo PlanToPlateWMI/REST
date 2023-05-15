@@ -16,12 +16,8 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -31,7 +27,7 @@ import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ProductRepository;
-import pl.plantoplate.REST.repository.ShopProductGroupRepository;
+import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,11 +39,11 @@ import java.util.stream.Stream;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopProductGroupRepository shopProductService;
+    private final ShopProductRepository shopProductService;
     private final CategoryService categoryService;
 
 
-    public ProductService(ProductRepository productRepository, ShopProductGroupRepository shopProductService, CategoryService categoryService) {
+    public ProductService(ProductRepository productRepository, ShopProductRepository shopProductService, CategoryService categoryService) {
         this.productRepository = productRepository;
         this.shopProductService = shopProductService;
         this.categoryService = categoryService;

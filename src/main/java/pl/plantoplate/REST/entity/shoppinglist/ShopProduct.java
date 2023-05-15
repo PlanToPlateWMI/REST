@@ -29,7 +29,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "shop_product_group")
-public class ShopProductGroup {
+public class ShopProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +49,7 @@ public class ShopProductGroup {
     @Column(name = "is_bought")
     private boolean isBought;
 
-    public ShopProductGroup(Product product, Group group, int amount, boolean isBought) {
+    public ShopProduct(Product product, Group group, int amount, boolean isBought) {
         this.product = product;
         this.group = group;
         this.amount = amount;

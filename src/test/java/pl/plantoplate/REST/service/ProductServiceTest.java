@@ -15,7 +15,7 @@ import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.repository.ProductRepository;
-import pl.plantoplate.REST.repository.ShopProductGroupRepository;
+import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 public class ProductServiceTest {
 
     private ProductRepository productRepository;
-    private ShopProductGroupRepository shopProductGroupRepository;
+    private ShopProductRepository shopProductRepository;
     private CategoryService categoryService;
     private ProductService productService;
 
@@ -39,9 +39,9 @@ public class ProductServiceTest {
     @BeforeEach
     void setUp(){
         productRepository = mock(ProductRepository.class);
-        shopProductGroupRepository = mock(ShopProductGroupRepository.class);
+        shopProductRepository = mock(ShopProductRepository.class);
         categoryService = mock(CategoryService.class);
-        productService = new ProductService(productRepository, shopProductGroupRepository, categoryService);
+        productService = new ProductService(productRepository, shopProductRepository, categoryService);
     }
 
 
@@ -213,7 +213,7 @@ public class ProductServiceTest {
 
 
         //then
-        verify(shopProductGroupRepository).deleteProductByGroupIdAndProductId(productId, groupId);
+        verify(shopProductRepository).deleteProductByGroupIdAndProductId(productId, groupId);
         verify(productRepository).deleteById(productId);
     }
 

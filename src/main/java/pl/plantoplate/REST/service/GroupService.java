@@ -24,7 +24,7 @@ import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
@@ -94,21 +94,21 @@ public class GroupService {
             Product product1 = productService.findByName(productName1);
             Product product2 = productService.findByName(productName2);
 
-            ShopProductGroup shopProductGroup = new ShopProductGroup();
-            shopProductGroup.setProduct(product1);
-            shopProductGroup.setGroup(group);
-            shopProductGroup.setAmount(2);
-            shopProductGroup.setBought(false);
+            ShopProduct shopProduct = new ShopProduct();
+            shopProduct.setProduct(product1);
+            shopProduct.setGroup(group);
+            shopProduct.setAmount(2);
+            shopProduct.setBought(false);
 
-            shopProductService.save(shopProductGroup);
+            shopProductService.save(shopProduct);
 
-            ShopProductGroup shopProductGroup2 = new ShopProductGroup();
-            shopProductGroup2.setProduct(product2);
-            shopProductGroup2.setGroup(group);
-            shopProductGroup2.setAmount(3);
-            shopProductGroup2.setBought(false);
+            ShopProduct shopProduct2 = new ShopProduct();
+            shopProduct2.setProduct(product2);
+            shopProduct2.setGroup(group);
+            shopProduct2.setAmount(3);
+            shopProduct2.setBought(false);
 
-            shopProductService.save(shopProductGroup2);
+            shopProductService.save(shopProduct2);
 
             log.info("User with email [" + email + "] created new group");
         }

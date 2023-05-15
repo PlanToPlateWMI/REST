@@ -31,7 +31,7 @@ import pl.plantoplate.REST.dto.Request.AmountRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
-import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.service.ShopProductService;
@@ -76,9 +76,9 @@ public class ShoppingListProductsController {
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        List<ShopProductGroup> productShopList = group.getShopProductList();
-        Map<Boolean, List<ShopProductGroup>> mapOfBoughtAndToBuyProducts = productShopList.stream().
-                collect(Collectors.partitioningBy(ShopProductGroup::isBought));
+        List<ShopProduct> productShopList = group.getShopProductList();
+        Map<Boolean, List<ShopProduct>> mapOfBoughtAndToBuyProducts = productShopList.stream().
+                collect(Collectors.partitioningBy(ShopProduct::isBought));
 
         ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(true),
                 mapOfBoughtAndToBuyProducts.get(false));
@@ -141,7 +141,7 @@ public class ShoppingListProductsController {
 
 
         try {
-            shopProductService.addProductToList(productRequest, group);
+            shopProductService.addProductToList(productRequest.getId(), productRequest.getAmount(), group);
         } catch (WrongProductInShoppingList|EntityNotFound e) {
             return new ResponseEntity(
                     new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);

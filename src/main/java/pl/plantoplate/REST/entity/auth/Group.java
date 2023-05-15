@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class Group {
     private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "group")
-    private List<ShopProductGroup> shopProductList = new ArrayList<>();
+    private List<ShopProduct> shopProductList = new ArrayList<>();
 
     public void addUser(User user){
         users.add(user);

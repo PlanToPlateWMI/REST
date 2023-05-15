@@ -1,7 +1,7 @@
 package pl.plantoplate.REST.dto.Response;
 
 import lombok.*;
-import pl.plantoplate.REST.entity.shoppinglist.ShopProductGroup;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +15,15 @@ public class ShoppingProductsResponse {
     private List<ShoppingProduct> bought;
     private List<ShoppingProduct> toBuy;
 
-    public ShoppingProductsResponse(List<ShopProductGroup> bought, List<ShopProductGroup> toBuy){
+    public ShoppingProductsResponse(List<ShopProduct> bought, List<ShopProduct> toBuy){
         this.bought = new ArrayList<>();
         this.toBuy = new ArrayList<>();
 
-        for(ShopProductGroup p: bought){
+        for(ShopProduct p: bought){
             this.bought.add(new ShoppingProduct(p));
         }
 
-        for(ShopProductGroup p: toBuy){
+        for(ShopProduct p: toBuy){
             this.toBuy.add(new ShoppingProduct(p));
         }
     }
@@ -44,7 +44,7 @@ public class ShoppingProductsResponse {
         private String unit;
 
 
-        public ShoppingProduct(ShopProductGroup productGroup){
+        public ShoppingProduct(ShopProduct productGroup){
             this.name = productGroup.getProduct().getName();
             this.id = productGroup.getId();
             this.amount = productGroup.getAmount();
