@@ -29,10 +29,6 @@ import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.exception.AddTheSameProduct;
-import pl.plantoplate.REST.exception.EntityNotFound;
-import pl.plantoplate.REST.exception.ModifyGeneralProduct;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 

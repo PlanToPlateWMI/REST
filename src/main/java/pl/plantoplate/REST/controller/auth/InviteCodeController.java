@@ -34,8 +34,6 @@ import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Role;
-import pl.plantoplate.REST.exception.EntityNotFound;
-import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
 
