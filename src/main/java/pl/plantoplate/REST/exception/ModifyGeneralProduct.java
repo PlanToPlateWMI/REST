@@ -1,6 +1,10 @@
 package pl.plantoplate.REST.exception;
 
-public class ModifyGeneralProduct extends Exception{
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+public class ModifyGeneralProduct extends RuntimeException{
 
     public ModifyGeneralProduct() {
         super();

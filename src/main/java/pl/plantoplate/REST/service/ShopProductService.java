@@ -46,7 +46,7 @@ public class ShopProductService {
     }
 
 
-    public void addProductToList(long productId, int amount , Group group) throws WrongProductInShoppingList, EntityNotFound {
+    public void addProductToList(long productId, int amount , Group group) {
 
         if(amount <= 0 ){
             throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
@@ -81,7 +81,7 @@ public class ShopProductService {
 
     }
 
-    public void deleteProduct(long id, Group group) throws WrongProductInShoppingList {
+    public void deleteProduct(long id, Group group) {
 
         List<ShopProduct> shopProductsOfGroup = shopProductRepository.findByGroup(group);
 
@@ -95,7 +95,7 @@ public class ShopProductService {
         log.info("Product with id [" + id + "] was deleted from shopping list");
     }
 
-    public void modifyAmount(long id, Group group, int amount) throws WrongProductInShoppingList {
+    public void modifyAmount(long id, Group group, int amount) {
 
         if(amount <= 0 ){
             throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
@@ -112,7 +112,7 @@ public class ShopProductService {
         shopProductRepository.save(productGroup);
     }
 
-    public void changeIsBought(long id, Group group) throws WrongProductInShoppingList {
+    public void changeIsBought(long id, Group group) {
 
         List<ShopProduct> shopProductsOfGroup = shopProductRepository.findByGroup(group);
 

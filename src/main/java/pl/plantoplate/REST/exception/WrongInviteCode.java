@@ -1,6 +1,10 @@
 package pl.plantoplate.REST.exception;
 
-public class WrongInviteCode extends Exception{
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+public class WrongInviteCode extends RuntimeException{
 
     public WrongInviteCode() {
     }

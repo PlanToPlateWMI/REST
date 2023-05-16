@@ -1,6 +1,10 @@
 package pl.plantoplate.REST.exception;
 
-public class EntityNotFound extends Exception{
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+public class EntityNotFound extends RuntimeException{
 
     public EntityNotFound(String message) {
         super(message);

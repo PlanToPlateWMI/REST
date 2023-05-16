@@ -1,4 +1,4 @@
-package pl.plantoplate.REST.controller;
+package pl.plantoplate.REST.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

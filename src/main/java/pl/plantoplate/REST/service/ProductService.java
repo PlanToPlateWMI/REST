@@ -91,7 +91,7 @@ public class ProductService {
         log.info("Product with id [" + productId + "] was deleted");
     }
 
-    public void save(String name, String categoryName, String unit, Group group) throws AddTheSameProduct, EntityNotFound, WrongProductInShoppingList {
+    public void save(String name, String categoryName, String unit, Group group) {
 
         isUnitCorrect(unit);
 
@@ -111,7 +111,7 @@ public class ProductService {
     }
 
 
-    public void updateProduct(String name, String unit, String category, Group group, long productId) throws EntityNotFound, AddTheSameProduct, ModifyGeneralProduct, WrongProductInShoppingList {
+    public void updateProduct(String name, String unit, String category, Group group, long productId) {
 
         isUnitCorrect(unit);
 
@@ -160,14 +160,14 @@ public class ProductService {
     }
 
 
-    private void existsProductWithNameAndUnit(String name, String unit, long groupId) throws AddTheSameProduct {
+    private void existsProductWithNameAndUnit(String name, String unit, long groupId) {
         List<Product> allProducts = generalAndProductsOfGroup(groupId);
         if (allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))) {
             throw new AddTheSameProduct("Product with name [" + name + "] and unit [" + unit + "] already exists.");
         }
     }
 
-    private void isUnitCorrect(String unit) throws WrongProductInShoppingList{
+    private void isUnitCorrect(String unit){
         if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(unit)) && unit!=null){
             throw new WrongProductInShoppingList("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
         }

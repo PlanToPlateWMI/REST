@@ -147,12 +147,7 @@ public class AuthController {
                                                                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailPasswordRequest){
 
-        try {
-            groupService.createGroupAndAddAdmin(emailPasswordRequest.getEmail());
-        }catch (EntityNotFound e){
-            return new ResponseEntity(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        groupService.createGroupAndAddAdmin(emailPasswordRequest.getEmail());
 
         return controllerUtils.generateJwtToken(emailPasswordRequest.getEmail(), emailPasswordRequest.getPassword());
     }
@@ -175,12 +170,7 @@ public class AuthController {
 
         log.info("User with email [" + emailPasswordRequest.getPassword() + "] try to reset password");
 
-        try{
-            userService.resetPassword(emailPasswordRequest.getEmail(), encodedPassword);
-        }catch (EntityNotFound e){
-            return new ResponseEntity(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        userService.resetPassword(emailPasswordRequest.getEmail(), encodedPassword);
 
         return ResponseEntity.ok(new SimpleResponse("Password was successfully updated"));
     }

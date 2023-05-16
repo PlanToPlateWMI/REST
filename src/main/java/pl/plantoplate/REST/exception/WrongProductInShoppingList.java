@@ -1,6 +1,10 @@
 package pl.plantoplate.REST.exception;
 
-public class WrongProductInShoppingList extends Exception{
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+public class WrongProductInShoppingList extends RuntimeException{
     public WrongProductInShoppingList(String message) {
         super(message);
     }

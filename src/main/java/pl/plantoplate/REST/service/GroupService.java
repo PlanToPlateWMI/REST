@@ -59,7 +59,7 @@ public class GroupService {
      * Dodanie do ShopProductGroup 2 produkty.
      * @param email
      */
-    public void createGroupAndAddAdmin(String email) throws EntityNotFound {
+    public void createGroupAndAddAdmin(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ " + email + "] wasn't found"));
         user.setActive(true);
 
@@ -118,7 +118,7 @@ public class GroupService {
 
 
     @Transactional(readOnly = true)
-    public Group findById(long id) throws EntityNotFound {
+    public Group findById(long id) {
         return groupRepository.findById(id).orElseThrow(() -> new EntityNotFound("Group with id [" +id + "] not found"));
     }
 }

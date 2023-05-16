@@ -45,11 +45,11 @@ public class UserService {
 
 
     @Transactional(readOnly = true)
-    public User findByEmail(String email) throws EntityNotFound {
+    public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
     }
 
-    public void resetPassword(String email, String newPassword) throws EntityNotFound {
+    public void resetPassword(String email, String newPassword)  {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
         user.setPassword(newPassword);
         userRepository.save(user);
@@ -57,7 +57,7 @@ public class UserService {
     }
 
 
-    public Group findGroupOfUser(String email) throws EntityNotFound {
+    public Group findGroupOfUser(String email) {
         return this.findByEmail(email).getUserGroup();
     }
 }

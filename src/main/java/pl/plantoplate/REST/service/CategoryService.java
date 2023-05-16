@@ -33,7 +33,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public Category findByName(String name) throws EntityNotFound {
+    public Category findByName(String name) {
         return categoryRepository.findByCategory(name).orElseThrow(() -> new EntityNotFound("Category [ " + name + "] not found"));
     }
 

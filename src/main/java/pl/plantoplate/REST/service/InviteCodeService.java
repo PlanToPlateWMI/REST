@@ -49,7 +49,7 @@ public class InviteCodeService {
      * @param userEmail
      * @param inviteCode
      */
-    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) throws WrongInviteCode, EntityNotFound {
+    public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) {
             if(inviteCodeRepository.existsByCode(inviteCode)){
                 InviteCode code = inviteCodeRepository.getByCode(inviteCode);
 
@@ -84,7 +84,7 @@ public class InviteCodeService {
      * @param groupId
      * @param role
      */
-    public void saveCode(int code, long groupId, Role role) throws EntityNotFound {
+    public void saveCode(int code, long groupId, Role role) {
 
         Group group = groupService.findById(groupId);
 

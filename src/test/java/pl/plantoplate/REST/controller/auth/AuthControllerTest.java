@@ -1,4 +1,4 @@
-package pl.plantoplate.REST.controller;
+package pl.plantoplate.REST.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -317,7 +317,6 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String password = "password";
         EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(email, password);
-
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/password/reset")

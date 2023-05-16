@@ -82,11 +82,7 @@ public class InviteCodeController {
                     new SimpleResponse(String.format("User with email %s doesn't exist", addToGroupByInviteCodeRequest.getEmail())), HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
-        }catch (WrongInviteCode | EntityNotFound e){
-            return ResponseEntity.badRequest().body(new SimpleResponse("Invite code is wrong or expired"));
-        }
+        inviteCodeService.verifyInviteCodeAndAddUserToGroup(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getCode());
 
         return controllerUtils.generateJwtToken(addToGroupByInviteCodeRequest.getEmail(), addToGroupByInviteCodeRequest.getPassword());
     }
@@ -116,19 +112,9 @@ public class InviteCodeController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         int generateCode = controllerUtils.generateCode(100000, 899999);
-        long groupId = 0;
+        long groupId = userService.findByEmail(email).getUserGroup().getId();
 
-        try {
-            groupId = userService.findByEmail(email).getUserGroup().getId();
-        }catch (EntityNotFound e){
-            return ResponseEntity.badRequest().body(new SimpleResponse(e.getMessage()));
-        }
-
-        try {
-            inviteCodeService.saveCode(generateCode, groupId, Role.valueOf("ROLE_" + role));
-        }catch (EntityNotFound e){
-            return ResponseEntity.badRequest().body(new SimpleResponse(e.getMessage()));
-        }
+        inviteCodeService.saveCode(generateCode, groupId, Role.valueOf("ROLE_" + role));
 
         return ResponseEntity.ok(new CodeResponse(generateCode));
     }

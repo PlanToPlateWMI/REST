@@ -29,12 +29,13 @@ import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.exception.*;
+import pl.plantoplate.REST.exception.AddTheSameProduct;
+import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.exception.ModifyGeneralProduct;
+import pl.plantoplate.REST.exception.WrongProductInShoppingList;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -57,16 +58,9 @@ public class BaseProductsController {
                     schema = @Schema(implementation = BaseOfProductsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<Object> getAllProduct(){
+    public ResponseEntity getAllProduct(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Group group = null;
-
-        try{
-            group = userService.findGroupOfUser(email);
-        }catch (EntityNotFound e){
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        Group group = userService.findGroupOfUser(email);
 
         long groupId = group.getId();
 
@@ -75,7 +69,7 @@ public class BaseProductsController {
 
         BaseOfProductsResponse baseOfProductsResponse = new BaseOfProductsResponse(generalProducts, productsOfGroup);
 
-        return new ResponseEntity<Object>(baseOfProductsResponse, HttpStatus.OK);
+        return new ResponseEntity(baseOfProductsResponse, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -89,20 +83,9 @@ public class BaseProductsController {
     public ResponseEntity updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Group group = null;
-        try{
-            group = userService.findGroupOfUser(email);
-        }catch (EntityNotFound e){
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        Group group = userService.findGroupOfUser(email);
 
-        try {
-            productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
-        } catch (EntityNotFound | AddTheSameProduct |ModifyGeneralProduct| WrongProductInShoppingList e) {
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
 
         return ResponseEntity.ok().body(new SimpleResponse("Product was updated"));
     }
@@ -120,20 +103,9 @@ public class BaseProductsController {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Group group = null;
-        try{
-            group = userService.findGroupOfUser(email);
-        }catch (EntityNotFound e){
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        Group group = userService.findGroupOfUser(email);
 
-        try {
-            productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-        } catch (AddTheSameProduct | EntityNotFound | WrongProductInShoppingList e) {
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
 
         return new ResponseEntity(new SimpleResponse("Product was saved"), HttpStatus.OK);
 
@@ -151,21 +123,12 @@ public class BaseProductsController {
     public ResponseEntity<SimpleResponse> deleteProductFromGroupBase(@PathVariable Long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Group group = null;
-        try{
-            group = userService.findGroupOfUser(email);
-        }catch (EntityNotFound e) {
-            return new ResponseEntity<>(
-                    new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
+        Group group = userService.findGroupOfUser(email);
+
         long groupId = group.getId();
 
-        try {
-            productService.deleteById(id, groupId);
-        } catch (ModifyGeneralProduct|EntityNotFound e) {
-            return new ResponseEntity<>(new SimpleResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        productService.deleteById(id, groupId);
 
-        }
         return ResponseEntity.ok(new SimpleResponse("Product with id [" + id + "] was deleted"));
 
     }
