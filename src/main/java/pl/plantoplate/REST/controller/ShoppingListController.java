@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/shopping")
-public class ShoppingListProductsController {
+public class ShoppingListController {
 
 
     private final ShopProductService shopProductService;
@@ -49,7 +49,7 @@ public class ShoppingListProductsController {
 
 
     @Autowired
-    public ShoppingListProductsController(ShopProductService shopProductService, UserService userService) {
+    public ShoppingListController(ShopProductService shopProductService, UserService userService) {
         this.shopProductService = shopProductService;
         this.userService = userService;
     }
@@ -62,7 +62,7 @@ public class ShoppingListProductsController {
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductsResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity shoppingListOfGroup(){
+    public ResponseEntity<ShoppingProductsResponse> shoppingListOfGroup(){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
@@ -74,7 +74,7 @@ public class ShoppingListProductsController {
         ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(true),
                 mapOfBoughtAndToBuyProducts.get(false));
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -139,7 +139,7 @@ public class ShoppingListProductsController {
                     array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User try to change product not of his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<SimpleResponse>  changeIsBoughtOfProductInShoppingList(@PathVariable long id){
+    public ResponseEntity<SimpleResponse> changeIsBoughtOfProductInShoppingList(@PathVariable long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
