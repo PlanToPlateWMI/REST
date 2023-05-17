@@ -100,9 +100,7 @@ public class BaseProductsController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Group group = userService.findGroupOfUser(email);
-
         productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-
         return new ResponseEntity(new SimpleResponse("Product was saved"), HttpStatus.OK);
 
     }

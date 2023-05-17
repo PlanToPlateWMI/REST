@@ -88,11 +88,13 @@ public class GroupService {
 
             productService.save(customProduct);
 
-            // add 2 products to shopping list of this group
+            // add 3 products to shopping list of this group
             String productName1 = "Mleko";
             String productName2 = "Boczek";
+            String productName3 = "Piwo jasne";
             Product product1 = productService.findByName(productName1);
             Product product2 = productService.findByName(productName2);
+            Product product3 = productService.findByName(productName3);
 
             ShopProduct shopProduct = new ShopProduct();
             shopProduct.setProduct(product1);
@@ -109,6 +111,14 @@ public class GroupService {
             shopProduct2.setBought(false);
 
             shopProductService.save(shopProduct2);
+
+            ShopProduct shopProduct3 = new ShopProduct();
+            shopProduct3.setProduct(product3);
+            shopProduct3.setGroup(group);
+            shopProduct3.setAmount(10);
+            shopProduct3.setBought(true);
+
+            shopProductService.save(shopProduct3);
 
             log.info("User with email [" + email + "] created new group");
         }
