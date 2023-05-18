@@ -126,12 +126,13 @@ public class ProductService {
         }
 
 
+
         if(unit!= null && name!=null){
-            existsProductWithNameAndUnit(name, unit, group.getId());
+            existsProductWithNameAndUnit(name, unit, group.getId(), productId);
         }else if(name!=null){
-            existsProductWithNameAndUnit(name, product.getUnit().name(), group.getId());
+            existsProductWithNameAndUnit(name, product.getUnit().name(), group.getId(), productId);
         }else if(unit != null){
-            existsProductWithNameAndUnit(product.getName(), unit,group.getId());
+            existsProductWithNameAndUnit(product.getName(), unit,group.getId(), productId);
         }
 
         if(name!=null)
@@ -160,8 +161,15 @@ public class ProductService {
     }
 
 
-    private void existsProductWithNameAndUnit(String name, String unit, long groupId) {
+    private void existsProductWithNameAndUnit(String name, String unit, long groupId, long productId) {
+
         List<Product> allProducts = generalAndProductsOfGroup(groupId);
+
+        for (int i = 0; i < allProducts.size(); i++) {
+            if(allProducts.get(i).getId() == productId)
+                allProducts.remove(i);
+        }
+
         if (allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))) {
             throw new AddTheSameProduct("Product with name [" + name + "] and unit [" + unit + "] already exists.");
         }
