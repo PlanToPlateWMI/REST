@@ -93,7 +93,7 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
-        when(userService.existsByEmail(email)).thenReturn(false);
+        when(userService.existsByEmailAndActiveTrue(email)).thenReturn(false);
         SignupRequest user = new SignupRequest(email, password, username);
 
         //when
@@ -105,14 +105,7 @@ public class AuthControllerTest {
                 .andReturn();
 
         //then
-        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userService).save(userArgumentCaptor.capture());
-        User savedUser = userArgumentCaptor.getValue();
-
-        assertEquals(savedUser.getRole(), Role.ROLE_USER);
-        assertEquals(savedUser.getEmail(), email);
-        assertEquals(savedUser.getUsername(), username);
-        assertFalse(savedUser.isActive());
+        verify(userService).existsByEmailAndActiveTrue(email);
 
 
         //check if code sent to email is equals code from response
@@ -136,7 +129,7 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
-        when(userService.existsByEmail(email)).thenReturn(true);
+        when(userService.existsByEmailAndActiveTrue(email)).thenReturn(true);
         SignupRequest user = new SignupRequest(email, password, username);
 
         //when
@@ -147,7 +140,7 @@ public class AuthControllerTest {
                 .andExpect(status().isConflict());
 
         //then
-        verify(userService).existsByEmail(email);
+        verify(userService).existsByEmailAndActiveTrue(email);
         verifyNoMoreInteractions(userService);
         verifyNoInteractions(mailSenderService);
     }

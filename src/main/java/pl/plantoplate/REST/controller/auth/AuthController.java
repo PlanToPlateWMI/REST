@@ -82,20 +82,13 @@ public class AuthController {
                                                             schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity registerUser(@RequestBody SignupRequest userSignupInfo){
 
-        if(userService.existsByEmail(userSignupInfo.getEmail())){
+        if(userService.existsByEmailAndActiveTrue(userSignupInfo.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new SimpleResponse(String.format("User with email already exists", userSignupInfo.getEmail())));
         }
 
-        // create User
-        User user  = new User(userSignupInfo.getUsername(),
-                encoder.encode(userSignupInfo.getPassword()), userSignupInfo.getEmail());
-        // set User's role to USER, isActivated - false
-        user.setRole(Role.ROLE_USER);
-        user.setActive(false);
+        userService.registerUser(userSignupInfo.getEmail(), encoder.encode(userSignupInfo.getPassword()), userSignupInfo.getUsername());
 
-        // save new User in DB
-        userService.save(user);
 
         //generate code and send it to user's email address
         int code = ControllerUtils.generateCode(1000, 8999);

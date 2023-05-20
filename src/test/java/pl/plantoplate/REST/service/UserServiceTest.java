@@ -3,6 +3,7 @@ package pl.plantoplate.REST.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -107,5 +108,49 @@ public class UserServiceTest {
         //then
         assertEquals(user.getPassword(), newPassword);
 
+    }
+
+
+    @Test
+    void shouldRegisterUserWhenHeNotExists(){
+
+        String email = "email";
+        String password = "password";
+        String login = "login";
+        when(userRepository.existsByEmail(email)).thenReturn(true);
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(new User()));
+
+        userService.registerUser(email, password, login);
+
+
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+
+        User saved = userArgumentCaptor.getValue();
+
+        assertEquals(password, saved.getPassword());
+        assertEquals(login, saved.getUsername());
+
+    }
+
+
+    @Test
+    void shouldRegisterUserWhenHeExists(){
+
+        String email = "email";
+        String password = "password";
+        String login = "login";
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+
+        userService.registerUser(email, password, login);
+
+
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+
+        User saved = userArgumentCaptor.getValue();
+
+        assertEquals(password, saved.getPassword());
+        assertEquals(login, saved.getUsername());
     }
 }

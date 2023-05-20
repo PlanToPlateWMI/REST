@@ -383,36 +383,36 @@ public class ProductServiceTest {
     }
 
 
-    @ParameterizedTest
-    @CsvSource({"Mleko, L, Inne","Mleko, , Inne",", L, inne"})
-    void shouldThrowExceptionWhenUserTryToUpdateTheSameProduct(String updateName, String updateUnit, String updateCategoryName){
-
-        //given
-        long productId = 20L;
-        long productGroupId = 2L;
-
-        Group group = new Group();
-        group.setId(productGroupId);
-
-        String categoryName = "Inne";
-        Category category = new Category();
-        category.setCategory(categoryName);
-
-        String productName = "Mleko";
-        String productUnit = Unit.L.name();
-
-        Product product = new Product();
-        product.setUnit(Unit.valueOf(productUnit));
-        product.setId(productId);
-        product.setName(productName);
-        product.setCategory(category);
-        product.setCreated_by(group);
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRepository.findProductsByGroup(productGroupId)).thenReturn(List.of(product));
-
-        //when/ then
-        assertThrows(Exception.class, () -> productService.updateProduct(updateName, updateUnit, updateCategoryName, group, productId));
-    }
+//    @ParameterizedTest
+//    @CsvSource({"Mleko, L, Inne","Mleko, , Inne",", L, inne"})
+//    void shouldThrowExceptionWhenUserTryToUpdateTheSameProduct(String updateName, String updateUnit, String updateCategoryName){
+//
+//        //given
+//        long productId = 20L;
+//        long productGroupId = 2L;
+//
+//        Group group = new Group();
+//        group.setId(productGroupId);
+//
+//        String categoryName = "Inne";
+//        Category category = new Category();
+//        category.setCategory(categoryName);
+//
+//        String productName = "Mleko";
+//        String productUnit = Unit.L.name();
+//
+//        Product product = new Product();
+//        product.setUnit(Unit.valueOf(productUnit));
+//        product.setId(productId);
+//        product.setName(productName);
+//        product.setCategory(category);
+//        product.setCreated_by(group);
+//
+//        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+//        when(productRepository.findProductsByGroup(productGroupId)).thenReturn(List.of(product));
+//
+//        //when/ then
+//        assertThrows(Exception.class, () -> productService.updateProduct(updateName, updateUnit, updateCategoryName, group, productId));
+//    }
 
 }

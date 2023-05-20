@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -59,5 +60,33 @@ public class UserService {
 
     public Group findGroupOfUser(String email) {
         return this.findByEmail(email).getUserGroup();
+    }
+
+    public boolean existsByEmailAndActiveTrue(String email) {
+        return userRepository.existsByEmailAndIsActiveTrue(email);
+    }
+
+    public void registerUser(String email, String password, String username) {
+
+        if(userRepository.existsByEmail(email)){
+            User user = userRepository.findByEmail(email).get();
+            user.setPassword(password);
+            user.setUsername(username);
+            user.setRole(Role.ROLE_USER);
+            user.setActive(false);
+
+            userRepository.save(user);
+            return;
+        }
+
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setUsername(username);
+        user.setRole(Role.ROLE_USER);
+        user.setActive(false);
+
+        userRepository.save(user);
+
     }
 }
