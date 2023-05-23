@@ -1,14 +1,9 @@
 INSERT INTO user_group(name) VALUES ('admins');
 
--- SELECT setval('user_group_id_seq', 1, true);
-
+-- moderator
 INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
-('marianamariana1509@gmail.com', 'maryana', '$2a$12$6C3AdGX37TU14oycAAfegOEUKhVpVYZkD5lL4yG4Ke8D2dlIpmxQ.',
+('plantoplatemobileapp@gmail.com', 'plantoplate', '$2a$10$SjxWexEjOJzrFR3CrQFaRehmWM1S6YzyALcSkTPDCbyFDNpypKfFK',
  'ROLE_ADMIN', 1, true);
-
-INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
-('marianamartyniuk2001@gmail.com', 'maryana2', '$2a$12$h/P7FJedQLkojas2qPP19eyTHnuQlSHDwzXtRBrubdAEhdEjx1rfK',
-'ROLE_USER', 1, true);
 
 
 INSERT INTO category (category) VALUES

@@ -54,18 +54,13 @@ public class BaseProductsController {
                     schema = @Schema(implementation = BaseOfProductsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity getAllProduct(){
+    public ResponseEntity<BaseOfProductsResponse> getAllProduct(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
 
-        long groupId = group.getId();
+        BaseOfProductsResponse baseOfProductsResponse = generateBaseOfProductsResponse(group.getId());
 
-        List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
-        List<Product> generalProducts = productService.getProductsOfGroup(1L);
-
-        BaseOfProductsResponse baseOfProductsResponse = new BaseOfProductsResponse(generalProducts, productsOfGroup);
-
-        return new ResponseEntity(baseOfProductsResponse, HttpStatus.OK);
+        return new ResponseEntity<>(baseOfProductsResponse, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -76,7 +71,7 @@ public class BaseProductsController {
             @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
                     " general product of product not of his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
+    public ResponseEntity<SimpleResponse> updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
@@ -95,13 +90,13 @@ public class BaseProductsController {
                     schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "User try to add product what already exists (the same name and unit) or category or unit are not correct",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
+    public ResponseEntity<SimpleResponse> addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Group group = userService.findGroupOfUser(email);
         productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-        return new ResponseEntity(new SimpleResponse("Product was saved"), HttpStatus.OK);
+        return new ResponseEntity<>(new SimpleResponse("Product was saved"), HttpStatus.OK);
 
     }
 
@@ -125,5 +120,13 @@ public class BaseProductsController {
 
         return ResponseEntity.ok(new SimpleResponse("Product with id [" + id + "] was deleted"));
 
+    }
+
+    private BaseOfProductsResponse generateBaseOfProductsResponse(long groupId) {
+
+        List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
+        List<Product> generalProducts = productService.getProductsOfGroup(1L);
+
+        return new BaseOfProductsResponse(generalProducts, productsOfGroup);
     }
 }

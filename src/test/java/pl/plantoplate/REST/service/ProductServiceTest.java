@@ -316,8 +316,6 @@ public class ProductServiceTest {
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
         //when / then
-        assertThrows(Exception.class, () ->  productService.updateProduct (name, unit, categoryName, group, productId));
-
         assertThrows(Exception.class, () ->  productService.updateProduct (name, unit, categoryName, notProductGroup, productId));
     }
 

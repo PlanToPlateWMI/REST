@@ -65,12 +65,24 @@ public class ProductService {
                 + " not found."));
     }
 
+    /**
+     * User can get all product of group by groupId
+     * @param groupId - id of user's group
+     * @return
+     */
     @Transactional(readOnly = true)
     public List<Product> getProductsOfGroup(long groupId) {
         return productRepository.findProductsByGroup(groupId);
     }
 
 
+    /**
+     * User can delete product of his group.Moderator can delete general product
+     * @param productId - id of product to delete
+     * @param groupId - group of user
+     * @throws ModifyGeneralProduct - User try to modify not his group product
+     * @throws EntityNotFound - product with id not found
+     */
     public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct, EntityNotFound {
 
         Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
@@ -78,10 +90,10 @@ public class ProductService {
 
         long groupCreatedById = product.getCreated_by().getId();
 
-        if(groupCreatedById == 1L || groupCreatedById != groupId ){
+        if(groupCreatedById != groupId ){
 
             log.info("User try to delete general product or product not his group");
-            throw new ModifyGeneralProduct("User cannot delete general products or product not of his group");
+            throw new ModifyGeneralProduct("User cannot delete general products (only moderators) or product not of his group");
         }
 
 
@@ -91,6 +103,13 @@ public class ProductService {
         log.info("Product with id [" + productId + "] was deleted");
     }
 
+    /**
+     * User can add new product to his group list. Moderator can add new product to general list that is available for all users.
+     * @param name - product name
+     * @param categoryName - product category
+     * @param unit - product unit
+     * @param group - group of user
+     */
     public void save(String name, String categoryName, String unit, Group group) {
 
         isUnitCorrect(unit);
@@ -111,6 +130,16 @@ public class ProductService {
     }
 
 
+    /**
+     * Only moderators can update general product. Users can update only products of their group.
+     * User cannot update product unit and name that already exists product with the same unit and name in general
+     * products or products of his group
+     * @param name - new product name
+     * @param unit - new product unit
+     * @param category - new product category
+     * @param group - group of user
+     * @param productId - id of updated product
+     */
     public void updateProduct(String name, String unit, String category, Group group, long productId) {
 
         isUnitCorrect(unit);
@@ -120,11 +149,10 @@ public class ProductService {
 
         long groupCreatedById = product.getCreated_by().getId();
 
-        if(groupCreatedById == 1L || groupCreatedById != group.getId() ){
+        if(groupCreatedById != group.getId() ){
             log.info("User try to update general product or product not his group");
-            throw new ModifyGeneralProduct("User cannot update general products or product not of his group");
+            throw new ModifyGeneralProduct("User cannot update general products (only moderators) or product not of his group");
         }
-
 
 
         if(unit!= null && name!=null){
@@ -150,7 +178,7 @@ public class ProductService {
 
 
     /**
-     * Return general products nad products of group
+     * Return general products and products of group
      * @param groupId - id of group
      * @return
      */
