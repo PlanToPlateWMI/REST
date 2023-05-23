@@ -9,14 +9,14 @@ import pl.plantoplate.REST.entity.product.Product;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductDto {
+public class ProductResponse {
 
         private long id;
         private String name;
         private String category;
         private String unit;
 
-        public ProductDto (Product product){
+        public ProductResponse(Product product){
             this.name = product.getName();
             this.unit = product.getUnit().name();
             this.id = product.getId();

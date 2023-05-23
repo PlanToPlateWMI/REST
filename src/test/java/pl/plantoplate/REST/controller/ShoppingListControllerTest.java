@@ -1,5 +1,6 @@
 package pl.plantoplate.REST.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,6 +20,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.dto.Request.AmountRequest;
+import pl.plantoplate.REST.dto.Response.ProductResponse;
+import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
@@ -71,45 +75,66 @@ public class ShoppingListControllerTest {
 
     @Test
     @WithMockUser(value = "email@gmail.com")
-    void shouldReturnShoppingProductList() throws Exception {
+    void shouldReturnShoppingProductListToBuy() throws Exception {
+
+        //given
+        String email = "email@gmail.com";
 
         Category category = new Category();
         category.setCategory("name");
 
         Product product = new Product();
-        product.setCategory(category);
-        product.setUnit(Unit.L);
+        product.setId(1L);
         product.setName("Name");
-        //given
-        String email = "email@gmail.com";
-        ShopProduct toBuy = new ShopProduct();
-        toBuy.setBought(false);
-        toBuy.setProduct(product);
-        toBuy.setId(1L);
-        toBuy.setAmount(10);
+        product.setUnit(Unit.L);
+        product.setCategory(category);
 
-        ShopProduct bought = new ShopProduct();
-        bought.setBought(true);
-        bought.setProduct(product);
-        bought.setId(1L);
-        bought.setAmount(10);
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setAmount(10);
+        shopProduct.setProduct(product);
 
-        List<ShopProduct> toBuyProducts = List.of(toBuy, toBuy);
-        List<ShopProduct> boughtProducts = List.of(bought);
-
-        Group group = new Group();
-        group.setShopProductList(Stream.concat(toBuyProducts.stream(), boughtProducts.stream()).collect(Collectors.toList()));
-
-        when(userService.findGroupOfUser(email)).thenReturn(group);
+        List<ShopProduct> products = List.of(shopProduct);
+        when(productService.getProducts(email, false)).thenReturn(products);
 
         //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/shopping"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/shopping?bought=false"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        ShoppingProductsResponse response = mapper.readValue(mvcResult.getResponse().getContentAsString(), ShoppingProductsResponse.class);
-        assertEquals(response.getBought().size(), boughtProducts.size());
-        assertEquals(response.getToBuy().size(), toBuyProducts.size());
+        List<ShoppingProductResponse> productResponses = mapper.readValue(mvcResult.getResponse().getContentAsString(),  new TypeReference<List<ShoppingProductResponse>>(){});
+        assertEquals(products.size(), productResponses.size());
+    }
+
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldReturnShoppingProductListBought() throws Exception {
+
+        String email = "email@gmail.com";
+
+        Category category = new Category();
+        category.setCategory("name");
+
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Name");
+        product.setUnit(Unit.L);
+        product.setCategory(category);
+
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setAmount(10);
+        shopProduct.setProduct(product);
+
+        List<ShopProduct> products = List.of(shopProduct);
+        when(productService.getProducts(email, true)).thenReturn(products);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/shopping?bought=true"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<ShoppingProductResponse> productResponses = mapper.readValue(mvcResult.getResponse().getContentAsString(),  new TypeReference<List<ShoppingProductResponse>>(){});
+        assertEquals(products.size(), productResponses.size());
     }
 
     @Test
@@ -131,7 +156,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).addProductToList(productId, amount, group);
+        verify(productService).addProductToList(productId, amount, email);
     }
 
 
@@ -149,7 +174,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).deleteProduct(productId, group);
+        verify(productService).deleteProduct(productId, email);
     }
 
 
@@ -173,7 +198,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).modifyAmount(productId, group, amount);
+        verify(productService).modifyAmount(productId, email, amount);
     }
 
 
@@ -193,7 +218,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).changeIsBought(productId, group);
+        verify(productService).changeIsBought(productId, email);
     }
 
 

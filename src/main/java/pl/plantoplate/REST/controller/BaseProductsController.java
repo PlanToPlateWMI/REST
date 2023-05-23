@@ -28,7 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.BaseProductType;
 import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.ProductDto;
+import pl.plantoplate.REST.dto.Response.ProductResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
@@ -58,10 +58,10 @@ public class BaseProductsController {
             "type = group - product of group",description = "User can get list of all products or group products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "list of products depends on query param value",  content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ProductDto>> getAllProduct(@RequestParam(value = "type", defaultValue = "all") @Parameter(schema = @Schema(description = "type of products : all - list of all products, group - list of groups products",
+    public ResponseEntity<List<ProductResponse>> getAllProduct(@RequestParam(value = "type", defaultValue = "all") @Parameter(schema = @Schema(description = "type of products : all - list of all products, group - list of groups products",
                             type = "string", allowableValues = {"all", "group"}))  String typeOfProduct){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -83,10 +83,10 @@ public class BaseProductsController {
     @Operation(summary="Add new product to group. Return list of products of group",description = "User with Role ADMIN can add new product to group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully added ",   content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User try to add product what already exists (the same name and unit) or category or unit are not correct",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ProductDto>> addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
+    public ResponseEntity<List<ProductResponse>> addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -102,11 +102,11 @@ public class BaseProductsController {
     @Operation(summary="Update product of group. Return list of products of group.",description = "User can update product of his group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully updated ",  content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
                     " general product of product not of his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ProductDto>> updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
+    public ResponseEntity<List<ProductResponse>> updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
@@ -122,10 +122,10 @@ public class BaseProductsController {
     @Operation(summary="Delete group product - from list of group products and from shopping list. Return list of products of group.",description = "User with Role ADMIN can delete group product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully deleted ",  content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User try to delete general product or delete product not from his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ProductDto>> deleteProductFromGroupBase(@PathVariable Long id){
+    public ResponseEntity<List<ProductResponse>> deleteProductFromGroupBase(@PathVariable Long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
@@ -138,20 +138,20 @@ public class BaseProductsController {
 
     }
 
-    private ResponseEntity<List<ProductDto>> generateListOfProductDtoDependsOnTypeOfProducts(long groupId, BaseProductType productsType) {
+    private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(long groupId, BaseProductType productsType) {
 
         List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
 
         // if group == 1 it means that it is group of moderators and return always  general products
         if(groupId == 1L){
-            return new ResponseEntity<>(productsOfGroup.stream().map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity<>(productsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }
 
         if(productsType.equals(BaseProductType.all)){
             List<Product> generalProducts = productService.getProductsOfGroup(1L);
 
-            return new ResponseEntity<>(Stream.concat(productsOfGroup.stream(), generalProducts.stream()).map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity<>(Stream.concat(productsOfGroup.stream(), generalProducts.stream()).map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }
-        return new ResponseEntity<>(productsOfGroup.stream().map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
+        return new ResponseEntity<>(productsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
     }
 }

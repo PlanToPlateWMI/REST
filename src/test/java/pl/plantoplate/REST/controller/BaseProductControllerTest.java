@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.ProductDto;
+import pl.plantoplate.REST.dto.Response.ProductResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -96,7 +96,7 @@ public class BaseProductControllerTest {
                 .andReturn();
 
         //then
-        List<ProductDto> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductDto>>(){});
+        List<ProductResponse> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductResponse>>(){});
         assertEquals(generalProducts.size() + groupProducts.size(), base.size());
     }
 
@@ -131,7 +131,7 @@ public class BaseProductControllerTest {
                 .andReturn();
 
         //then
-        List<ProductDto> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductDto>>(){});
+        List<ProductResponse> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductResponse>>(){});
         assertEquals(groupProducts.size(), base.size());
     }
 

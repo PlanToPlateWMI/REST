@@ -1,6 +1,5 @@
 package pl.plantoplate.REST.service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,13 +26,15 @@ public class ShopProductServiceTest {
     private ShopProductRepository shopProductRepository;
     private ProductService productService;
     private ShopProductService shopProductService;
+    private UserService userService;
 
 
     @BeforeEach
     void setUp(){
         shopProductRepository = mock(ShopProductRepository.class);
         productService = mock(ProductService.class);
-        shopProductService = new ShopProductService(shopProductRepository, productService);
+        userService = mock(UserService.class);
+        shopProductService = new ShopProductService(shopProductRepository, productService, userService);
     }
 
 
@@ -55,24 +56,28 @@ public class ShopProductServiceTest {
     void shouldThrowExceptionWhenUserTryToAddProductWithNegativeAmount(int amount){
 
         long productId = 1L;
-        Group group = new Group();
+        String email = "email";
 
-        assertThrows(Exception.class, () -> shopProductService.addProductToList( productId, amount, group));
+        assertThrows(Exception.class, () -> shopProductService.addProductToList( productId, amount, email));
     }
 
 
-    @ParameterizedTest
-    @ValueSource(longs = { 1 , 2})
-    void shouldThrowExceptionWhenUserTryToAddNotHisProduct(long groupId) {
+
+    @Test
+    void shouldThrowExceptionWhenUserTryToAddNotHisProduct() {
 
         long productId = 1L;
+        String email = "email";
+        int amount = 1;
+        long groupId = 2L;
         Group group = new Group();
         group.setId(groupId);
-        int amount = 1;
 
-        when(productService.getProductsOfGroup(productId)).thenReturn(new ArrayList<>());
+        when(productService.findById(productId)).thenReturn(new Product());
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
 
-        assertThrows(Exception.class, () -> shopProductService.addProductToList( productId, amount, group));
+        assertThrows(Exception.class, () -> shopProductService.addProductToList( productId, amount, email));
     }
 
     @Test
@@ -83,6 +88,7 @@ public class ShopProductServiceTest {
         long groupId = 2L;
         Group group = new Group();
         group.setId(groupId);
+        String email = "email";
         int addAmount = 1;
         int oldAmount = 20;
 
@@ -97,12 +103,13 @@ public class ShopProductServiceTest {
         shopProduct.setAmount(oldAmount);
 
         when(productService.findById(productId)).thenReturn(product);
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
         when(shopProductRepository.findAllByIsBoughtAndGroupId(false, groupId)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when
-        shopProductService.addProductToList(productId, addAmount, group);
+        shopProductService.addProductToList(productId, addAmount, email);
 
 
         //then
@@ -119,6 +126,7 @@ public class ShopProductServiceTest {
         //given
         long productId = 1L;
         long groupId = 2L;
+        String email = "email";
         Group group = new Group();
         group.setId(groupId);
         int addAmount = 1;
@@ -130,13 +138,14 @@ public class ShopProductServiceTest {
         product.setUnit(Unit.L);
 
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.findById(productId)).thenReturn(product);
         when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
         when(shopProductRepository.findAllByIsBoughtAndGroupId(false, groupId)).thenReturn(new ArrayList<>());
 
 
         //when
-        shopProductService.addProductToList(productId, addAmount, group);
+        shopProductService.addProductToList(productId, addAmount, email);
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
@@ -153,12 +162,14 @@ public class ShopProductServiceTest {
         //given
         long productId = 1L;
         long groupId = 2L;
+        String email = "email";
         Group group = new Group();
         group.setId(groupId);
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.getProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
 
-        assertThrows(Exception.class, () -> shopProductService.deleteProduct(productId, group));
+        assertThrows(Exception.class, () -> shopProductService.deleteProduct(productId, email));
     }
 
 
@@ -168,18 +179,20 @@ public class ShopProductServiceTest {
         //given
         long productId = 1L;
         long groupId = 2L;
+        String email = "email";
         Group group = new Group();
         group.setId(groupId);
 
         ShopProduct product = new ShopProduct();
         product.setId(productId);
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(shopProductRepository.findByGroup(group)).thenReturn(List.of(product));
         when(shopProductRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
 
 
         //when
-        shopProductService.deleteProduct(productId, group);
+        shopProductService.deleteProduct(productId, email);
 
 
         //then
@@ -190,7 +203,7 @@ public class ShopProductServiceTest {
     @ParameterizedTest
     @ValueSource(ints = { -1 , 0})
     void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(int amount){
-        assertThrows(Exception.class, () -> shopProductService.modifyAmount(1L, new Group(), amount));
+        assertThrows(Exception.class, () -> shopProductService.modifyAmount(1L, "email", amount));
     }
 
 
@@ -198,14 +211,16 @@ public class ShopProductServiceTest {
     void shouldThrowExceptionThenUserTryToModifyAMountToOfHisProduct(){
         //given
         long groupId = 2L;
+        String email = "email";
         Group group = new Group();
         group.setId(groupId);
         int amount = 20;
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(shopProductRepository.findAllByIsBoughtAndGroupId(false, groupId)).thenReturn(new ArrayList<>());
 
         //when
-        assertThrows(Exception.class, () -> shopProductService.modifyAmount(1L, group, amount));
+        assertThrows(Exception.class, () -> shopProductService.modifyAmount(1L, email, amount));
     }
 
     @Test
@@ -214,6 +229,7 @@ public class ShopProductServiceTest {
         //given
         long groupId = 2L;
         long productId = 10L;
+        String email = "email";
         Group group = new Group();
         group.setId(groupId);
         int amount = 20;
@@ -221,11 +237,12 @@ public class ShopProductServiceTest {
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setId(productId);
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(shopProductRepository.findAllByIsBoughtAndGroupId(false, groupId)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findById(productId)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when
-        shopProductService.modifyAmount(productId, group, amount);
+        shopProductService.modifyAmount(productId, email, amount);
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
@@ -244,16 +261,18 @@ public class ShopProductServiceTest {
         long productId = 10L;
         Group group = new Group();
         group.setId(groupId);
+        String email = "email";
 
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setId(productId);
         shopProduct.setBought(isBought);
 
+        when(userService.findGroupOfUser(email)).thenReturn(group);
         when(shopProductRepository.findByGroup(group)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findById(productId)).thenReturn(java.util.Optional.of(shopProduct));
 
         //then
-        shopProductService.changeIsBought(productId, group);
+        shopProductService.changeIsBought(productId, email);
 
         //when
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);

@@ -12,44 +12,19 @@ import java.util.List;
 @ToString
 public class ShoppingProductsResponse {
 
-    private List<ShoppingProduct> bought;
-    private List<ShoppingProduct> toBuy;
+    private List<ShoppingProductResponse> bought;
+    private List<ShoppingProductResponse> toBuy;
 
     public ShoppingProductsResponse(List<ShopProduct> bought, List<ShopProduct> toBuy){
         this.bought = new ArrayList<>();
         this.toBuy = new ArrayList<>();
 
         for(ShopProduct p: bought){
-            this.bought.add(new ShoppingProduct(p));
+            this.bought.add(new ShoppingProductResponse(p));
         }
 
         for(ShopProduct p: toBuy){
-            this.toBuy.add(new ShoppingProduct(p));
-        }
-    }
-
-
-
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @ToString
-    static class ShoppingProduct {
-        private Long id;
-        private String name;
-        private String category;
-        private int amount;
-        private String unit;
-
-
-        public ShoppingProduct(ShopProduct productGroup){
-            this.name = productGroup.getProduct().getName();
-            this.id = productGroup.getId();
-            this.amount = productGroup.getAmount();
-            this.unit = productGroup.getProduct().getUnit().name();
-            this.category = productGroup.getProduct().getCategory().getCategory();
+            this.toBuy.add(new ShoppingProductResponse(p));
         }
     }
 
