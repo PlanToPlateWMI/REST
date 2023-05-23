@@ -98,20 +98,20 @@ public class BaseProductsController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Add new product to group",description = "User with Role ADMIN can add new product to group")
+    @Operation(summary="Add new product to group. Return list of products of users group",description = "User with Role ADMIN can add new product to group")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Product successfully added ",  content = @Content(
-                    schema = @Schema(implementation = SimpleResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Product successfully added ",   content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
             @ApiResponse(responseCode = "400", description = "User try to add product what already exists (the same name and unit) or category or unit are not correct",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<SimpleResponse> addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
+    public ResponseEntity<List<ProductDto>> addProductToGroup(@RequestBody BaseProductRequest baseProductRequest){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Group group = userService.findGroupOfUser(email);
         productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
-        return new ResponseEntity<>(new SimpleResponse("Product was saved"), HttpStatus.OK);
 
+        return generateBaseOfProductsResponse(group.getId(), BaseProductType.group);
     }
 
 
