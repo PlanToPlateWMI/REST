@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
@@ -115,6 +116,7 @@ public class ShoppingListController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary= "Delete product from shopping list ",description = "User can add delete to shopping list ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully deleted",  content = @Content(

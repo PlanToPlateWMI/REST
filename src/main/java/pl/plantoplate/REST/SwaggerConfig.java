@@ -22,8 +22,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 //http://localhost:8080/swagger-ui/index.html#/
 @Configuration
@@ -39,6 +42,10 @@ public class SwaggerConfig {
                 .info(getInfo());
 
         addSecurity(openApi);
+
+//        Server server = new Server();
+//        server.setUrl("https://ambient-elf-336514.lm.r.appspot.com");
+//        openApi.servers(List.of(server));
 
         return openApi;
     }

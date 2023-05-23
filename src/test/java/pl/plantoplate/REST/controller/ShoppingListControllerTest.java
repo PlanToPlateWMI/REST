@@ -136,7 +136,7 @@ public class ShoppingListControllerTest {
 
 
     @Test
-    @WithMockUser(value = "email@gmail.com")
+    @WithMockUser(value = "email@gmail.com", roles = {"ADMIN"})
     void shouldDeleteProductFromShoppingList() throws Exception {
         //given
         String email = "email@gmail.com";

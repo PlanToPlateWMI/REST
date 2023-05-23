@@ -72,13 +72,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             // other public endpoints of your API may be appended to this array
             "/context-path/swagger-ui/index.html",
             "/context-path/swagger-ui/",
-            "/h2-console/**"
+            "/h2-console/**",
+            "/_ah/start"
     };
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-       //http.headers().frameOptions().disable().and()
-                http.csrf().disable()
+       http.headers().frameOptions().disable().and()
+                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
