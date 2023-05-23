@@ -15,6 +15,8 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,15 +26,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.controller.utils.BaseProductType;
 import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
+import pl.plantoplate.REST.dto.Response.ProductDto;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.exception.WrongQueryParam;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("api/products")
@@ -48,19 +54,27 @@ public class BaseProductsController {
     }
 
     @GetMapping
-    @Operation(summary="Get all products from base",description = "User can get list of all product in base - general and group custom products ")
+    @Operation(summary="Get products of base depend on query param (default without query param - all): type = all - all products, " +
+            "type = group - product of group",description = "User can get list of all products or group products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "2 lists of products - general and group products",  content = @Content(
-                    schema = @Schema(implementation = BaseOfProductsResponse.class))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<BaseOfProductsResponse> getAllProduct(){
+    public ResponseEntity<List<ProductDto>> getAllProduct(@RequestParam(value = "type", defaultValue = "all") @Parameter(schema = @Schema(description = "type of products : all - list of all products, group - list of groups products",
+                            type = "string", allowableValues = {"all", "group"}))  String typeOfProduct){
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
 
-        BaseOfProductsResponse baseOfProductsResponse = generateBaseOfProductsResponse(group.getId());
+        try{
+            BaseProductType.valueOf(typeOfProduct);
+        }
+        catch (IllegalArgumentException e){
+            throw new WrongQueryParam("Query keys available - ALL and GROUP");
+        }
 
-        return new ResponseEntity<>(baseOfProductsResponse, HttpStatus.OK);
+        return generateBaseOfProductsResponse(group.getId(), BaseProductType.valueOf(typeOfProduct));
     }
 
     @PatchMapping("/{id}")
@@ -122,11 +136,20 @@ public class BaseProductsController {
 
     }
 
-    private BaseOfProductsResponse generateBaseOfProductsResponse(long groupId) {
+    private ResponseEntity<List<ProductDto>> generateBaseOfProductsResponse(long groupId, BaseProductType productsType) {
 
         List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
-        List<Product> generalProducts = productService.getProductsOfGroup(1L);
 
-        return new BaseOfProductsResponse(generalProducts, productsOfGroup);
+        // if group == 1 it means that it is group of moderators and return always  general products
+        if(groupId == 1L){
+            return new ResponseEntity<>(productsOfGroup.stream().map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
+        }
+
+        if(productsType.equals(BaseProductType.all)){
+            List<Product> generalProducts = productService.getProductsOfGroup(1L);
+
+            return new ResponseEntity<>(Stream.concat(productsOfGroup.stream(), generalProducts.stream()).map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(productsOfGroup.stream().map(ProductDto::new).collect(Collectors.toList()), HttpStatus.OK);
     }
 }

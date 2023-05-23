@@ -1,5 +1,6 @@
 package pl.plantoplate.REST.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.BaseOfProductsResponse;
+import pl.plantoplate.REST.dto.Response.ProductDto;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -67,7 +68,7 @@ public class BaseProductControllerTest {
 
     @Test
     @WithMockUser(value = "email@gmail.com")
-    void shouldReturnBaseOfProduct() throws Exception {
+    void shouldReturnAllProductsFromBase() throws Exception {
 
         //given
         String email = "email@gmail.com";
@@ -90,14 +91,48 @@ public class BaseProductControllerTest {
         when(productService.getProductsOfGroup(groupId)).thenReturn(groupProducts);
 
         //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/products"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/products?type=all"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //then
-        BaseOfProductsResponse base = mapper.readValue(mvcResult.getResponse().getContentAsString(), BaseOfProductsResponse.class);
-        assertEquals(base.getGeneral().size(), generalProducts.size());
-        assertEquals(base.getGroup().size(), groupProducts.size());
+        List<ProductDto> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductDto>>(){});
+        assertEquals(generalProducts.size() + groupProducts.size(), base.size());
+    }
+
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldReturnGroupProducts() throws Exception {
+
+        //given
+        String email = "email@gmail.com";
+        long groupId = 2L;
+        long generalGroupId = 1L;
+        Group group = new Group();
+        group.setId(groupId);
+
+        Product p = new Product();
+        p.setUnit(Unit.L);
+        Category category = new Category();
+        category.setCategory("Inne");
+        p.setCategory(category);
+
+        List<Product> generalProducts = List.of(p, p);
+        List<Product> groupProducts = List.of(p);
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(productService.getProductsOfGroup(generalGroupId)).thenReturn(generalProducts);
+        when(productService.getProductsOfGroup(groupId)).thenReturn(groupProducts);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/products?type=group"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        List<ProductDto> base = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ProductDto>>(){});
+        assertEquals(groupProducts.size(), base.size());
     }
 
 

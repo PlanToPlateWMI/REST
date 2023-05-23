@@ -34,6 +34,7 @@ import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Role;
+import pl.plantoplate.REST.exception.WrongQueryParam;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -101,10 +102,11 @@ public class InviteCodeController {
                             schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity generateInviteCode(@RequestParam("role") @Parameter(schema = @Schema(description = "role",type = "string", allowableValues = {"USER", "ADMIN"})) String role){
 
-        List<String> availableRoles = Arrays.stream(Role.values()).map(Enum::name).collect(Collectors.toList());
 
-        if(!availableRoles.contains("ROLE_" + role)){
-            return ResponseEntity.badRequest().body(new SimpleResponse("Role value is wrong. Available roles : ADMIN, USER"));
+        try{
+            Role.valueOf("ROLE_" + role);
+        }catch (IllegalArgumentException e){
+            throw new WrongQueryParam("Query keys available - USER and ADMIN");
         }
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

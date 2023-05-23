@@ -35,6 +35,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(WrongQueryParam.class)
+    public ResponseEntity<SimpleResponse> wrongQueryParama(WrongQueryParam e) {
+        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
     private static ResponseEntity<SimpleResponse> buildResponseEntity(Exception e, HttpStatus status) {
         return new ResponseEntity<>(new SimpleResponse(e.getMessage()),status );
     }
