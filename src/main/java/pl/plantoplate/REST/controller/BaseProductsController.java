@@ -54,10 +54,10 @@ public class BaseProductsController {
     }
 
     @GetMapping
-    @Operation(summary="Get products of base depend on query param (default without query param - all): type = all - all products, " +
+    @Operation(summary="Get products of base depends on query param (default value without query param - all): type = all - all products, " +
             "type = group - product of group",description = "User can get list of all products or group products")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "2 lists of products - general and group products",  content = @Content(
+            @ApiResponse(responseCode = "200", description = "list of products depends on query param value",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
@@ -71,34 +71,16 @@ public class BaseProductsController {
             BaseProductType.valueOf(typeOfProduct);
         }
         catch (IllegalArgumentException e){
-            throw new WrongQueryParam("Query keys available - ALL and GROUP");
+            throw new WrongQueryParam("Query values available - ALL and GROUP");
         }
 
-        return generateBaseOfProductsResponse(group.getId(), BaseProductType.valueOf(typeOfProduct));
-    }
-
-    @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Product successfully updated ",  content = @Content(
-                    schema = @Schema(implementation = SimpleResponse.class))),
-            @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
-                    " general product of product not of his group",  content = @Content(
-                    schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<SimpleResponse> updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
-
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Group group = userService.findGroupOfUser(email);
-
-        productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
-
-        return ResponseEntity.ok().body(new SimpleResponse("Product was updated"));
+        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.valueOf(typeOfProduct));
     }
 
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Add new product to group. Return list of products of users group",description = "User with Role ADMIN can add new product to group")
+    @Operation(summary="Add new product to group. Return list of products of group",description = "User with Role ADMIN can add new product to group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully added ",   content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
@@ -111,19 +93,39 @@ public class BaseProductsController {
         Group group = userService.findGroupOfUser(email);
         productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
 
-        return generateBaseOfProductsResponse(group.getId(), BaseProductType.group);
+        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
+    }
+
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary="Update product of group. Return list of products of group.",description = "User can update product of his group")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product successfully updated ",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to update product but it already exists (the same name and unit) or category or unit are not correct or user try to update" +
+                    " general product of product not of his group",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<ProductDto>> updateProduct(@PathVariable long id, @RequestBody BaseProductRequest updateProductRequest) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = userService.findGroupOfUser(email);
+
+        productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
+
+        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
     }
 
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Delete group product - form list of group products and from shopping list",description = "User with Role ADMIN can delete group product")
+    @Operation(summary="Delete group product - from list of group products and from shopping list. Return list of products of group.",description = "User with Role ADMIN can delete group product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully deleted ",  content = @Content(
-                    schema = @Schema(implementation = SimpleResponse.class))),
+                    array = @ArraySchema(schema = @Schema(implementation = ProductDto.class)))),
             @ApiResponse(responseCode = "400", description = "User try to delete general product or delete product not from his group",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<SimpleResponse> deleteProductFromGroupBase(@PathVariable Long id){
+    public ResponseEntity<List<ProductDto>> deleteProductFromGroupBase(@PathVariable Long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
@@ -132,11 +134,11 @@ public class BaseProductsController {
 
         productService.deleteById(id, groupId);
 
-        return ResponseEntity.ok(new SimpleResponse("Product with id [" + id + "] was deleted"));
+        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
 
     }
 
-    private ResponseEntity<List<ProductDto>> generateBaseOfProductsResponse(long groupId, BaseProductType productsType) {
+    private ResponseEntity<List<ProductDto>> generateListOfProductDtoDependsOnTypeOfProducts(long groupId, BaseProductType productsType) {
 
         List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
 
