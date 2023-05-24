@@ -24,7 +24,7 @@ public class GroupServiceTest {
     private GroupService groupService;
     private CategoryService categoryService;
     private ProductService productService;
-    private ShopProductService shopProductGroup;
+    private ShoppingListService shopProductGroup;
 
     @BeforeEach
     void setUp(){
@@ -32,7 +32,7 @@ public class GroupServiceTest {
         userRepository = mock(UserRepository.class);
         categoryService = mock(CategoryService.class);
         productService = mock(ProductService.class);
-        shopProductGroup = mock(ShopProductService.class);
+        shopProductGroup = mock(ShoppingListService.class);
         groupService = new GroupService(groupRepository, userRepository,categoryService, productService, shopProductGroup);
     }
 

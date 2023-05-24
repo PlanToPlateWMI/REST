@@ -33,10 +33,10 @@ import pl.plantoplate.REST.dto.Request.AmountRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.exception.WrongQueryParam;
-import pl.plantoplate.REST.service.ShopProductService;
+import pl.plantoplate.REST.service.ShoppingListService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
@@ -48,13 +48,13 @@ import java.util.stream.Collectors;
 public class ShoppingListController {
 
 
-    private final ShopProductService shopProductService;
+    private final ShoppingListService shoppingListService;
     private final UserService userService;
 
 
     @Autowired
-    public ShoppingListController(ShopProductService shopProductService, UserService userService) {
-        this.shopProductService = shopProductService;
+    public ShoppingListController(ShoppingListService shoppingListService, UserService userService) {
+        this.shoppingListService = shoppingListService;
         this.userService = userService;
     }
 
@@ -74,10 +74,10 @@ public class ShoppingListController {
         if(!typeOfProduct.equals("true") && !typeOfProduct.equals("false"))
             throw new WrongQueryParam("Query param values available : true and false");
 
-        boolean type = Boolean.parseBoolean(typeOfProduct);
+        ProductState productState = Boolean.parseBoolean(typeOfProduct) ? ProductState.BOUGHT : ProductState.BUY;
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ShoppingProductResponse> shopProductList = shopProductService.getProducts(email, type).stream()
+        List<ShoppingProductResponse> shopProductList = shoppingListService.getProducts(email, productState).stream()
                 .map(ShoppingProductResponse::new)
                 .collect(Collectors.toList());
 
@@ -97,7 +97,7 @@ public class ShoppingListController {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ShoppingProductResponse> shopProductList =
-                shopProductService.addProductToList(productRequest.getId(), productRequest.getAmount(), email).stream()
+                shoppingListService.addProductToShoppingList(productRequest.getId(), productRequest.getAmount(), email).stream()
                 .map(ShoppingProductResponse::new)
                 .collect(Collectors.toList());
 
@@ -117,7 +117,7 @@ public class ShoppingListController {
     public ResponseEntity<List<ShoppingProductResponse>> modifyShopProductAmount(@RequestBody AmountRequest amountRequest, @PathVariable long id) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ShoppingProductResponse> productDtos = shopProductService.modifyAmount(id, email, amountRequest.getAmount()).stream()
+        List<ShoppingProductResponse> productDtos = shoppingListService.modifyAmount(id, email, amountRequest.getAmount()).stream()
                 .map(ShoppingProductResponse::new).collect(Collectors.toList());
 
         return new ResponseEntity<>(productDtos, HttpStatus.OK);
@@ -136,13 +136,13 @@ public class ShoppingListController {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<ShopProduct> shopProductList = shopProductService.changeIsBought(id, email);
+        List<ShopProduct> shopProductList = shoppingListService.changeProductStateOnShoppingList(id, email);
 
-        Map<Boolean, List<ShopProduct>> mapOfBoughtAndToBuyProducts = shopProductList.stream().
-                collect(Collectors.partitioningBy(ShopProduct::isBought));
+        Map<ProductState, List<ShopProduct>> mapOfBoughtAndToBuyProducts = shopProductList.stream().
+                collect(Collectors.groupingBy(ShopProduct::getProductState));
 
-        ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(true),
-                mapOfBoughtAndToBuyProducts.get(false));
+        ShoppingProductsResponse response = new ShoppingProductsResponse(mapOfBoughtAndToBuyProducts.get(ProductState.BOUGHT),
+                mapOfBoughtAndToBuyProducts.get(ProductState.BUY));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -161,7 +161,7 @@ public class ShoppingListController {
     public ResponseEntity<List<ShoppingProductResponse>> deleteProductFromShoppingList(@PathVariable long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ShoppingProductResponse> productResponses = shopProductService.deleteProduct(id, email).stream()
+        List<ShoppingProductResponse> productResponses = shoppingListService.deleteProduct(id, email).stream()
                 .map(ShoppingProductResponse::new)
                 .collect(Collectors.toList());
 

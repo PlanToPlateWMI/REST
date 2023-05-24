@@ -1,0 +1,16 @@
+package pl.plantoplate.REST.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.shoppinglist.ProductState;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
+
+import java.util.List;
+
+@Repository
+public interface PantryRepository extends JpaRepository<ShopProduct, Long> {
+
+    List<ShopProduct> findAllByProductStateAndGroup(ProductState state, Group group);
+
+}

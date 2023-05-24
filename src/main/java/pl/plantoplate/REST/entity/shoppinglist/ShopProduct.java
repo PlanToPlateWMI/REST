@@ -22,6 +22,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -46,13 +47,27 @@ public class ShopProduct {
     @Column
     private int amount;
 
-    @Column(name = "is_bought")
-    private boolean isBought;
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private ProductState productState;
 
-    public ShopProduct(Product product, Group group, int amount, boolean isBought) {
+    public ShopProduct(Product product, Group group, int amount, ProductState productState) {
         this.product = product;
         this.group = group;
         this.amount = amount;
-        this.isBought = isBought;
+        this.productState = productState;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShopProduct that = (ShopProduct) o;
+        return id == that.id && amount == that.amount && productState == that.productState;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, amount, productState);
     }
 }

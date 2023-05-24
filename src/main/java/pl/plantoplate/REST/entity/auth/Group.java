@@ -25,6 +25,7 @@ import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_group")
@@ -50,5 +51,18 @@ public class Group {
     public void addUser(User user){
         users.add(user);
         user.setUserGroup(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return id.equals(group.id) && name.equals(group.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
@@ -20,21 +19,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.dto.Request.AmountRequest;
-import pl.plantoplate.REST.dto.Response.ProductResponse;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
-import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.security.JwtUtils;
-import pl.plantoplate.REST.service.ShopProductService;
+import pl.plantoplate.REST.service.ShoppingListService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -44,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@DisplayName("BaseProductController test")
+@DisplayName("ShoppingListController test")
 @Sql({"/schema-test.sql", "/data-test.sql"})
 public class ShoppingListControllerTest {
 
@@ -54,14 +50,10 @@ public class ShoppingListControllerTest {
     @Autowired
     private WebApplicationContext context;
 
-    @Autowired
-    private JwtUtils utils;
-
-
     @MockBean
     private UserService userService;
     @MockBean
-    private ShopProductService productService;
+    private ShoppingListService productService;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -94,7 +86,7 @@ public class ShoppingListControllerTest {
         shopProduct.setProduct(product);
 
         List<ShopProduct> products = List.of(shopProduct);
-        when(productService.getProducts(email, false)).thenReturn(products);
+        when(productService.getProducts(email, ProductState.BUY)).thenReturn(products);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/shopping?bought=false"))
@@ -126,7 +118,7 @@ public class ShoppingListControllerTest {
         shopProduct.setProduct(product);
 
         List<ShopProduct> products = List.of(shopProduct);
-        when(productService.getProducts(email, true)).thenReturn(products);
+        when(productService.getProducts(email, ProductState.BOUGHT)).thenReturn(products);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/shopping?bought=true"))
@@ -156,7 +148,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).addProductToList(productId, amount, email);
+        verify(productService).addProductToShoppingList(productId, amount, email);
     }
 
 
@@ -205,7 +197,7 @@ public class ShoppingListControllerTest {
 
     @Test
     @WithMockUser(value = "email@gmail.com")
-    void shouldModifyIsBoughtProductOnShoppingList() throws Exception {
+    void shouldModifyStateOfProductOnShoppingList() throws Exception {
 
         //given
         String email = "email@gmail.com";
@@ -218,7 +210,7 @@ public class ShoppingListControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(productService).changeIsBought(productId, email);
+        verify(productService).changeProductStateOnShoppingList(productId, email);
     }
 
 

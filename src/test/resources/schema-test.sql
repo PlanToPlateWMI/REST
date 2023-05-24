@@ -51,7 +51,7 @@ create table shop_product_group(
     amount int check (amount > 0),
     product_id bigint not null ,
     group_owner_id bigint not null ,
-    is_bought bool
+    state varchar check (state in ('BUY', 'BOUGHT', 'PANTRY'))
 );
 
 

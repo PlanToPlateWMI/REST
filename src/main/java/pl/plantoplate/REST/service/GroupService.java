@@ -24,6 +24,7 @@ import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
@@ -42,16 +43,16 @@ public class GroupService {
 
     private final ProductService productService;
 
-    private final ShopProductService shopProductService;
+    private final ShoppingListService shoppingListService;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, CategoryService categoryService, ProductService productService, ShopProductService shopProductService) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, CategoryService categoryService, ProductService productService, ShoppingListService shoppingListService) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
 
         this.categoryService = categoryService;
         this.productService = productService;
-        this.shopProductService = shopProductService;
+        this.shoppingListService = shoppingListService;
     }
 
     /**
@@ -100,25 +101,25 @@ public class GroupService {
             shopProduct.setProduct(product1);
             shopProduct.setGroup(group);
             shopProduct.setAmount(2);
-            shopProduct.setBought(false);
+            shopProduct.setProductState(ProductState.BUY);
 
-            shopProductService.save(shopProduct);
+            shoppingListService.save(shopProduct);
 
             ShopProduct shopProduct2 = new ShopProduct();
             shopProduct2.setProduct(product2);
             shopProduct2.setGroup(group);
             shopProduct2.setAmount(3);
-            shopProduct2.setBought(false);
+            shopProduct2.setProductState(ProductState.BUY);
 
-            shopProductService.save(shopProduct2);
+            shoppingListService.save(shopProduct2);
 
             ShopProduct shopProduct3 = new ShopProduct();
             shopProduct3.setProduct(product3);
             shopProduct3.setGroup(group);
             shopProduct3.setAmount(10);
-            shopProduct3.setBought(true);
+            shopProduct3.setProductState(ProductState.BOUGHT);
 
-            shopProductService.save(shopProduct3);
+            shoppingListService.save(shopProduct3);
 
             log.info("User with email [" + email + "] created new group");
         }

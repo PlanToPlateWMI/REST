@@ -19,6 +19,11 @@ public class ShoppingProductsResponse {
         this.bought = new ArrayList<>();
         this.toBuy = new ArrayList<>();
 
+        if(bought == null)
+            bought = new ArrayList<>();
+        if(toBuy == null)
+            toBuy = new ArrayList<>();
+
         for(ShopProduct p: bought){
             this.bought.add(new ShoppingProductResponse(p));
         }
