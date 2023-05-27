@@ -36,13 +36,21 @@ public class MailSenderServiceImpl implements MailSenderService{
     }
 
     /**
-     * Send email to email address from MailParams with code
+     * Send email to email address from MailParams with code and depends on type email change subject and body of email
      * @param mailParams
+     * @param emailType
      */
     @Override
-    public void send(MailParams mailParams) {
-        String mailSubject = "Activate account in PlanToPlate mobile app";
-        String messageBody = String.format("To confirm your email address use code :\n%d", mailParams.getCode());
+    public void send(MailParams mailParams,  EmailType emailType) {
+        String mailSubject = null;
+        String messageBody = null;
+        if (emailType.equals(EmailType.registration)) {
+             mailSubject = "Activate account in PlanToPlate mobile app";
+             messageBody = String.format("To confirm your email address to continue registration use code :\n%d", mailParams.getCode());
+        }else if(emailType.equals(EmailType.reset)){
+            mailSubject = "Reset password to your account in PlanToPlate mobile app";
+            messageBody = String.format("To confirm your email address to reset password use code :\n%d", mailParams.getCode());
+        }
         String emailTo = mailParams.getEmailTo();
 
         SimpleMailMessage message = new SimpleMailMessage();

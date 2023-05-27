@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
+import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.UserService;
@@ -81,7 +82,7 @@ public class MailControllerTest {
 
         //then
         ArgumentCaptor<MailParams> mailParamsArgumentCaptor = ArgumentCaptor.forClass(MailParams.class);
-        verify(mailSenderService).send(mailParamsArgumentCaptor.capture());
+        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), EmailType.registration);
 
         MailParams mailParams = mailParamsArgumentCaptor.getValue();
         CodeResponse codeResponse = mapper.readValue(result.getResponse().getContentAsString(), CodeResponse.class);

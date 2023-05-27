@@ -17,6 +17,6 @@ package pl.plantoplate.REST.mail;
 
 public interface MailSenderService {
 
-        void send(MailParams mailParams);
+        void send(MailParams mailParams, EmailType emailEnum);
 
 }

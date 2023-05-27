@@ -74,7 +74,7 @@ public class ShoppingListService {
 
         // check if product with the same name nad unit already exists in shopping list and
         // if it is so - sum amounts
-        List<ShopProduct> toBuyProductOfGroupList = shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), group.getId());
+        List<ShopProduct> toBuyProductOfGroupList = shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group);
 
         if(toBuyProductOfGroupList.stream().anyMatch(p -> p.getProduct().getName().equals(product.getName()) &&
                 p.getProduct().getUnit().equals(product.getUnit()))){
@@ -134,7 +134,7 @@ public class ShoppingListService {
             throw new NoValidProductWithAmount("Product amount cannot be negative or 0");
         }
 
-        List<ShopProduct> toBuyProductOfGroup = shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), group.getId());
+        List<ShopProduct> toBuyProductOfGroup = shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group);
         if(toBuyProductOfGroup.stream().noneMatch(p -> p.getId() == id)){
             log.info("User try to modify product not from toBuy list");
             throw new NoValidProductWithAmount("User try to modify product not from toBuyList ");

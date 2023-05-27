@@ -36,7 +36,7 @@ public class MailSenderServiceImplTest {
         MailParams mailParams = new MailParams(code, emailTo);
 
         //when
-        mailSenderService.send(mailParams);
+        mailSenderService.send(mailParams, EmailType.registration);
 
         //then
         ArgumentCaptor<SimpleMailMessage> messageArgumentCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);

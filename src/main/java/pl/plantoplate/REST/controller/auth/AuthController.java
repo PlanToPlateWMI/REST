@@ -35,8 +35,7 @@ import pl.plantoplate.REST.dto.Request.SignupRequest;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.entity.auth.Role;
-import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.GroupService;
@@ -92,7 +91,7 @@ public class AuthController {
 
         //generate code and send it to user's email address
         int code = ControllerUtils.generateCode(1000, 8999);
-        mailSenderService.send(new MailParams(code, userSignupInfo.getEmail()));
+        mailSenderService.send(new MailParams(code, userSignupInfo.getEmail()), EmailType.registration);
 
         log.info("User with email [ " + userSignupInfo.getEmail() +"] started registration");
 

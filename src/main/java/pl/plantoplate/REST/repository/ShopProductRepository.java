@@ -27,8 +27,6 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
 
     List<ShopProduct> findByGroup(Group group);
 
-    @Modifying
-    @Transactional
-    @Query(nativeQuery = true, value  = "SELECT * FROM shop_product_group WHERE state = :state and group_owner_id = :group_id")
-    List<ShopProduct> findAllByIsBoughtAndGroupId(@Param("state") String state, @Param("group_id") Long groupId);
+
+    List<ShopProduct> findAllByProductStateAndGroup(ProductState productState, Group group);
 }

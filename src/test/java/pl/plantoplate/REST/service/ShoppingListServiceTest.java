@@ -106,7 +106,7 @@ public class ShoppingListServiceTest {
         when(productService.findById(productId)).thenReturn(product);
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
-        when(shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), groupId)).thenReturn(List.of(shopProduct));
+        when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when
@@ -142,7 +142,7 @@ public class ShoppingListServiceTest {
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.findById(productId)).thenReturn(product);
         when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
-        when(shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), groupId)).thenReturn(new ArrayList<>());
+        when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(new ArrayList<>());
 
 
         //when
@@ -219,7 +219,7 @@ public class ShoppingListServiceTest {
         int amount = 20;
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), groupId)).thenReturn(new ArrayList<>());
+        when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(new ArrayList<>());
 
         //when
         assertThrows(Exception.class, () -> shoppingListService.modifyAmount(shopProductId, email, amount));
@@ -240,7 +240,7 @@ public class ShoppingListServiceTest {
         shopProduct.setId(productId);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), groupId)).thenReturn(List.of(shopProduct));
+        when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findById(productId)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when

@@ -16,6 +16,7 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.controller.auth;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,8 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
+import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.exception.WrongQueryParam;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.UserService;
@@ -55,13 +58,23 @@ public class MailController {
      * @return generated code
      */
     @GetMapping("/code")
-    @Operation(summary="Send code to email",description = "If user doesn't receive previously generated code he will able to ask for resending a new code ")
+    @Operation(summary="Send code to email. There are 2 type of email - email to confirm registration and emila to confirm reset password,",description = "If user doesn't receive previously generated code he will able to ask for resending a new code ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API send back code that it sends to user's email", content = @Content(
                     schema = @Schema(implementation = CodeResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist", content = @Content(
+            @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist or type of email is invalid", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity generateCodeToEmail(@RequestParam("email") String email){
+    public ResponseEntity generateCodeToEmail(@RequestParam("email") String email,
+                                              @RequestParam(value = "type", defaultValue = "registration")
+                                              @Parameter(schema = @Schema(description = "type of email to send",type = "string", allowableValues = {"registration", "reset"})) String emailType){
+
+
+        EmailType emailEnum= null;
+        try{
+            emailEnum = EmailType.valueOf(emailType);
+        }catch (IllegalArgumentException e){
+            throw new WrongQueryParam("Query keys available - USER and ADMIN");
+        }
 
         if (!userService.existsByEmail(email)) {
             return new ResponseEntity(
@@ -69,7 +82,7 @@ public class MailController {
         }
 
         int code = ControllerUtils.generateCode(1000, 8999);
-        mailSenderService.send(new MailParams(code, email));
+        mailSenderService.send(new MailParams(code, email),emailEnum );
         log.info("For user with email ["+email+"] was generated code ["+code+"] to confirm email");
         return ResponseEntity.ok(new CodeResponse(code));
     }

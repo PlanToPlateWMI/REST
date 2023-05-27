@@ -26,6 +26,7 @@ import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -110,7 +111,7 @@ public class AuthControllerTest {
 
         //check if code sent to email is equals code from response
         ArgumentCaptor<MailParams> mailParamsArgumentCaptor = ArgumentCaptor.forClass(MailParams.class);
-        verify(mailSenderService).send(mailParamsArgumentCaptor.capture());
+        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), EmailType.registration);
 
         MailParams mailParams = mailParamsArgumentCaptor.getValue();
         CodeResponse codeResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), CodeResponse.class);
