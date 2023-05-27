@@ -215,6 +215,49 @@ public class PantryServiceTest {
     }
 
 
+    @Test
+    void shouldThrowExceptionWhenUserTryToDeleteProductNotFromHistGroup(){
+
+        //given
+        long productId = 1L;
+        long groupId = 2L;
+        String email = "email";
+        Group group = new Group();
+        group.setId(groupId);
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(new ArrayList<>());
+
+        assertThrows(Exception.class, () -> pantryService.deleteProduct(productId, email));
+    }
+
+
+    @Test
+    void shouldDeleteProductFromShoppingList() throws NoValidProductWithAmount {
+
+        //given
+        long productId = 1L;
+        long groupId = 2L;
+        String email = "email";
+        Group group = new Group();
+        group.setId(groupId);
+
+        ShopProduct product = new ShopProduct();
+        product.setId(productId);
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(List.of(product));
+        when(pantryRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
+
+
+        //when
+        pantryService.deleteProduct(productId, email);
+
+        //then
+        verify(pantryRepository).delete(product);
+    }
+
+
 
 
 }

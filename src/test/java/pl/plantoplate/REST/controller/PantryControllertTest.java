@@ -154,4 +154,22 @@ public class PantryControllertTest {
         verify(pantryService).addProductToPantry(productId, amount, email);
 
     }
+
+
+    @Test
+    @WithMockUser(value = "email@gmail.com", roles = {"ADMIN"})
+    void shouldDeleteProductFromShoppingList() throws Exception {
+        //given
+        String email = "email@gmail.com";
+        Group group = new Group();
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        long productId = 1L;
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/pantry/" + productId))
+                .andExpect(status().isOk());
+
+        //then
+        verify(pantryService).deleteProduct(productId, email);
+    }
 }

@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
@@ -94,8 +95,27 @@ public class PantryController {
                 pantryService.addProductToPantry(productRequest.getId(), productRequest.getAmount(), email).stream()
                         .map(ShoppingProductResponse::new)
                         .collect(Collectors.toList());
-
         return new ResponseEntity<>(pantryProductList, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary= "Delete product from pantry. Return list of product in pantry. ",description = "User can add delete from pantry ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product was successfully deleted",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to delete product not of his group or product not exists",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<ShoppingProductResponse>> deleteProductFromShoppingList(@PathVariable long id){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<ShoppingProductResponse> productResponses = pantryService.deleteProduct(id, email).stream()
+                .map(ShoppingProductResponse::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
 

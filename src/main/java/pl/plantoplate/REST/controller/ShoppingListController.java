@@ -155,8 +155,7 @@ public class ShoppingListController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully deleted",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
-            @ApiResponse(responseCode = "400", description = "User try to delete product not of his group " +
-                    "or amount is negative or 0",  content = @Content(
+            @ApiResponse(responseCode = "400", description = "User try to delete product not of his group or product not exists",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<List<ShoppingProductResponse>> deleteProductFromShoppingList(@PathVariable long id){
 

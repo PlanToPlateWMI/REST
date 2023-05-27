@@ -1,3 +1,18 @@
+/*
+Copyright 2023 the original author or authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You
+may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ */
+
 package pl.plantoplate.REST.service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +74,14 @@ public class PantryService {
         return pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group);
     }
 
+
+    /**
+     * Add product to pantry from base
+     * @param productId - id of product in base
+     * @param amount -amount of product
+     * @param email - email of user to identify his group
+     * @return
+     */
     public List<ShopProduct> addProductToPantry(long productId, int amount, String email) {
 
         Group group = userService.findGroupOfUser(email);
@@ -86,16 +109,45 @@ public class PantryService {
             pantryProduct.setAmount(pantryProduct.getAmount() + amount);
 
             pantryRepository.save(pantryProduct);
-            log.info("Product with id [" + productId + "] exists in shopping list. Modified his amount.");
+            log.info("Product with id [" + productId + "] exists in pantry. Modified his amount.");
         }else{
             ShopProduct pantryProduct = new ShopProduct(product, group, amount, ProductState.PANTRY);
             pantryRepository.save(pantryProduct);
-            log.info("Product with id [" + productId + "] added to shopping list.");
+            log.info("Product with id [" + productId + "] added to pantry.");
         }
 
 
         return this.findProductsFromPantry(email);
     }
+
+
+    /**
+     * Delete product from pantry by product id and email of user
+     * @param pantryProductId - pantry Product id
+     * @param email - email of user to identify his group
+     * @return
+     */
+    public List<ShopProduct> deleteProduct(long pantryProductId, String email) {
+
+        Group group = userService.findGroupOfUser(email);
+        Product product = productService.findById(pantryProductId);
+
+        List<ShopProduct> pantryProductsOfGroup = this.findProductsFromPantry(email);
+
+        if(pantryProductsOfGroup.stream().noneMatch(p -> p.getId() == pantryProductId)){
+            log.info("User try to delete product not from his pantry or product not exists");
+            throw new NoValidProductWithAmount("User try to delete product not from his pantry or product not exists in pantry");
+        }
+
+
+        ShopProduct productGroup = pantryRepository.findById(pantryProductId).get();
+        pantryRepository.delete(productGroup);
+        log.info("Product with id [" + pantryProductId + "] was deleted from pantry");
+
+
+        return this.findProductsFromPantry(email);
+    }
+
 
 
 
