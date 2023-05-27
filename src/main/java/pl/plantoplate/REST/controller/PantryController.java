@@ -27,6 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
+import pl.plantoplate.REST.dto.Request.AmountRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
@@ -107,7 +108,7 @@ public class PantryController {
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User try to delete product not of his group or product not exists",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ShoppingProductResponse>> deleteProductFromShoppingList(@PathVariable long id){
+    public ResponseEntity<List<ShoppingProductResponse>> deleteProductFromPantry(@PathVariable long id){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -116,6 +117,25 @@ public class PantryController {
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
+    }
+
+
+    @PatchMapping("/{id}")
+    @Operation(summary="Modify product amount in pantry.",
+            description = "User modify amount of product in pantry ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Amount was modifies",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to modify product not from his pantry or" +
+                    "amount is negative or 0",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<ShoppingProductResponse>> modifyPantryProductAmount(@RequestBody AmountRequest amountRequest, @PathVariable long id) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ShoppingProductResponse> productDtos = pantryService.modifyAmount(id, email, amountRequest.getAmount()).stream()
+                .map(ShoppingProductResponse::new).collect(Collectors.toList());
+
+        return new ResponseEntity<>(productDtos, HttpStatus.OK);
     }
 
 

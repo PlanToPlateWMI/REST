@@ -211,6 +211,7 @@ public class ShoppingListServiceTest {
     @Test
     void shouldThrowExceptionThenUserTryToModifyAMountToOfHisProduct(){
         //given
+        long shopProductId = 1L;
         long groupId = 2L;
         String email = "email";
         Group group = new Group();
@@ -221,7 +222,7 @@ public class ShoppingListServiceTest {
         when(shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), groupId)).thenReturn(new ArrayList<>());
 
         //when
-        assertThrows(Exception.class, () -> shoppingListService.modifyAmount(1L, email, amount));
+        assertThrows(Exception.class, () -> shoppingListService.modifyAmount(shopProductId, email, amount));
     }
 
     @Test

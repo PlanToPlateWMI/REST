@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
+import pl.plantoplate.REST.dto.Request.AmountRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
@@ -172,4 +173,31 @@ public class PantryControllertTest {
         //then
         verify(pantryService).deleteProduct(productId, email);
     }
+
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldModifyProductOnShoppingList() throws Exception {
+        //given
+        String email = "email@gmail.com";
+        Group group = new Group();
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        long productId = 1L;
+
+        int amount = 10;
+        AmountRequest request = new AmountRequest(amount);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/pantry/" + productId)
+                .content(mapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(pantryService).modifyAmount(productId, email, amount);
+    }
+
+
+
 }

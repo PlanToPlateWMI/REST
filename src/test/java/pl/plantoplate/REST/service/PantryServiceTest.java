@@ -226,7 +226,7 @@ public class PantryServiceTest {
         group.setId(groupId);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(new ArrayList<>());
+        when(pantryRepository.findByIdAndProductStateAndGroup(productId, ProductState.PANTRY, group)).thenReturn(Optional.empty());
 
         assertThrows(Exception.class, () -> pantryService.deleteProduct(productId, email));
     }
@@ -246,7 +246,8 @@ public class PantryServiceTest {
         product.setId(productId);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(List.of(product));
+        when(pantryRepository.findByIdAndProductStateAndGroup(productId, ProductState.PANTRY, group))
+                                            .thenReturn(Optional.of(product));
         when(pantryRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
 
 
@@ -255,6 +256,59 @@ public class PantryServiceTest {
 
         //then
         verify(pantryRepository).delete(product);
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(ints = { -1 , 0})
+    void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(int amount){
+        assertThrows(Exception.class, () -> pantryService.modifyAmount(1L, "email", amount));
+    }
+
+
+    @Test
+    void shouldThrowExceptionThenUserTryToModifyAMountNotOfHisProduct(){
+        //given
+        long groupId = 2L;
+        String email = "email";
+        Group group = new Group();
+        group.setId(groupId);
+        int amount = 20;
+        long pantryProductId = 20L;
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(pantryRepository.findByIdAndProductStateAndGroup(pantryProductId, ProductState.PANTRY, group)).thenReturn(Optional.empty());
+
+        //when
+        assertThrows(NoValidProductWithAmount.class, () -> pantryService.modifyAmount(pantryProductId, email, amount));
+    }
+
+    @Test
+    void shouldModifyAmount() throws NoValidProductWithAmount {
+
+        //given
+        long groupId = 2L;
+        long pantryProductId = 10L;
+        String email = "email";
+        Group group = new Group();
+        group.setId(groupId);
+        int amount = 20;
+
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setId(pantryProductId);
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(pantryRepository.findByIdAndProductStateAndGroup(pantryProductId, ProductState.PANTRY, group)).thenReturn(Optional.of(shopProduct));
+        when(pantryRepository.findById(pantryProductId)).thenReturn(java.util.Optional.of(shopProduct));
+
+        //when
+        pantryService.modifyAmount(pantryProductId, email, amount);
+
+        //then
+        ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
+        verify(pantryRepository).save(shopProductArgumentCaptor.capture());
+        ShopProduct captured = shopProductArgumentCaptor.getValue();
+        assertEquals(amount, captured.getAmount());
     }
 
 

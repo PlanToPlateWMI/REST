@@ -25,6 +25,7 @@ import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.PantryRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -130,11 +131,8 @@ public class PantryService {
     public List<ShopProduct> deleteProduct(long pantryProductId, String email) {
 
         Group group = userService.findGroupOfUser(email);
-        Product product = productService.findById(pantryProductId);
 
-        List<ShopProduct> pantryProductsOfGroup = this.findProductsFromPantry(email);
-
-        if(pantryProductsOfGroup.stream().noneMatch(p -> p.getId() == pantryProductId)){
+        if(pantryRepository.findByIdAndProductStateAndGroup(pantryProductId, ProductState.PANTRY, group).isEmpty()){
             log.info("User try to delete product not from his pantry or product not exists");
             throw new NoValidProductWithAmount("User try to delete product not from his pantry or product not exists in pantry");
         }
@@ -149,6 +147,30 @@ public class PantryService {
     }
 
 
+    /**
+     * Modify amount of product in pantry
+     * @param pantryProductId - id of pantry product
+     * @param email - email of ser to identify his group
+     * @param amount - new amount of product
+     * @return
+     */
+    public List<ShopProduct> modifyAmount(long pantryProductId, String email, int amount) {
 
+        Group group = userService.findGroupOfUser(email);
 
+        if(amount <= 0 ){
+            throw new NoValidProductWithAmount("Product amount cannot be negative or 0");
+        }
+
+        if(pantryRepository.findByIdAndProductStateAndGroup(pantryProductId, ProductState.PANTRY, group).isEmpty()){
+            log.info("User try to modify amount of product not from his pantry or product not exists");
+            throw new NoValidProductWithAmount("User try to modify amount of product not from his pantry or product not exists in pantry");
+        }
+
+        ShopProduct shopProduct = pantryRepository.findById(pantryProductId).get();
+        shopProduct.setAmount(amount);
+        pantryRepository.save(shopProduct);
+
+        return this.findProductsFromPantry(email);
+    }
 }

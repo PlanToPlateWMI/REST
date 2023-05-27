@@ -119,6 +119,13 @@ public class ShoppingListService {
         return getProducts(email, productType);
     }
 
+    /**
+     * Modify amount of product in shopping list
+     * @param id - id of shopping list product
+     * @param email - email of ser to identify his group
+     * @param amount - new amount of product
+     * @return
+     */
     public List<ShopProduct> modifyAmount(long id, String email, int amount) {
 
         Group group = userService.findGroupOfUser(email);
