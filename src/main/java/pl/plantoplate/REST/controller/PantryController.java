@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
@@ -74,6 +75,27 @@ public class PantryController {
 
         return new ResponseEntity<>(shopProductList.stream().map(ShoppingProductResponse::new).collect(Collectors.toList()),
                 HttpStatus.OK);
+    }
+
+    @PostMapping()
+    @Operation(summary= "Add Product to pantry by product id and amount. Return list of product in pantry. ",
+            description = "User can add product to pantry ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product was successfully added",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to add product not of his group " +
+                    "or amount is negative or 0",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<ShoppingProductResponse>> addProductToPantryFromBase(@RequestBody AddShopProductRequest productRequest) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<ShoppingProductResponse> pantryProductList =
+                pantryService.addProductToPantry(productRequest.getId(), productRequest.getAmount(), email).stream()
+                        .map(ShoppingProductResponse::new)
+                        .collect(Collectors.toList());
+
+        return new ResponseEntity<>(pantryProductList, HttpStatus.OK);
     }
 
 

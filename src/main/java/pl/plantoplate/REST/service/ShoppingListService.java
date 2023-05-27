@@ -21,7 +21,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
+import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class ShoppingListService {
         Group group = userService.findGroupOfUser(email);
 
         if(amount <= 0 ){
-            throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
+            throw new NoValidProductWithAmount("Product amount cannot be negative or 0");
         }
 
         Product product = productService.findById(productId);
@@ -69,7 +69,7 @@ public class ShoppingListService {
 
         if(productsOfGroup.stream().noneMatch(p -> p.getId() == productId)){
             log.info("User try to add product not from his list to shopping list");
-            throw new WrongProductInShoppingList("User try to add product to shopping list not from his list");
+            throw new NoValidProductWithAmount("User try to add product to shopping list not from his list");
         }
 
         // check if product with the same name nad unit already exists in shopping list and
@@ -108,7 +108,7 @@ public class ShoppingListService {
 
         if(shopProductsOfGroup.stream().noneMatch(p -> p.getId() == id)){
             log.info("User try to delete product not from his shopping list or product not exists");
-            throw new WrongProductInShoppingList("User try to delete product not from his shopping list");
+            throw new NoValidProductWithAmount("User try to delete product not from his shopping list");
         }
 
         ShopProduct productGroup = shopProductRepository.findById(id).get();
@@ -124,13 +124,13 @@ public class ShoppingListService {
         Group group = userService.findGroupOfUser(email);
 
         if(amount <= 0 ){
-            throw new WrongProductInShoppingList("Product amount cannot be negative or 0");
+            throw new NoValidProductWithAmount("Product amount cannot be negative or 0");
         }
 
         List<ShopProduct> toBuyProductOfGroup = shopProductRepository.findAllByIsBoughtAndGroupId(ProductState.BUY.name(), group.getId());
         if(toBuyProductOfGroup.stream().noneMatch(p -> p.getId() == id)){
             log.info("User try to modify product not from toBuy list");
-            throw new WrongProductInShoppingList("User try to modify product not from toBuyList ");
+            throw new NoValidProductWithAmount("User try to modify product not from toBuyList ");
         }
 
         ShopProduct productGroup = shopProductRepository.findById(id).get();
@@ -154,7 +154,7 @@ public class ShoppingListService {
 
         if(shopProductsOfGroup.stream().noneMatch(p -> p.getId() == id)){
             log.info("User try to change product not from his shopping list or product not exists");
-            throw new WrongProductInShoppingList("User try to change product not from his shopping list");
+            throw new NoValidProductWithAmount("User try to change product not from his shopping list");
         }
 
         ShopProduct shopProduct = shopProductRepository.findById(id).get();

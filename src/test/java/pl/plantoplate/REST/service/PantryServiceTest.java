@@ -3,13 +3,20 @@ package pl.plantoplate.REST.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
+import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.PantryRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,12 +29,14 @@ public class PantryServiceTest {
     private PantryRepository pantryRepository;
     private UserService userService;
     private PantryService pantryService;
+    private ProductService productService;
 
     @BeforeEach
     void init(){
         pantryRepository = mock(PantryRepository.class);
         userService = mock(UserService.class);
-        pantryService = new PantryService(pantryRepository, userService);
+        productService = mock(ProductService.class);
+        pantryService = new PantryService(pantryRepository, userService, productService);
     }
 
 
@@ -73,7 +82,7 @@ public class PantryServiceTest {
         when(pantryRepository.findById(products[0])).thenReturn(Optional.of(bought));
         when(pantryRepository.findById(products[1])).thenReturn(Optional.of(toBuy));
 
-        assertThrows(WrongProductInShoppingList.class, () -> pantryService.transferProductToPantry(email, products));
+        assertThrows(NoValidProductWithAmount.class, () -> pantryService.transferProductToPantry(email, products));
     }
 
 
@@ -102,6 +111,109 @@ public class PantryServiceTest {
         assertEquals(ProductState.PANTRY, bought2.getProductState());
         verify(pantryRepository).findAllByProductStateAndGroup(ProductState.PANTRY, group);
     }
+
+
+    @ParameterizedTest
+    @ValueSource(ints = {0,-20})
+    void shouldThrowExceptionWhenAmountIsZeroOrNegative(int amount){
+        long productId = 1L;
+        String email = "email";
+        when(userService.findGroupOfUser(email)).thenReturn(new Group());
+
+        assertThrows(NoValidProductWithAmount.class, () -> pantryService.addProductToPantry(productId, amount, email));
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenProductNotOfUsersGroup(){
+        long productId = 1L;
+        String email = "email";
+        int amount = 40;
+
+        long groupId = 2L;
+        Group group = new Group();
+        group.setId(groupId);
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
+
+        assertThrows(NoValidProductWithAmount.class, () -> pantryService.addProductToPantry(productId, amount, email));
+    }
+
+    @Test
+    void shouldIncreaseAmountIfProductExists(){
+
+        //given
+        long productId = 1L;
+        long groupId = 2L;
+        Group group = new Group();
+        group.setId(groupId);
+        String email = "email";
+        int addAmount = 1;
+        int oldAmount = 20;
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setCreated_by(group);
+        product.setName("Name");
+        product.setUnit(Unit.L);
+
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setProduct(product);
+        shopProduct.setAmount(oldAmount);
+
+        when(productService.findById(productId)).thenReturn(product);
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(List.of(shopProduct));
+        when(pantryRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
+
+        //when
+        pantryService.addProductToPantry(productId, addAmount, email);
+
+        //then
+        ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
+        verify(pantryRepository).save(shopProductArgumentCaptor.capture());
+        ShopProduct saved = shopProductArgumentCaptor.getValue();
+
+        assertEquals(saved.getAmount(), oldAmount + addAmount);
+    }
+
+
+    @Test
+    void shouldAddProductToPantry() throws EntityNotFound, NoValidProductWithAmount {
+        //given
+        long productId = 1L;
+        long groupId = 2L;
+        String email = "email";
+        Group group = new Group();
+        group.setId(groupId);
+        int addAmount = 1;
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setCreated_by(group);
+        product.setName("Name");
+        product.setUnit(Unit.L);
+
+
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        when(productService.findById(productId)).thenReturn(product);
+        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(new ArrayList<>());
+
+
+        //when
+        pantryService.addProductToPantry(productId, addAmount, email);
+
+        //then
+        ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
+        verify(pantryRepository).save(shopProductArgumentCaptor.capture());
+        ShopProduct saved = shopProductArgumentCaptor.getValue();
+        assertEquals(saved.getAmount(), addAmount);
+        assertEquals(saved.getProductState(), ProductState.PANTRY);
+    }
+
 
 
 

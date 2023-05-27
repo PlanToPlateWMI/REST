@@ -11,7 +11,7 @@ import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
+import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class ShoppingListServiceTest {
     }
 
     @Test
-    void shouldIncreaseAmountIfProductExistsInShoppingList() throws EntityNotFound, WrongProductInShoppingList {
+    void shouldIncreaseAmountIfProductExistsInShoppingList() throws EntityNotFound, NoValidProductWithAmount {
 
         //given
         long productId = 1L;
@@ -123,7 +123,7 @@ public class ShoppingListServiceTest {
 
 
     @Test
-    void shouldAddProductToShoppingList() throws EntityNotFound, WrongProductInShoppingList {
+    void shouldAddProductToShoppingList() throws EntityNotFound, NoValidProductWithAmount {
         //given
         long productId = 1L;
         long groupId = 2L;
@@ -175,7 +175,7 @@ public class ShoppingListServiceTest {
 
 
     @Test
-    void shouldDeleteProductFromShoppingList() throws WrongProductInShoppingList {
+    void shouldDeleteProductFromShoppingList() throws NoValidProductWithAmount {
 
         //given
         long productId = 1L;
@@ -225,7 +225,7 @@ public class ShoppingListServiceTest {
     }
 
     @Test
-    void shouldModifyAmount() throws WrongProductInShoppingList {
+    void shouldModifyAmount() throws NoValidProductWithAmount {
 
         //given
         long groupId = 2L;
@@ -255,7 +255,7 @@ public class ShoppingListServiceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"BUY", "BOUGHT"})
-    void shouldChangeIsBought(String productState) throws WrongProductInShoppingList {
+    void shouldChangeIsBought(String productState) throws NoValidProductWithAmount {
 
         //given
         long groupId = 2L;

@@ -30,8 +30,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(WrongProductInShoppingList.class)
-    public ResponseEntity<SimpleResponse> wrongProductInShoppingList(WrongProductInShoppingList e) {
+    @ExceptionHandler(NoValidProductWithAmount.class)
+    public ResponseEntity<SimpleResponse> wrongProductInShoppingList(NoValidProductWithAmount e) {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 

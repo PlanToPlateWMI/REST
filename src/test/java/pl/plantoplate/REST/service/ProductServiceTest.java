@@ -13,7 +13,7 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
+import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ProductRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
@@ -253,7 +253,7 @@ public class ProductServiceTest {
 
 
     @Test
-    void shouldAddNewProduct() throws EntityNotFound, AddTheSameProduct, WrongProductInShoppingList {
+    void shouldAddNewProduct() throws EntityNotFound, AddTheSameProduct, NoValidProductWithAmount {
 
         //given
         String unit = Unit.L.name();
@@ -337,7 +337,7 @@ public class ProductServiceTest {
 
     @ParameterizedTest
     @CsvSource({"Muller, KG, Inne","Muller, , Inne",", KG, Inne"})
-    void shouldUpdateProduct(String updateName, String updateUnit, String updateCategoryName) throws EntityNotFound, ModifyGeneralProduct, AddTheSameProduct, WrongProductInShoppingList {
+    void shouldUpdateProduct(String updateName, String updateUnit, String updateCategoryName) throws EntityNotFound, ModifyGeneralProduct, AddTheSameProduct, NoValidProductWithAmount {
 
         //given
         long productId = 20L;

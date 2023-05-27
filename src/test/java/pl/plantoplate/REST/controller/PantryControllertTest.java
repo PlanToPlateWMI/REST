@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
 import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
@@ -128,6 +130,28 @@ public class PantryControllertTest {
 
         List<ShoppingProductResponse> products = mapper.readValue(mvcResult.getResponse().getContentAsString(),  new TypeReference<List<ShoppingProductResponse>>(){});
         assertEquals(productList.size(), products.size());
+    }
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldAddProductToPantry() throws Exception {
+        //given
+        String email = "email@gmail.com";
+        Group group = new Group();
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        long productId = 1L;
+        int amount = 10;
+        AddShopProductRequest request = new AddShopProductRequest(productId, amount);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/pantry/")
+                .content(mapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(pantryService).addProductToPantry(productId, amount, email);
 
     }
 }

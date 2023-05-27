@@ -25,7 +25,7 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
-import pl.plantoplate.REST.exception.WrongProductInShoppingList;
+import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ProductRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
@@ -205,7 +205,7 @@ public class ProductService {
 
     private void isUnitCorrect(String unit){
         if(Arrays.stream(Unit.values()).map(Enum::name).noneMatch(u -> u.equals(unit)) && unit!=null){
-            throw new WrongProductInShoppingList("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
+            throw new NoValidProductWithAmount("Unit is not correct. Available units : " + Arrays.toString(Unit.values()));
         }
     }
 }
