@@ -45,13 +45,13 @@ public class ShopProduct {
     private Group group;
 
     @Column
-    private int amount;
+    private float amount;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private ProductState productState;
 
-    public ShopProduct(Product product, Group group, int amount, ProductState productState) {
+    public ShopProduct(Product product, Group group, float amount, ProductState productState) {
         this.product = product;
         this.group = group;
         this.amount = amount;

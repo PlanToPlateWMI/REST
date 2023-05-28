@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AmountRequest {
 
-    private int amount;
+    private float amount;
 
 }

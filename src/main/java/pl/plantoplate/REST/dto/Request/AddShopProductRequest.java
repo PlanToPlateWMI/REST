@@ -12,5 +12,5 @@ import lombok.Setter;
 public class AddShopProductRequest {
 
     private long id;
-    private int amount;
+    private float amount;
 }

@@ -188,7 +188,7 @@ public class PantryServiceTest {
         String email = "email";
         Group group = new Group();
         group.setId(groupId);
-        int addAmount = 1;
+        float addAmount = 1;
 
         Product product = new Product();
         product.setId(productId);
@@ -260,8 +260,8 @@ public class PantryServiceTest {
 
 
     @ParameterizedTest
-    @ValueSource(ints = { -1 , 0})
-    void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(int amount){
+    @ValueSource(floats = { -1.0f , 0.0f})
+    void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(float amount){
         assertThrows(Exception.class, () -> pantryService.modifyAmount(1L, "email", amount));
     }
 
@@ -273,7 +273,7 @@ public class PantryServiceTest {
         String email = "email";
         Group group = new Group();
         group.setId(groupId);
-        int amount = 20;
+        float amount = 20;
         long pantryProductId = 20L;
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
@@ -292,7 +292,7 @@ public class PantryServiceTest {
         String email = "email";
         Group group = new Group();
         group.setId(groupId);
-        int amount = 20;
+        float amount = 20;
 
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setId(pantryProductId);

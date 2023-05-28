@@ -141,7 +141,7 @@ public class PantryControllertTest {
         Group group = new Group();
         when(userService.findGroupOfUser(email)).thenReturn(group);
         long productId = 1L;
-        int amount = 10;
+        float amount = 10;
         AddShopProductRequest request = new AddShopProductRequest(productId, amount);
 
         //when
@@ -184,7 +184,7 @@ public class PantryControllertTest {
         when(userService.findGroupOfUser(email)).thenReturn(group);
         long productId = 1L;
 
-        int amount = 10;
+        float amount = 10;
         AmountRequest request = new AmountRequest(amount);
 
         //when

@@ -12,7 +12,7 @@ public class ShoppingProductResponse {
         private Long id;
         private String name;
         private String category;
-        private int amount;
+        private float amount;
         private String unit;
 
 

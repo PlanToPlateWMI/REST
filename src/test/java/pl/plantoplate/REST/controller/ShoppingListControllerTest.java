@@ -82,7 +82,7 @@ public class ShoppingListControllerTest {
         product.setCategory(category);
 
         ShopProduct shopProduct = new ShopProduct();
-        shopProduct.setAmount(10);
+        shopProduct.setAmount(10.3f);
         shopProduct.setProduct(product);
 
         List<ShopProduct> products = List.of(shopProduct);
@@ -114,7 +114,7 @@ public class ShoppingListControllerTest {
         product.setCategory(category);
 
         ShopProduct shopProduct = new ShopProduct();
-        shopProduct.setAmount(10);
+        shopProduct.setAmount(10.4f);
         shopProduct.setProduct(product);
 
         List<ShopProduct> products = List.of(shopProduct);
@@ -137,7 +137,7 @@ public class ShoppingListControllerTest {
         Group group = new Group();
         when(userService.findGroupOfUser(email)).thenReturn(group);
         long productId = 1L;
-        int amount = 10;
+        float amount = 10;
         AddShopProductRequest request = new AddShopProductRequest(productId, amount);
 
         //when
@@ -179,7 +179,7 @@ public class ShoppingListControllerTest {
         when(userService.findGroupOfUser(email)).thenReturn(group);
         long productId = 1L;
 
-        int amount = 10;
+        float amount = 10;
         AmountRequest request = new AmountRequest(amount);
 
         //when

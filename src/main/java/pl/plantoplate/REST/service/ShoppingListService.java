@@ -56,7 +56,7 @@ public class ShoppingListService {
      * @param email - email of user to find his group
      * @return
      */
-    public List<ShopProduct> addProductToShoppingList(long productId, int amount , String email) {
+    public List<ShopProduct> addProductToShoppingList(long productId, float amount , String email) {
 
         Group group = userService.findGroupOfUser(email);
 
@@ -126,7 +126,7 @@ public class ShoppingListService {
      * @param amount - new amount of product
      * @return
      */
-    public List<ShopProduct> modifyAmount(long id, String email, int amount) {
+    public List<ShopProduct> modifyAmount(long id, String email, float amount) {
 
         Group group = userService.findGroupOfUser(email);
 

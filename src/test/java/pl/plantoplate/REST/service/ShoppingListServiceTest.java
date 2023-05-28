@@ -202,8 +202,8 @@ public class ShoppingListServiceTest {
 
 
     @ParameterizedTest
-    @ValueSource(ints = { -1 , 0})
-    void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(int amount){
+    @ValueSource(floats = { -1.0f , 0.0f})
+    void shouldThrowExceptionWHenAmountISNegativeWhenUserModiFyAmount(float amount){
         assertThrows(Exception.class, () -> shoppingListService.modifyAmount(1L, "email", amount));
     }
 
@@ -216,7 +216,7 @@ public class ShoppingListServiceTest {
         String email = "email";
         Group group = new Group();
         group.setId(groupId);
-        int amount = 20;
+        float amount = 20;
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(new ArrayList<>());
@@ -234,7 +234,7 @@ public class ShoppingListServiceTest {
         String email = "email";
         Group group = new Group();
         group.setId(groupId);
-        int amount = 20;
+        float amount = 20;
 
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setId(productId);
