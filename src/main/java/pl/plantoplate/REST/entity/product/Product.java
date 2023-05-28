@@ -44,16 +44,16 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "group_created_id")
-    private Group created_by;
+    private Group createdBy;
 
     @Column
     @Enumerated(EnumType.STRING)
     private Unit unit;
 
 
-    public Product(String name, Category category, Group created_by, Unit unit){
+    public Product(String name, Category category, Group createdBy, Unit unit){
         this.category = category;
-        this.created_by = created_by;
+        this.createdBy = createdBy;
         this.unit = unit;
         this.name = name;
     }

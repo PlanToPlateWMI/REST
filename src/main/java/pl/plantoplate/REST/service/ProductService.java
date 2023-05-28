@@ -26,6 +26,7 @@ import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
+import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.ProductRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
@@ -41,12 +42,14 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ShopProductRepository shopProductService;
     private final CategoryService categoryService;
+    private final GroupRepository groupRepository;
 
 
-    public ProductService(ProductRepository productRepository, ShopProductRepository shopProductService, CategoryService categoryService) {
+    public ProductService(ProductRepository productRepository, ShopProductRepository shopProductService, CategoryService categoryService, GroupRepository groupRepository) {
         this.productRepository = productRepository;
         this.shopProductService = shopProductService;
         this.categoryService = categoryService;
+        this.groupRepository = groupRepository;
     }
 
     public void save(Product product){
@@ -67,12 +70,12 @@ public class ProductService {
 
     /**
      * User can get all product of group by groupId
-     * @param groupId - id of user's group
+     * @param group - user's group
      * @return
      */
     @Transactional(readOnly = true)
-    public List<Product> getProductsOfGroup(long groupId) {
-        return productRepository.findProductsByGroup(groupId);
+    public List<Product> getProductsOfGroup(Group group) {
+        return productRepository.findAllByCreatedBy(group);
     }
 
 
@@ -88,7 +91,7 @@ public class ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
                 + " not found."));
 
-        long groupCreatedById = product.getCreated_by().getId();
+        long groupCreatedById = product.getCreatedBy().getId();
 
         if(groupCreatedById != groupId ){
 
@@ -114,7 +117,7 @@ public class ProductService {
 
         isUnitCorrect(unit);
 
-        List<Product> allProducts = generalAndProductsOfGroup(group.getId());
+        List<Product> allProducts = generalAndProductsOfGroup(group);
 
         if(allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))){
             throw new AddTheSameProduct("Product with name [" + name + "] and unit ["+unit + "] already exists.");
@@ -147,7 +150,7 @@ public class ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
                 + " not found."));
 
-        long groupCreatedById = product.getCreated_by().getId();
+        long groupCreatedById = product.getCreatedBy().getId();
 
         if(groupCreatedById != group.getId() ){
             log.info("User try to update general product or product not his group");
@@ -156,11 +159,11 @@ public class ProductService {
 
 
         if(unit!= null && name!=null){
-            existsProductWithNameAndUnit(name, unit, group.getId(), productId);
+            existsProductWithNameAndUnit(name, unit, group, productId);
         }else if(name!=null){
-            existsProductWithNameAndUnit(name, product.getUnit().name(), group.getId(), productId);
+            existsProductWithNameAndUnit(name, product.getUnit().name(), group, productId);
         }else if(unit != null){
-            existsProductWithNameAndUnit(product.getName(), unit,group.getId(), productId);
+            existsProductWithNameAndUnit(product.getName(), unit,group, productId);
         }
 
         if(name!=null)
@@ -179,19 +182,19 @@ public class ProductService {
 
     /**
      * Return general products and products of group
-     * @param groupId - id of group
+     * @param userGroup - id of group
      * @return
      */
-    public List<Product> generalAndProductsOfGroup(long groupId){
-        List<Product> products = productRepository.findProductsByGroup(groupId);
-        List<Product> productsGeneral = productRepository.findProductsByGroup(1L);
+    public List<Product> generalAndProductsOfGroup(Group userGroup){
+        List<Product> products = productRepository.findAllByCreatedBy(userGroup);
+        List<Product> productsGeneral = productRepository.findAllByCreatedBy(groupRepository.getById(1L));
         return Stream.concat(products.stream(), productsGeneral.stream()).collect(Collectors.toList());
     }
 
 
-    private void existsProductWithNameAndUnit(String name, String unit, long groupId, long productId) {
+    private void existsProductWithNameAndUnit(String name, String unit, Group userGroup, long productId) {
 
-        List<Product> allProducts = generalAndProductsOfGroup(groupId);
+        List<Product> allProducts = generalAndProductsOfGroup(userGroup);
 
         for (int i = 0; i < allProducts.size(); i++) {
             if(allProducts.get(i).getId() == productId)

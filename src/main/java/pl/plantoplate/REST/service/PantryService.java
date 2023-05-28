@@ -93,7 +93,7 @@ public class PantryService {
 
         Product product = productService.findById(productId);
 
-        List<Product> productsOfGroup = productService.generalAndProductsOfGroup(group.getId());
+        List<Product> productsOfGroup = productService.generalAndProductsOfGroup(group);
 
         if(productsOfGroup.stream().noneMatch(p -> p.getId() == productId)){
             log.info("User try to add product not from his list to shopping list");

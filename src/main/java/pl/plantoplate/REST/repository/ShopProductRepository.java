@@ -1,5 +1,6 @@
 package pl.plantoplate.REST.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,10 +24,20 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
     void deleteProductByGroupIdAndProductId(@Param("product_id")long productID,@Param("group_id") Long GroupId);
 
 
+    @EntityGraph(
+            attributePaths = {"product"}
+    )
     Optional<ShopProduct> findByProductAndGroup(Product product, Group group);
 
+
+    @EntityGraph(
+            attributePaths = {"product"}
+    )
     List<ShopProduct> findByGroup(Group group);
 
 
+    @EntityGraph(
+            attributePaths = {"product"}
+    )
     List<ShopProduct> findAllByProductStateAndGroup(ProductState productState, Group group);
 }

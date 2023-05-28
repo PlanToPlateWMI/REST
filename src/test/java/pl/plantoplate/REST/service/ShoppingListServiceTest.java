@@ -76,7 +76,7 @@ public class ShoppingListServiceTest {
 
         when(productService.findById(productId)).thenReturn(new Product());
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(new ArrayList<>());
 
         assertThrows(Exception.class, () -> shoppingListService.addProductToShoppingList( productId, amount, email));
     }
@@ -95,7 +95,7 @@ public class ShoppingListServiceTest {
 
         Product product = new Product();
         product.setId(productId);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
         product.setName("Name");
         product.setUnit(Unit.L);
 
@@ -105,7 +105,7 @@ public class ShoppingListServiceTest {
 
         when(productService.findById(productId)).thenReturn(product);
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(List.of(shopProduct));
         when(shopProductRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
 
@@ -134,14 +134,14 @@ public class ShoppingListServiceTest {
 
         Product product = new Product();
         product.setId(productId);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
         product.setName("Name");
         product.setUnit(Unit.L);
 
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.findById(productId)).thenReturn(product);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(new ArrayList<>());
 
 
@@ -168,7 +168,7 @@ public class ShoppingListServiceTest {
         group.setId(groupId);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.getProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
+        when(productService.getProductsOfGroup(group)).thenReturn(new ArrayList<>());
 
         assertThrows(Exception.class, () -> shoppingListService.deleteProduct(productId, email));
     }

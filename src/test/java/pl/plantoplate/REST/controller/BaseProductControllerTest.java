@@ -47,10 +47,6 @@ public class BaseProductControllerTest {
     @Autowired
     private WebApplicationContext context;
 
-    @Autowired
-    private JwtUtils utils;
-
-
     @MockBean
     private UserService userService;
     @MockBean
@@ -77,6 +73,9 @@ public class BaseProductControllerTest {
         Group group = new Group();
         group.setId(groupId);
 
+        Group generalGroup = new Group();
+        generalGroup.setId(generalGroupId);
+
         Product p = new Product();
         p.setUnit(Unit.L);
         Category category = new Category();
@@ -87,8 +86,8 @@ public class BaseProductControllerTest {
         List<Product> groupProducts = List.of(p);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.getProductsOfGroup(generalGroupId)).thenReturn(generalProducts);
-        when(productService.getProductsOfGroup(groupId)).thenReturn(groupProducts);
+        when(productService.getProductsOfGroup(generalGroup)).thenReturn(generalProducts);
+        when(productService.getProductsOfGroup(group)).thenReturn(groupProducts);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/products?type=all"))
@@ -112,6 +111,10 @@ public class BaseProductControllerTest {
         Group group = new Group();
         group.setId(groupId);
 
+
+        Group generalGroup = new Group();
+        generalGroup.setId(generalGroupId);
+
         Product p = new Product();
         p.setUnit(Unit.L);
         Category category = new Category();
@@ -122,8 +125,8 @@ public class BaseProductControllerTest {
         List<Product> groupProducts = List.of(p);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.getProductsOfGroup(generalGroupId)).thenReturn(generalProducts);
-        when(productService.getProductsOfGroup(groupId)).thenReturn(groupProducts);
+        when(productService.getProductsOfGroup(generalGroup)).thenReturn(generalProducts);
+        when(productService.getProductsOfGroup(group)).thenReturn(groupProducts);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/products?type=group"))

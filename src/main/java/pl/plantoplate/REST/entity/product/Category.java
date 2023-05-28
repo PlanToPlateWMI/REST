@@ -38,6 +38,6 @@ public class Category {
     @Column
     private String category;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "category")
     List<Product> products;
 }

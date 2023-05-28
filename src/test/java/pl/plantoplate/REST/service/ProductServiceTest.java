@@ -14,6 +14,7 @@ import pl.plantoplate.REST.exception.AddTheSameProduct;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
+import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.ProductRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
@@ -34,6 +35,7 @@ public class ProductServiceTest {
     private ShopProductRepository shopProductRepository;
     private CategoryService categoryService;
     private ProductService productService;
+    private GroupRepository groupRepository;
 
 
     @BeforeEach
@@ -41,7 +43,8 @@ public class ProductServiceTest {
         productRepository = mock(ProductRepository.class);
         shopProductRepository = mock(ShopProductRepository.class);
         categoryService = mock(CategoryService.class);
-        productService = new ProductService(productRepository, shopProductRepository, categoryService);
+        groupRepository = mock(GroupRepository.class);
+        productService = new ProductService(productRepository, shopProductRepository, categoryService, groupRepository);
     }
 
 
@@ -125,11 +128,13 @@ public class ProductServiceTest {
     void shouldFindProductOfGroup(){
         //given
         long groupId = 1L;
+        Group group = new Group();
+        group.setId(groupId);
 
         //when
-        productService.getProductsOfGroup(groupId);
+        productService.getProductsOfGroup(group);
 
-        verify(productRepository).findProductsByGroup(groupId);
+        verify(productRepository).findAllByCreatedBy(group);
         verifyNoMoreInteractions(productRepository);
     }
 
@@ -141,17 +146,21 @@ public class ProductServiceTest {
 
         long generalGroupId = 1L;
         long groupId = 2L;
-        when(productRepository.findProductsByGroup(generalGroupId)).thenReturn(general);
-        when(productRepository.findProductsByGroup(groupId)).thenReturn(group);
+
+        Group userGroup = new Group();
+        userGroup.setId(groupId);
+
+        Group generalGroup = new Group();
+        generalGroup.setId(generalGroupId);
+
+        when(productRepository.findAllByCreatedBy(userGroup)).thenReturn(group);
 
         //when
-        List<Product> allProducts = productService.generalAndProductsOfGroup(groupId);
+        List<Product> allProducts = productService.generalAndProductsOfGroup(userGroup);
         assertEquals( Stream.concat(general.stream(),
                 group.stream()).collect(Collectors.toList()), allProducts);
 
-        verify(productRepository).findProductsByGroup(1L);
-        verify(productRepository).findProductsByGroup(groupId);
-        verifyNoMoreInteractions(productRepository);
+        verify(productRepository).findAllByCreatedBy(userGroup);
     }
 
 
@@ -167,7 +176,7 @@ public class ProductServiceTest {
         group.setId(generalGroupId);
 
         Product product = new Product();
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
@@ -186,7 +195,7 @@ public class ProductServiceTest {
         Group group = new Group();
         group.setId(groupId + 1L);
         Product product = new Product();
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
@@ -204,7 +213,7 @@ public class ProductServiceTest {
         Group group = new Group();
         group.setId(groupId);
         Product product = new Product();
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
@@ -245,7 +254,7 @@ public class ProductServiceTest {
         product.setUnit(Unit.valueOf(unit));
         product.setName(name);
 
-        when(productRepository.findProductsByGroup(group.getId())).thenReturn(List.of(product));
+        when(productRepository.findAllByCreatedBy(group)).thenReturn(List.of(product));
 
         //when
         assertThrows(Exception.class,() -> productService.save(name, categoryName, unit, group));
@@ -270,7 +279,7 @@ public class ProductServiceTest {
         product.setUnit(Unit.valueOf(unit));
         product.setName(name);
 
-        when(productRepository.findProductsByGroup(group.getId())).thenReturn(new ArrayList<>());
+        when(productRepository.findAllByCreatedBy(group)).thenReturn(new ArrayList<>());
         when(categoryService.findByName(name)).thenReturn(category);
 
         //when
@@ -311,7 +320,7 @@ public class ProductServiceTest {
         product.setId(productId);
         product.setName(name);
         product.setCategory(category);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
@@ -358,10 +367,10 @@ public class ProductServiceTest {
         product.setId(productId);
         product.setName(productName);
         product.setCategory(category);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRepository.findProductsByGroup(productGroupId)).thenReturn(List.of(product));
+        when(productRepository.findAllByCreatedBy(group)).thenReturn(List.of(product));
         when(categoryService.findByName(updateCategoryName)).thenReturn(category);
 
         //when

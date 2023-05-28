@@ -33,6 +33,7 @@ import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.exception.WrongQueryParam;
+import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -46,11 +47,13 @@ public class BaseProductsController {
 
     private final ProductService productService;
     private final UserService userService;
+    private final GroupService groupService;
 
 
-    public BaseProductsController(ProductService productService, UserService userService) {
+    public BaseProductsController(ProductService productService, UserService userService, GroupService groupService) {
         this.productService = productService;
         this.userService = userService;
+        this.groupService = groupService;
     }
 
     @GetMapping
@@ -74,7 +77,7 @@ public class BaseProductsController {
             throw new WrongQueryParam("Query values available - ALL and GROUP");
         }
 
-        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.valueOf(typeOfProduct));
+        return generateListOfProductDtoDependsOnTypeOfProducts(group, BaseProductType.valueOf(typeOfProduct));
     }
 
 
@@ -93,7 +96,7 @@ public class BaseProductsController {
         Group group = userService.findGroupOfUser(email);
         productService.save(baseProductRequest.getName(), baseProductRequest.getCategory(), baseProductRequest.getUnit(), group);
 
-        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
+        return generateListOfProductDtoDependsOnTypeOfProducts(group, BaseProductType.group);
     }
 
 
@@ -113,7 +116,7 @@ public class BaseProductsController {
 
         productService.updateProduct(updateProductRequest.getName(), updateProductRequest.getUnit(), updateProductRequest.getCategory(), group, id);
 
-        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
+        return generateListOfProductDtoDependsOnTypeOfProducts(group, BaseProductType.group);
     }
 
 
@@ -134,21 +137,21 @@ public class BaseProductsController {
 
         productService.deleteById(id, groupId);
 
-        return generateListOfProductDtoDependsOnTypeOfProducts(group.getId(), BaseProductType.group);
+        return generateListOfProductDtoDependsOnTypeOfProducts(group, BaseProductType.group);
 
     }
 
-    private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(long groupId, BaseProductType productsType) {
+    private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(Group usersGroup, BaseProductType productsType) {
 
-        List<Product> productsOfGroup = productService.getProductsOfGroup(groupId);
+        List<Product> productsOfGroup = productService.getProductsOfGroup(usersGroup);
 
-        // if group == 1 it means that it is group of moderators and return always  general products
-        if(groupId == 1L){
+        // if group == 1 it means that it is group of moderators and return always general products
+        if(usersGroup.getId() == 1L){
             return new ResponseEntity<>(productsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }
 
         if(productsType.equals(BaseProductType.all)){
-            List<Product> generalProducts = productService.getProductsOfGroup(1L);
+            List<Product> generalProducts = productService.getProductsOfGroup(groupService.findById(1L));
 
             return new ResponseEntity<>(Stream.concat(productsOfGroup.stream(), generalProducts.stream()).map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }

@@ -15,8 +15,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmailAndIsActiveTrue(String email);
 
-//    @Modifying
-//    @Transactional
-//    @Query(value = "insert into app_user (email,username,password,role) values (:email,:username,:password,:role) ",nativeQuery = true)
-//    int save(@Param("email") String email, @Param("username") String username, @Param("password")String password, @Param("role")String role);
 }

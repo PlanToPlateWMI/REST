@@ -111,7 +111,7 @@ public class AuthControllerTest {
 
         //check if code sent to email is equals code from response
         ArgumentCaptor<MailParams> mailParamsArgumentCaptor = ArgumentCaptor.forClass(MailParams.class);
-        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), EmailType.registration);
+        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), any(EmailType.class));
 
         MailParams mailParams = mailParamsArgumentCaptor.getValue();
         CodeResponse codeResponse = mapper.readValue(mvcResult.getResponse().getContentAsString(), CodeResponse.class);

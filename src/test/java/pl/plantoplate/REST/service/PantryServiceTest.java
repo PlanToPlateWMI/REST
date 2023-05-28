@@ -135,7 +135,7 @@ public class PantryServiceTest {
         group.setId(groupId);
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(new ArrayList<>());
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(new ArrayList<>());
 
         assertThrows(NoValidProductWithAmount.class, () -> pantryService.addProductToPantry(productId, amount, email));
     }
@@ -154,7 +154,7 @@ public class PantryServiceTest {
 
         Product product = new Product();
         product.setId(productId);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
         product.setName("Name");
         product.setUnit(Unit.L);
 
@@ -164,7 +164,7 @@ public class PantryServiceTest {
 
         when(productService.findById(productId)).thenReturn(product);
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(List.of(shopProduct));
         when(pantryRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
 
@@ -192,14 +192,14 @@ public class PantryServiceTest {
 
         Product product = new Product();
         product.setId(productId);
-        product.setCreated_by(group);
+        product.setCreatedBy(group);
         product.setName("Name");
         product.setUnit(Unit.L);
 
 
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.findById(productId)).thenReturn(product);
-        when(productService.generalAndProductsOfGroup(groupId)).thenReturn(List.of(product));
+        when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(new ArrayList<>());
 
 

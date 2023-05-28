@@ -36,13 +36,9 @@ import pl.plantoplate.REST.repository.UserRepository;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-
     private final UserRepository userRepository;
-
     private final CategoryService categoryService;
-
     private final ProductService productService;
-
     private final ShoppingListService shoppingListService;
 
     @Autowired
@@ -85,7 +81,7 @@ public class GroupService {
             customProduct.setName("Miód wielokwiatowy");
             customProduct.setCategory(category);
             customProduct.setUnit(Unit.GR);
-            customProduct.setCreated_by(group);
+            customProduct.setCreatedBy(group);
 
             productService.save(customProduct);
 

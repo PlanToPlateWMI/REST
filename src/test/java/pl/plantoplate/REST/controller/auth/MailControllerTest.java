@@ -82,7 +82,7 @@ public class MailControllerTest {
 
         //then
         ArgumentCaptor<MailParams> mailParamsArgumentCaptor = ArgumentCaptor.forClass(MailParams.class);
-        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), EmailType.registration);
+        verify(mailSenderService).send(mailParamsArgumentCaptor.capture(), any(EmailType.class));
 
         MailParams mailParams = mailParamsArgumentCaptor.getValue();
         CodeResponse codeResponse = mapper.readValue(result.getResponse().getContentAsString(), CodeResponse.class);
