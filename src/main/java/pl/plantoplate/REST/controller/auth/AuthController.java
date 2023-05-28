@@ -152,7 +152,7 @@ public class AuthController {
     @Operation(summary="Reset password",description = "User can reset password if doesn't remember his password ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API update password",  content = @Content(
-                    schema = @Schema(implementation = JwtResponse.class))),
+                    schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity resetPassword(@RequestBody EmailPasswordRequest emailPasswordRequest){

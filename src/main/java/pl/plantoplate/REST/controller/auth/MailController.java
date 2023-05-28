@@ -58,7 +58,8 @@ public class MailController {
      * @return generated code
      */
     @GetMapping("/code")
-    @Operation(summary="Send code to email. There are 2 type of email - email to confirm registration and emila to confirm reset password,",description = "If user doesn't receive previously generated code he will able to ask for resending a new code ")
+    @Operation(summary="Send code to email. There are 2 types of email - ?type=registration email to confirm registration and ?type=reset " +
+            "email to confirm reset password. Default value is registration. ",description = "If user doesn't receive previously generated code he will able to ask for resending a new code ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API send back code that it sends to user's email", content = @Content(
                     schema = @Schema(implementation = CodeResponse.class))),
