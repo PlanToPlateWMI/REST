@@ -14,9 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByName(String name);
 
-    @EntityGraph(
-            attributePaths = {"category", "createdBy", }
-    )
+    @EntityGraph(attributePaths = {"category", "createdBy", })
     List<Product> findAllByCreatedBy(Group group);
 
 

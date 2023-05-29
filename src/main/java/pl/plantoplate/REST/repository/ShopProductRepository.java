@@ -25,10 +25,6 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
 
 
     @EntityGraph(attributePaths = {"product"})
-    Optional<ShopProduct> findByProductAndGroup(Product product, Group group);
-
-
-    @EntityGraph(attributePaths = {"product"})
     List<ShopProduct> findByGroup(Group group);
 
 

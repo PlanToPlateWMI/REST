@@ -14,19 +14,13 @@ import java.util.Optional;
 @Repository
 public interface PantryRepository extends JpaRepository<ShopProduct, Long> {
 
-    @EntityGraph(
-            attributePaths = {"product" }
-    )
+    @EntityGraph(attributePaths = {"product" })
     List<ShopProduct> findAllByProductStateAndGroup(ProductState state, Group group);
 
-    @EntityGraph(
-            attributePaths = {"product" }
-    )
+    @EntityGraph(attributePaths = {"product" })
     Optional<ShopProduct> findByProductAndGroup(Product product, Group group);
 
-    @EntityGraph(
-            attributePaths = {"product" }
-    )
+    @EntityGraph(attributePaths = {"product" })
     Optional<ShopProduct> findByIdAndProductStateAndGroup(long pantryId, ProductState productState, Group group);
 
 }

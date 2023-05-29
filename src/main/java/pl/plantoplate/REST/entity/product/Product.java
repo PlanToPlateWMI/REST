@@ -15,10 +15,7 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.entity.product;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 
@@ -30,6 +27,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table
+@Builder
 public class Product {
 
     @Id

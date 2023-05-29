@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @DisplayName("BaseProductController test")
-@Sql({"/schema-test.sql", "/data-test.sql"})
 public class BaseProductControllerTest {
 
     @Autowired
