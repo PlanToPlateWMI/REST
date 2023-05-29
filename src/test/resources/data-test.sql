@@ -86,7 +86,7 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 
 
 INSERT INTO invite_code (code, role, expired_time, group_id) VALUES
-(123456, 'ROLE_USER','17:09:03',1 );
+(123456, 'ROLE_USER','2022-06-22 19:10:25-07',1 );
 
 
 -- miód wielokwiatowy

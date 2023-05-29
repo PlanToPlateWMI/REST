@@ -22,10 +22,10 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.InviteCode;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Service
@@ -53,7 +53,7 @@ public class InviteCodeService {
             if(inviteCodeRepository.existsByCode(inviteCode)){
                 InviteCode code = inviteCodeRepository.getByCode(inviteCode);
 
-                if(!code.getExpiredTime().isBefore(LocalTime.now())) {
+                if(!code.getExpiredTime().isBefore(LocalDateTime.now())) {
                     Group group = code.getGroup();
                     User user = userService.findByEmail(userEmail);
                     user.setActive(true);
@@ -88,7 +88,7 @@ public class InviteCodeService {
 
         Group group = groupService.findById(groupId);
 
-        LocalTime time = LocalTime.now().plusMinutes(30);
+        LocalDateTime time = LocalDateTime.now().plusMinutes(30);
         InviteCode inviteCode = new InviteCode(code, group, role, time);
         inviteCodeRepository.save(inviteCode);
 

@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invite_code")
@@ -45,10 +45,10 @@ public class InviteCode {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @Column(name = "expired_time", columnDefinition = "varchar(8)")
-    private LocalTime expiredTime;
+    @Column(name = "expired_time")
+    private LocalDateTime expiredTime;
 
-    public InviteCode(int code, Group group, Role role, LocalTime expiredTime) {
+    public InviteCode(int code, Group group, Role role, LocalDateTime expiredTime) {
         this.code = code;
         this.group = group;
         this.role = role;

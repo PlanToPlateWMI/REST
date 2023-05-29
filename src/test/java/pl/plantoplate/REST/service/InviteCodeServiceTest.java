@@ -12,6 +12,7 @@ import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,7 +89,7 @@ public class InviteCodeServiceTest {
         when(inviteCodeRepository.existsByCode(code)).thenReturn(true);
 
         InviteCode inviteCode = new InviteCode();
-        inviteCode.setExpiredTime(LocalTime.now().minusMinutes(1));
+        inviteCode.setExpiredTime(LocalDateTime.now().minusMinutes(1));
 
         when(inviteCodeRepository.getByCode(code)).thenReturn(inviteCode);
 
@@ -115,7 +116,7 @@ public class InviteCodeServiceTest {
 
         Group group = new Group();
 
-        InviteCode inviteCode = new InviteCode(code, group, role, LocalTime.now().plusMinutes(10));
+        InviteCode inviteCode = new InviteCode(code, group, role, LocalDateTime.now().plusMinutes(10));
         when(inviteCodeRepository.getByCode(code)).thenReturn(inviteCode);
 
         //when
