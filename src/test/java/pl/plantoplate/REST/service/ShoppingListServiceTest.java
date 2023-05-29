@@ -107,7 +107,7 @@ public class ShoppingListServiceTest {
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(shopProductRepository.findAllByProductStateAndGroup(ProductState.BUY, group)).thenReturn(List.of(shopProduct));
-        when(shopProductRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
+        when(shopProductRepository.findByProductAndProductStateAndGroup(product, ProductState.BUY, group)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when
         shoppingListService.addProductToShoppingList(productId, addAmount, email);

@@ -24,20 +24,17 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
     void deleteProductByGroupIdAndProductId(@Param("product_id")long productID,@Param("group_id") Long GroupId);
 
 
-    @EntityGraph(
-            attributePaths = {"product"}
-    )
+    @EntityGraph(attributePaths = {"product"})
     Optional<ShopProduct> findByProductAndGroup(Product product, Group group);
 
 
-    @EntityGraph(
-            attributePaths = {"product"}
-    )
+    @EntityGraph(attributePaths = {"product"})
     List<ShopProduct> findByGroup(Group group);
 
 
-    @EntityGraph(
-            attributePaths = {"product"}
-    )
+    @EntityGraph(attributePaths = {"product"})
     List<ShopProduct> findAllByProductStateAndGroup(ProductState productState, Group group);
+
+
+    Optional<ShopProduct> findByProductAndProductStateAndGroup(Product product, ProductState productState, Group group);
 }

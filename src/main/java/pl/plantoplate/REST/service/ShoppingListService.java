@@ -25,6 +25,7 @@ import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -78,7 +79,7 @@ public class ShoppingListService {
 
         if(toBuyProductOfGroupList.stream().anyMatch(p -> p.getProduct().getName().equals(product.getName()) &&
                 p.getProduct().getUnit().equals(product.getUnit()))){
-            ShopProduct shopProduct = shopProductRepository.findByProductAndGroup(product, group).get();
+            ShopProduct shopProduct = shopProductRepository.findByProductAndProductStateAndGroup(product, ProductState.BUY, group).get();
             shopProduct.setAmount(shopProduct.getAmount() + amount);
 
             shopProductRepository.save(shopProduct);
@@ -165,15 +166,33 @@ public class ShoppingListService {
         }
 
         ShopProduct shopProduct = shopProductRepository.findById(id).get();
+        Product productOfShopProduct = shopProduct.getProduct();
 
         if (shopProduct.getProductState() == ProductState.BOUGHT) {
-            shopProduct.setProductState(ProductState.BUY);
+
+            Optional<ShopProduct> shopProductFromBase = shopProductRepository.findByProductAndProductStateAndGroup(productOfShopProduct, ProductState.BUY, group);
+            if(shopProductFromBase.isPresent()){
+                shopProductFromBase.get().setAmount(shopProductFromBase.get().getAmount() + shopProduct.getAmount());
+                shopProductRepository.delete(shopProduct);
+            }else {
+                shopProduct.setProductState(ProductState.BUY);
+                shopProductRepository.save(shopProduct);
+            }
+
             log.info("Product with id [" +id + "] was moved to Trzeba kupić section");
         } else {
-            shopProduct.setProductState(ProductState.BOUGHT);
+
+            Optional<ShopProduct> shopProductFromBase = shopProductRepository.findByProductAndProductStateAndGroup(productOfShopProduct, ProductState.BOUGHT, group);
+            if(shopProductFromBase.isPresent()){
+                shopProductFromBase.get().setAmount(shopProductFromBase.get().getAmount() + shopProduct.getAmount());
+                shopProductRepository.delete(shopProduct);
+            }else {
+                shopProduct.setProductState(ProductState.BOUGHT);
+                shopProductRepository.save(shopProduct);
+            }
+
             log.info("Product with id [" +id + "] was moved to Kupione section");
         }
-        shopProductRepository.save(shopProduct);
 
         return Stream.concat(getProducts(email, ProductState.BUY).stream(), getProducts(email, ProductState.BOUGHT)
                 .stream()).collect(Collectors.toList());
