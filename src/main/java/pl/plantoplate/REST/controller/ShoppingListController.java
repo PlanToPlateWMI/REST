@@ -85,7 +85,7 @@ public class ShoppingListController {
     }
 
     @PostMapping()
-    @Operation(summary= "Add Product to Shopping list (to buy type) by product id and amount.Return to buy shopping product list. ",
+    @Operation(summary= "Add Product to Shopping list (to buy type) by product id and amount. Return to buy shopping product list. ",
             description = "User can add product to shopping list ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully added",  content = @Content(

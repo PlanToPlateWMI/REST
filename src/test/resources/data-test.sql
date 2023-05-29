@@ -27,7 +27,7 @@ INSERT INTO category (category) VALUES
 
 INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Mleko', 2, 1, 'L'),
-('Jogurt', 2, 1, 'L'),
+('Jogurt', 2, 1, 'ML'),
 ('Kefir', 2, 1, 'L'),
 ('Maślanka', 2, 1, 'L'),
 ('Śmietanka', 2, 1, 'GR'),
@@ -82,6 +82,11 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Sok pomarańczowy', 11, 1, 'L'),
 ('Piwo ciemne', 11, 1, 'L'),
 ('Piwo jasne', 11, 1, 'L');
+
+
+
+INSERT INTO invite_code (code, role, expired_time, group_id) VALUES
+(123456, 'ROLE_USER','17:09:03',1 );
 
 
 -- miód wielokwiatowy

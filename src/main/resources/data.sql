@@ -25,7 +25,7 @@ INSERT INTO category (category) VALUES
 
 INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Mleko', 2, 1, 'L'),
-('Jogurt', 2, 1, 'L'),
+('Jogurt', 2, 1, 'ML'),
 ('Kefir', 2, 1, 'L'),
 ('Maślanka', 2, 1, 'L'),
 ('Śmietanka', 2, 1, 'GR'),

@@ -41,7 +41,7 @@ create table product(
     name varchar(255) not null ,
     category_id bigint not null ,
     group_created_id bigint not null ,
-    unit varchar(255) not null check (unit in ('L', 'KG', 'GR', 'SZT')),
+    unit varchar(255) not null check (unit in ('L', 'KG', 'GR', 'SZT', 'ML')),
     primary key (id)
 );
 
