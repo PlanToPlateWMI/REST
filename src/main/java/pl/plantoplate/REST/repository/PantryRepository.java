@@ -21,6 +21,9 @@ public interface PantryRepository extends JpaRepository<ShopProduct, Long> {
     Optional<ShopProduct> findByProductAndGroup(Product product, Group group);
 
     @EntityGraph(attributePaths = {"product" })
+    Optional<ShopProduct> findByProductAndGroupAndProductState(Product product, Group group, ProductState productState);
+
+    @EntityGraph(attributePaths = {"product" })
     Optional<ShopProduct> findByIdAndProductStateAndGroup(long pantryId, ProductState productState, Group group);
 
 }

@@ -27,6 +27,7 @@ import pl.plantoplate.REST.repository.PantryRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -51,7 +52,7 @@ public class PantryService {
 
     /**
      * Transfer products from shopping list to pantry (change product state to PATRY). If at least one product not found, user try to transfer not his product or
-     * product doesn't have state BOUGHT - throws exception.
+     * product doesn't have state BOUGHT - throws exception. If the same product exists in pantry - only increase amount
      * @param email - email of user
      * @param productId - idis of products
      * @return
@@ -66,10 +67,22 @@ public class PantryService {
                 throw new NoValidProductWithAmount("User try to transfer to pantry not his product or product wasn't bought ");
         }
 
+        List<ShopProduct> pantryProduct = this.findProductsFromPantry(email);
         for(long id:productId){
             ShopProduct shopProduct = pantryRepository.findById(id).get();
-            shopProduct.setProductState(ProductState.PANTRY);
-            pantryRepository.save(shopProduct);
+
+            Optional<ShopProduct> productFromPantryTheSame = pantryProduct.stream().filter(p -> p.getProduct().getName().equals(shopProduct.getProduct().getName())
+                    && p.getProduct().getUnit().equals(shopProduct.getProduct().getUnit())).findFirst();
+
+            if(productFromPantryTheSame.isPresent()){
+                ShopProduct productFromPantry = productFromPantryTheSame.get();
+                productFromPantry.setAmount(productFromPantry.getAmount() + shopProduct.getAmount());
+                pantryRepository.save(productFromPantry);
+                pantryRepository.delete(shopProduct);
+            }else{
+                shopProduct.setProductState(ProductState.PANTRY);
+                pantryRepository.save(shopProduct);
+            }
         }
 
         return pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group);
@@ -102,11 +115,11 @@ public class PantryService {
 
         // check if product with the same name nad unit already exists in pantry and
         // if it is so - sum amounts
-        List<ShopProduct> toBuyProductOfGroupList = this.findProductsFromPantry(email);
+        List<ShopProduct> pantryProducts = this.findProductsFromPantry(email);
 
-        if(toBuyProductOfGroupList.stream().anyMatch(p -> p.getProduct().getName().equals(product.getName()) &&
+        if(pantryProducts.stream().anyMatch(p -> p.getProduct().getName().equals(product.getName()) &&
                 p.getProduct().getUnit().equals(product.getUnit()))){
-            ShopProduct pantryProduct = pantryRepository.findByProductAndGroup(product, group).get();
+            ShopProduct pantryProduct = pantryRepository.findByProductAndGroupAndProductState(product, group, ProductState.PANTRY).get();
             pantryProduct.setAmount(pantryProduct.getAmount() + amount);
 
             pantryRepository.save(pantryProduct);

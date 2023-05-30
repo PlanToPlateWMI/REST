@@ -109,7 +109,7 @@ public class PantryServiceTest {
 
         assertEquals(ProductState.PANTRY, bought1.getProductState());
         assertEquals(ProductState.PANTRY, bought2.getProductState());
-        verify(pantryRepository).findAllByProductStateAndGroup(ProductState.PANTRY, group);
+        verify(pantryRepository, atLeast(2)).findAllByProductStateAndGroup(ProductState.PANTRY, group);
     }
 
 
@@ -161,12 +161,13 @@ public class PantryServiceTest {
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setProduct(product);
         shopProduct.setAmount(oldAmount);
+        shopProduct.setProductState(ProductState.PANTRY);
 
         when(productService.findById(productId)).thenReturn(product);
         when(userService.findGroupOfUser(email)).thenReturn(group);
         when(productService.generalAndProductsOfGroup(group)).thenReturn(List.of(product));
         when(pantryRepository.findAllByProductStateAndGroup(ProductState.PANTRY, group)).thenReturn(List.of(shopProduct));
-        when(pantryRepository.findByProductAndGroup(product, group)).thenReturn(java.util.Optional.of(shopProduct));
+        when(pantryRepository.findByProductAndGroupAndProductState(product, group, ProductState.PANTRY)).thenReturn(java.util.Optional.of(shopProduct));
 
         //when
         pantryService.addProductToPantry(productId, addAmount, email);
