@@ -6,11 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.EmailAlreadyTaken;
-import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.exception.*;
 import pl.plantoplate.REST.repository.UserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -281,5 +285,99 @@ public class UserServiceTest {
 
         //when
         assertThrows(EmailAlreadyTaken.class, () -> userService.updateEmail(email,newEmail));
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenRoleIsWrong(){
+        String userEmail = "test@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("wrong role", "email");
+        emailRoleRequestList.add(request);
+
+        assertThrows(WrongRequestData.class, () -> userService.updateRoles(userEmail, emailRoleRequestList));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotHasGroup(){
+        String userEmail = "test@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("ADMIN", "email");
+        emailRoleRequestList.add(request);
+
+        User user = new User();
+        user.setEmail(userEmail);
+        user.setUserGroup(null);
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
+        assertThrows(EntityNotFound.class, () -> userService.updateRoles(userEmail, emailRoleRequestList));
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenUserTryToChangeHisRole(){
+        String userEmail = "test@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("ADMIN", userEmail);
+        emailRoleRequestList.add(request);
+
+        User user = new User();
+        user.setEmail(userEmail);
+        user.setUserGroup(new Group());
+        user.setEmail(userEmail);
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
+        assertThrows(UserChangeHisRole.class, () -> userService.updateRoles(userEmail, emailRoleRequestList));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserTryToChangeRoleOfUserNotFromHisGroup(){
+        String userEmail = "test@gmail.com";
+        String emailOfUserNotFromGroup = "test2@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("ADMIN", emailOfUserNotFromGroup);
+        emailRoleRequestList.add(request);
+
+        User user = new User();
+        user.setEmail(userEmail);
+        user.setUserGroup(new Group());
+        user.setEmail(userEmail);
+
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
+        assertThrows(UserNotFromGroup.class, () -> userService.updateRoles(userEmail, emailRoleRequestList));
+    }
+
+    @Test
+    void shouldUpdateUsersRoles(){
+        String userEmail = "test@gmail.com";
+        String emailOfUserFromGroup = "test2@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("ADMIN", emailOfUserFromGroup);
+        emailRoleRequestList.add(request);
+
+        Group group = new Group();
+
+        User user = new User();
+        user.setEmail(userEmail);
+        user.setUserGroup(group);
+        user.setEmail(userEmail);
+        user.setRole(Role.ROLE_ADMIN);
+
+        User user2 = new User();
+        user2.setEmail(userEmail);
+        user2.setUserGroup(group);
+        user2.setEmail(emailOfUserFromGroup);
+        user.setRole(Role.ROLE_USER);
+
+        group.setUsers(List.of(user, user2));
+
+        when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
+        when(userRepository.findByEmail(emailOfUserFromGroup)).thenReturn(java.util.Optional.of(user2));
+
+        List<User> returnedUsers = userService.updateRoles(userEmail, emailRoleRequestList);
+
+        assertTrue(returnedUsers.stream().anyMatch(e-> e.getEmail().equals(emailOfUserFromGroup) && e.getRole().equals(Role.ROLE_ADMIN)));
+        verify(userRepository).save(user2);
     }
 }

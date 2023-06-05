@@ -11,6 +11,12 @@ import pl.plantoplate.REST.dto.Response.SimpleResponse;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
+    @ExceptionHandler(UserChangeHisRole.class)
+    public ResponseEntity<SimpleResponse> userChangeHisRole(UserChangeHisRole e) {
+        return buildResponseEntity(e, HttpStatus.CONFLICT);
+    }
+
+
     @ExceptionHandler(EmailAlreadyTaken.class)
     public ResponseEntity<SimpleResponse> emailAlreadyTaken(EmailAlreadyTaken e) {
         return buildResponseEntity(e, HttpStatus.CONFLICT);

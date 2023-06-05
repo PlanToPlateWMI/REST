@@ -144,8 +144,7 @@ public class UserController {
 
 
     @GetMapping("infos")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Info of all user of group : username, role, email ")
+    @Operation(summary="Info of all user of group : username, role, email ", description = "User have access to list of users of his group.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of user's info",  content = @Content(
                     array = @ArraySchema( schema = @Schema(implementation = UsernameRoleEmailResponse.class)))),
@@ -176,15 +175,13 @@ public class UserController {
 
     @PatchMapping("roles")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Update roles by email")
+    @Operation(summary="Update roles by email", description = "user with role ADMIN can change roles of users of his group.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of user's info",  content = @Content(
                     array = @ArraySchema( schema = @Schema(implementation = UsernameRoleEmailResponse.class)))),
             @ApiResponse(responseCode = "400", description = "User doesn't have group or role in body isn't valid",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class))),
-            @ApiResponse(responseCode = "409", description = "At least one user with email",  content = @Content(
-                    schema = @Schema(implementation = SimpleResponse.class))),
-            @ApiResponse(responseCode = "409", description = "At least one user with email",  content = @Content(
+            @ApiResponse(responseCode = "409", description = "At least one user with email not from user's group or user try to change his role",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))
     })
     public ResponseEntity<List<UsernameRoleEmailResponse>> updatedRoles(@RequestBody List<EmailRoleRequest> requests){

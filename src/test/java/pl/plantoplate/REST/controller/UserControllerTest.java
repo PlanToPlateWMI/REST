@@ -16,12 +16,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
+import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
 import pl.plantoplate.REST.dto.Request.PasswordRequest;
 import pl.plantoplate.REST.dto.Request.UsernameRequest;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.service.UserService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -154,6 +158,33 @@ public class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    @WithMockUser(value = email, roles = "ADMIN")
+    void shouldUpdateRoles() throws Exception {
+
+        String emailOfUserFromGroup = "test2@gmail.com";
+        List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
+        EmailRoleRequest request = new EmailRoleRequest("ADMIN", emailOfUserFromGroup);
+        emailRoleRequestList.add(request);
+
+        User user = new User();
+        user.setRole(Role.ROLE_ADMIN);
+        user.setUsername("username");
+        user.setEmail(emailOfUserFromGroup);
+
+        when(userService.updateRoles(email, emailRoleRequestList)).thenReturn(List.of(user));
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/users/roles")
+                .content(mapper.writeValueAsString(emailRoleRequestList))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+
 
 
 }

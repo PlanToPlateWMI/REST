@@ -23,10 +23,7 @@ import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.exception.EmailAlreadyTaken;
-import pl.plantoplate.REST.exception.EntityNotFound;
-import pl.plantoplate.REST.exception.UserNotFromGroup;
-import pl.plantoplate.REST.exception.WrongRequestData;
+import pl.plantoplate.REST.exception.*;
 import pl.plantoplate.REST.repository.UserRepository;
 
 import java.util.List;
@@ -218,6 +215,10 @@ public class UserService {
             throw new EntityNotFound("Group of user with email [ "  + email + " ] not found");
 
         List<User> groupUsers = group.getUsers();
+
+        if(requests.stream().anyMatch(r -> r.getEmail().equals(email)))
+            throw new UserChangeHisRole("User [" + email + "] try to change his role");
+
         for(EmailRoleRequest request: requests){
             if(groupUsers.stream().noneMatch(u -> u.getEmail().equals(request.getEmail())))
                 throw new UserNotFromGroup("User with email [" + request.getEmail() + "] not from group of user with email [" + email + "]");
