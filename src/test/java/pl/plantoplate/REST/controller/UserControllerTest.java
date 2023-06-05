@@ -19,6 +19,7 @@ import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
 import pl.plantoplate.REST.dto.Request.PasswordRequest;
 import pl.plantoplate.REST.dto.Request.UsernameRequest;
+import pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -27,6 +28,7 @@ import pl.plantoplate.REST.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -182,6 +184,29 @@ public class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
+
+    @WithMockUser(value = email)
+    @Test
+    void shouldReturnInfoOfAuthenticatedUser() throws Exception {
+        String username = "username";
+        Role role = Role.ROLE_ADMIN;
+        User user = new User();
+        user.setEmail(email);
+        user.setRole(role);
+        user.setUsername(username);
+
+        when(userService.findByEmail(email)).thenReturn(user);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/users"))
+                .andExpect(status().isOk()).andReturn();
+
+        UsernameRoleEmailResponse response = mapper.readValue(result.getResponse().getContentAsString(), UsernameRoleEmailResponse.class);
+        assertEquals(username, response.getUsername());
+        assertEquals(email, response.getEmail());
+        assertEquals(role.name(), response.getRole());
+    }
+
 
 
 
