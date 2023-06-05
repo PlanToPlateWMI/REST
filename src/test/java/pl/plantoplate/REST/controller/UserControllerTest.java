@@ -8,11 +8,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import pl.plantoplate.REST.dto.Request.PasswordRequest;
 import pl.plantoplate.REST.dto.Request.UsernameRequest;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
@@ -38,6 +41,9 @@ public class UserControllerTest {
     private static final String email = "email@gmail.com";
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @BeforeEach
     public void setup() {
@@ -121,4 +127,5 @@ public class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/password/match?password=" + password))
                 .andExpect(status().isConflict());
     }
+
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -188,6 +189,7 @@ public class UserServiceTest {
 
     @Test
     void shouldMatchPassword(){
+        //given
         String email = "test@gmail.com";
         String password = "password";
 
@@ -197,8 +199,36 @@ public class UserServiceTest {
 
         when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
 
+        //when
         boolean isMatch = userService.isPasswordMatch(email, password);
 
+        //then
         assertTrue(isMatch);
+    }
+
+    @Test
+    void shouldChangePassword(){
+        //given
+        String email = "test@gmail.com";
+        String password = "newPassword";
+        String username = "username";
+
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setRole(Role.ROLE_USER);
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+
+        //when
+        userService.updatePassword(email, passwordEncoder.encode(password));
+
+        //then
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+        User capturedUser = userArgumentCaptor.getValue();
+        assertTrue(passwordEncoder.matches(password, capturedUser.getPassword()));
+
     }
 }

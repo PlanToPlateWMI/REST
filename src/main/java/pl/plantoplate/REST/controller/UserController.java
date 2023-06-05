@@ -91,7 +91,7 @@ public class UserController {
     }
 
     @PatchMapping("/password")
-    @Operation(summary="Change password. Return updated user info")
+    @Operation(summary="Change password. Return  user info")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password changed successfully",  content = @Content(
                     schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
