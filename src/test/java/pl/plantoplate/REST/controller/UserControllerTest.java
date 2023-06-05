@@ -90,6 +90,35 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
 
+
+    @Test
+    @WithMockUser(value = email)
+    void shouldMatchPassword() throws Exception {
+        String password = "password";
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+
+        when(userService.isPasswordMatch(email, password)).thenReturn(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/users/password/match?password=" + password))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockUser(value = email)
+    void shouldNotMatchPassword() throws Exception {
+        String password = "password";
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+
+        when(userService.isPasswordMatch(email, password)).thenReturn(false);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/users/password/match?password=" + password))
+                .andExpect(status().isConflict());
     }
 }

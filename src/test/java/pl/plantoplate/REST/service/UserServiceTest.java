@@ -118,15 +118,18 @@ public class UserServiceTest {
     @Test
     void shouldRegisterUserWhenHeNotExists(){
 
+        //given
         String email = "email";
         String password = "password";
         String login = "login";
         when(userRepository.existsByEmail(email)).thenReturn(true);
         when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(new User()));
 
+        //when
         userService.registerUser(email, password, login);
 
 
+        //then
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userArgumentCaptor.capture());
 
@@ -140,15 +143,17 @@ public class UserServiceTest {
 
     @Test
     void shouldRegisterUserWhenHeExists(){
-
+        //given
         String email = "email";
         String password = "password";
         String login = "login";
         when(userRepository.existsByEmail(email)).thenReturn(false);
 
+        //when
         userService.registerUser(email, password, login);
 
 
+        //then
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userArgumentCaptor.capture());
 
@@ -160,6 +165,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdateUsername(){
+        //given
         String oldUsername = "old";
         String newUsername = "new";
         String email = "test@gmail.com";
@@ -170,11 +176,29 @@ public class UserServiceTest {
 
         when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
 
+        //when
         userService.updateUsername(email, newUsername);
 
+        //then
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userArgumentCaptor.capture());
         User capturedUser = userArgumentCaptor.getValue();
         assertEquals(newUsername, capturedUser.getUsername());
+    }
+
+    @Test
+    void shouldMatchPassword(){
+        String email = "test@gmail.com";
+        String password = "password";
+
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+
+        boolean isMatch = userService.isPasswordMatch(email, password);
+
+        assertTrue(isMatch);
     }
 }
