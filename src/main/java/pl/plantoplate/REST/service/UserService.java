@@ -193,6 +193,7 @@ public class UserService {
         if(userRepository.existsByEmailAndIsActiveTrue(newEmail))
             throw new EmailAlreadyTaken("Email [" + newEmail + "] is already taken.");
         user.setEmail(newEmail);
+        userRepository.save(user);
     }
 
     /**

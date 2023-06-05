@@ -15,10 +15,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.PasswordRequest;
 import pl.plantoplate.REST.dto.Request.UsernameRequest;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.service.UserService;
 
 import static org.mockito.Mockito.when;
@@ -44,6 +46,9 @@ public class UserControllerTest {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @BeforeEach
     public void setup() {
@@ -127,5 +132,28 @@ public class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/password/match?password=" + password))
                 .andExpect(status().isConflict());
     }
+
+    @Test
+    @WithMockUser(value = email, password = "password")
+    void shouldUpdateEmail() throws Exception {
+        String password = "password";
+        String newEmail = "newEmail@gmail.com";
+        User user = new User();
+        user.setEmail(newEmail);
+        user.setPassword(encoder.encode(password));
+        user.setActive(true);
+        user.setRole(Role.ROLE_ADMIN);
+
+        when(userRepository.findByEmail(newEmail)).thenReturn(java.util.Optional.of(user));
+
+        EmailPasswordRequest emailPasswordRequest = new EmailPasswordRequest(newEmail, password);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/users/email")
+                .content(mapper.writeValueAsString(emailPasswordRequest))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
 
 }

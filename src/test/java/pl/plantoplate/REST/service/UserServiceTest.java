@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.exception.EmailAlreadyTaken;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
 
@@ -207,7 +208,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldChangePassword(){
+    void shouldUpdatePasswordOfAuthenticatesUser(){
         //given
         String email = "test@gmail.com";
         String password = "newPassword";
@@ -229,6 +230,56 @@ public class UserServiceTest {
         verify(userRepository).save(userArgumentCaptor.capture());
         User capturedUser = userArgumentCaptor.getValue();
         assertTrue(passwordEncoder.matches(password, capturedUser.getPassword()));
+    }
 
+
+    @Test
+    void shouldUpdateEmail(){
+        //given
+        String email = "test@gmail.com";
+        String newEmail = "test2@gmail.com";
+        String password = "password";
+        String username = "username";
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setRole(Role.ROLE_USER);
+        user.setPassword(password);
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+        when(userRepository.existsByEmailAndIsActiveTrue(newEmail)).thenReturn(false);
+
+        //when
+        userService.updateEmail(email,newEmail);
+
+        //then
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+        User capturedUser = userArgumentCaptor.getValue();
+        assertEquals(newEmail, capturedUser.getEmail());
+
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenTryToUpdateEmailAndUserWithThisEmailExists(){
+        //given
+        String email = "test@gmail.com";
+        String newEmail = "test2@gmail.com";
+        String password = "password";
+        String username = "username";
+
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setRole(Role.ROLE_USER);
+        user.setPassword(password);
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+        when(userRepository.existsByEmailAndIsActiveTrue(newEmail)).thenReturn(true);
+
+        //when
+        assertThrows(EmailAlreadyTaken.class, () -> userService.updateEmail(email,newEmail));
     }
 }
