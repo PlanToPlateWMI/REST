@@ -1,5 +1,7 @@
 package pl.plantoplate.REST.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +21,15 @@ import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
 import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
 import pl.plantoplate.REST.dto.Request.PasswordRequest;
 import pl.plantoplate.REST.dto.Request.UsernameRequest;
+import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.service.UserService;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -208,6 +213,41 @@ public class UserControllerTest {
     }
 
 
+    @Test
+    @WithMockUser(value = email)
+    void shouldReturnListOfUsersOfTheSameGroup() throws Exception {
+        //given
+        String username = "username";
+        Role role = Role.ROLE_ADMIN;
+
+        Group group = new Group();
+
+        User user = new User();
+        user.setUsername(username);
+        user.setRole(role);
+        user.setEmail(email);
+        user.setUserGroup(group);
+
+        User user1 = new User();
+        user1.setUsername(username);
+        user1.setRole(role);
+        user1.setEmail(email);
+        user1.setUserGroup(group);
+
+        group.setUsers(List.of(user, user1));
+
+        List<User> usersOfTheSameGroup = List.of(user, user1);
+
+        when(userService.getUserOfTheSameGroup(email)).thenReturn(usersOfTheSameGroup);
+
+        //when
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/users/infos"))
+                .andExpect(status().isOk()).andReturn();
+
+        //then
+        List<UsernameRoleEmailResponse> response = mapper.readValue(result.getResponse().getContentAsString(),new TypeReference<List<UsernameRoleEmailResponse>>(){});
+        assertEquals(2, response.size());
+    }
 
 
 

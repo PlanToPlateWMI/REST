@@ -380,4 +380,39 @@ public class UserServiceTest {
         assertTrue(returnedUsers.stream().anyMatch(e-> e.getEmail().equals(emailOfUserFromGroup) && e.getRole().equals(Role.ROLE_ADMIN)));
         verify(userRepository).save(user2);
     }
+
+    @Test
+    void shouldReturnUserOfGroup(){
+        //given
+        String email = "test@gmail.com";
+        String username = "username";
+        Role role = Role.ROLE_ADMIN;
+
+        Group group = new Group();
+
+        User user = new User();
+        user.setUsername(username);
+        user.setRole(role);
+        user.setEmail(email);
+        user.setUserGroup(group);
+
+        User user1 = new User();
+        user1.setUsername(username);
+        user1.setRole(role);
+        user1.setEmail(email);
+        user1.setUserGroup(group);
+
+        group.setUsers(List.of(user, user1));
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+
+        //when
+        List<User> usersOfGroup = userService.getUserOfTheSameGroup(email);
+
+
+        //then
+        assertEquals(2, usersOfGroup.size());
+        assertTrue(usersOfGroup.contains(user));
+        assertTrue(usersOfGroup.contains(user1));
+    }
 }

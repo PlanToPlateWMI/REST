@@ -13,7 +13,7 @@ express or implied. See the License for the specific language
 governing permissions and limitations under the License.
  */
 
-package pl.plantoplate.REST.controller;
+package pl.plantoplate.REST.controller.auth;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
