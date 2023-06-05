@@ -32,7 +32,7 @@ import pl.plantoplate.REST.dto.Response.ProductResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.exception.WrongQueryParam;
+import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
@@ -74,7 +74,7 @@ public class BaseProductsController {
             BaseProductType.valueOf(typeOfProduct);
         }
         catch (IllegalArgumentException e){
-            throw new WrongQueryParam("Query values available - ALL and GROUP");
+            throw new WrongRequestData("Query values available - ALL and GROUP");
         }
 
         return generateListOfProductDtoDependsOnTypeOfProducts(group, BaseProductType.valueOf(typeOfProduct));

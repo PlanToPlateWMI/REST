@@ -35,7 +35,7 @@ import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
-import pl.plantoplate.REST.exception.WrongQueryParam;
+import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.service.ShoppingListService;
 import pl.plantoplate.REST.service.UserService;
 
@@ -72,7 +72,7 @@ public class ShoppingListController {
             type = "string", allowableValues = {"false", "true"}))  String typeOfProduct){
 
         if(!typeOfProduct.equals("true") && !typeOfProduct.equals("false"))
-            throw new WrongQueryParam("Query param values available : true and false");
+            throw new WrongRequestData("Query param values available : true and false");
 
         ProductState productState = Boolean.parseBoolean(typeOfProduct) ? ProductState.BOUGHT : ProductState.BUY;
 

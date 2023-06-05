@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -15,12 +17,14 @@ import static org.mockito.Mockito.*;
 public class UserServiceTest {
 
     private UserService userService;
+    private PasswordEncoder passwordEncoder;
     private UserRepository userRepository;
 
     @BeforeEach
     void setUp(){
         userRepository = mock(UserRepository.class);
-        userService = new UserService(userRepository);
+        passwordEncoder = new BCryptPasswordEncoder();
+        userService = new UserService(userRepository, passwordEncoder);
     }
 
     @Test
@@ -152,5 +156,25 @@ public class UserServiceTest {
 
         assertEquals(password, saved.getPassword());
         assertEquals(login, saved.getUsername());
+    }
+
+    @Test
+    void shouldUpdateUsername(){
+        String oldUsername = "old";
+        String newUsername = "new";
+        String email = "test@gmail.com";
+
+        User user = new User();
+        user.setUsername(oldUsername);
+        user.setEmail(email);
+
+        when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(user));
+
+        userService.updateUsername(email, newUsername);
+
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+        User capturedUser = userArgumentCaptor.getValue();
+        assertEquals(newUsername, capturedUser.getUsername());
     }
 }

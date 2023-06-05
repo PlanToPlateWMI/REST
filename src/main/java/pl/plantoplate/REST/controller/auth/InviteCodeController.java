@@ -34,13 +34,9 @@ import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Role;
-import pl.plantoplate.REST.exception.WrongQueryParam;
+import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -106,7 +102,7 @@ public class InviteCodeController {
         try{
             Role.valueOf("ROLE_" + role);
         }catch (IllegalArgumentException e){
-            throw new WrongQueryParam("Query keys available - USER and ADMIN");
+            throw new WrongRequestData("Query keys available - USER and ADMIN");
         }
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

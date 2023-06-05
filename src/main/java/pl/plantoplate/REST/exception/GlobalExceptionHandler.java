@@ -10,6 +10,18 @@ import pl.plantoplate.REST.dto.Response.SimpleResponse;
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+
+    @ExceptionHandler(EmailAlreadyTaken.class)
+    public ResponseEntity<SimpleResponse> emailAlreadyTaken(EmailAlreadyTaken e) {
+        return buildResponseEntity(e, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserNotFromGroup.class)
+    public ResponseEntity<SimpleResponse> userNotFromGroup(UserNotFromGroup e) {
+        return buildResponseEntity(e, HttpStatus.CONFLICT);
+    }
+
+
     @ExceptionHandler(AddTheSameProduct.class)
     public ResponseEntity<SimpleResponse> addTheSameProduct(AddTheSameProduct e) {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
@@ -35,8 +47,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(WrongQueryParam.class)
-    public ResponseEntity<SimpleResponse> wrongQueryParama(WrongQueryParam e) {
+    @ExceptionHandler(WrongRequestData.class)
+    public ResponseEntity<SimpleResponse> wrongQueryParama(WrongRequestData e) {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 

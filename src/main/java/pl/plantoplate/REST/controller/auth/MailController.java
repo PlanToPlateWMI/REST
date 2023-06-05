@@ -33,7 +33,7 @@ import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.dto.Response.CodeResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.exception.WrongQueryParam;
+import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.UserService;
@@ -74,7 +74,7 @@ public class MailController {
         try{
             emailEnum = EmailType.valueOf(emailType);
         }catch (IllegalArgumentException e){
-            throw new WrongQueryParam("Query keys available - USER and ADMIN");
+            throw new WrongRequestData("Query keys available - USER and ADMIN");
         }
 
         if (!userService.existsByEmail(email)) {
