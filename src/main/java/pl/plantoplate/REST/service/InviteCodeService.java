@@ -28,6 +28,9 @@ import pl.plantoplate.REST.repository.InviteCodeRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+/**
+ * Service Layer of InviteCode JPA Repository
+ */
 @Service
 @Slf4j
 public class InviteCodeService {
@@ -44,10 +47,10 @@ public class InviteCodeService {
     }
 
     /**
-     * Verify if code exists in DB and verify is code expired.
-     * Add user to group with role from code and delete invite code from db
-     * @param userEmail
-     * @param inviteCode
+     * Verify if code exists and is code expired. If code is expired or doesn't exist throws {@link pl.plantoplate.REST.exception.WrongInviteCode}.
+     * Add user to group of invite code with role from code and delete code
+     * @param userEmail - email of user who try to user invite code
+     * @param inviteCode - invite code
      */
     public void verifyInviteCodeAndAddUserToGroup(String userEmail,int inviteCode) {
             if(inviteCodeRepository.existsByCode(inviteCode)){
@@ -79,10 +82,10 @@ public class InviteCodeService {
     }
 
     /**
-     * Save code to DB to the specific group and role
-     * @param code
-     * @param groupId
-     * @param role
+     * Save invite code to group with role
+     * @param code - generated invite code to save
+     * @param groupId - group id of invite code
+     * @param role - role of invite code
      */
     public void saveCode(int code, long groupId, Role role) {
 

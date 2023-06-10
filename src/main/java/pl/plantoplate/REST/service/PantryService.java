@@ -29,6 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service Layer of Pantry JPA Repository
+ */
 @Service
 @Slf4j
 public class PantryService {

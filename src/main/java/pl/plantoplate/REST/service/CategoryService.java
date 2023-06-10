@@ -22,6 +22,9 @@ import pl.plantoplate.REST.repository.CategoryRepository;
 
 import java.util.List;
 
+/**
+ * Service Layer of Category JPA Repository
+ */
 @Service
 public class CategoryService {
 
@@ -32,11 +35,20 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * Returns Category object if it exists otherwise throws RT Exception {@link pl.plantoplate.REST.exception.EntityNotFound}
+     * @param name - category name to find
+     * @return Category object if category with name parametr exists
+     */
     @Transactional(readOnly = true)
     public Category findByName(String name) {
         return categoryRepository.findByCategory(name).orElseThrow(() -> new EntityNotFound("Category [ " + name + "] not found"));
     }
 
+    /**
+     * Returns list of all categories
+     * @return list of all categories
+     */
     @Transactional(readOnly = true)
     public List<Category> findAll() {
         return categoryRepository.findAll();

@@ -29,6 +29,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Service Layer of ShopProduct JPA Repository
+ */
 @Service
 @Slf4j
 public class ShoppingListService {

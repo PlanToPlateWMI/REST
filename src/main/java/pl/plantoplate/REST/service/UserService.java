@@ -28,6 +28,9 @@ import pl.plantoplate.REST.repository.UserRepository;
 
 import java.util.List;
 
+/**
+ * Service Layer of User JPA Repository
+ */
 @Service
 public class UserService {
 

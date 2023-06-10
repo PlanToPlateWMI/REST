@@ -28,14 +28,24 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * Swagger configuration
+ */
 //http://localhost:8080/swagger-ui/index.html#/
 @Configuration
 public class SwaggerConfig {
 
 
+    /**
+     * Scheme for JWT authorization SCHEME and information about API
+     */
     private static final String SCHEME_NAME = "bearerScheme";
     private static final String SCHEME = "Bearer";
 
+    /**
+     * Creates Bean OpenAPI documentation with Security
+     * @return
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         var openApi = new OpenAPI()
@@ -52,15 +62,13 @@ public class SwaggerConfig {
 
     private Info getInfo() {
 
-
         Contact contact = new Contact();
         contact.setEmail("plantoplatemobileapp@gmail.com");
         contact.setName("Plan To Plate Team");
 
         return new Info()
-                .title("Your APIs Documentation")
-                .description("The API documentation for your Portal.")
-                .version("1.0.0")
+                .title("PlanToPlate API")
+                .description("API documentation")
                 .contact(contact)
                 .license(getLicense());
     }
@@ -94,48 +102,4 @@ public class SwaggerConfig {
                 .scheme(SCHEME);
     }
 
-//    public static final String AUTHORIZATION_HEADER = "Authorization";
-//
-//    private ApiKey apiKey(){
-//        return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
-//    }
-//
-//    private ApiInfo apiInfo(){
-//        return new ApiInfo("Book API",
-//                "REST API.\n" +
-//                        "AuthController - User can log in and get JWT token or create an account",
-//                "1.0.0",
-//                "",
-//                new Contact("Plan To Plate Teams","","plantoplatemobileapp@gmail.com"),
-//                "Apache 2.0","https://github.com/PlanToPlateWMI/REST/blob/main/LICENSE.md", Collections.EMPTY_LIST);
-//    }
-//
-//    @Bean
-//    public Docket api(){
-//        return new Docket(DocumentationType.SWAGGER_2)
-//                .useDefaultResponseMessages(false)
-//                .apiInfo(apiInfo())
-//                .securityContexts(Arrays.asList(securityContext()))
-//                .securitySchemes(Arrays.asList(apiKey()))
-//                .select()
-//                .apis(RequestHandlerSelectors.basePackage("pl.plantoplate.REST.controller"))
-//                .paths(paths())
-//                .build();
-//    }
-//
-//    private SecurityContext securityContext(){
-//        return SecurityContext.builder().securityReferences(defaultAuth()).build();
-//    }
-//
-//    private List<SecurityReference> defaultAuth(){
-//        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-//        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-//        authorizationScopes[0] = authorizationScope;
-//        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
-//    }
-//
-//
-//    private Predicate<String> paths() {
-//        return regex("/api/auth.*").or(regex("/invite-codes.*"));
-//    }
 }

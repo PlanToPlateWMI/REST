@@ -42,7 +42,9 @@ import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.UserService;
 
 
-
+/**
+ *
+ */
 @RestController
 @RequestMapping("api/auth/")
 @Slf4j
