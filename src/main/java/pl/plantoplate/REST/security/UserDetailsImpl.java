@@ -26,6 +26,9 @@ import pl.plantoplate.REST.entity.auth.User;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Implementation of UserDetails interface
+ */
 @Getter
 @Setter
 public class UserDetailsImpl implements UserDetails {
@@ -53,6 +56,11 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
+    /**
+     * Returns UserDetailImpl by User object
+     * @param user
+     * @return
+     */
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
 
@@ -100,6 +108,10 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
+    /**
+     * If user parametr isActivate is false what means that user account not enabled
+     * @return value of isActivated parametr
+     */
     @Override
     public boolean isEnabled() {
         return isActivated;

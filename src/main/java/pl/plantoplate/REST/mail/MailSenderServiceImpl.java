@@ -21,6 +21,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+/**
+ * Implementation of MailSenderService {@link pl.plantoplate.REST.mail.MailSenderService} interface
+ */
 @Component
 @Slf4j
 public class MailSenderServiceImpl implements MailSenderService{
@@ -36,7 +39,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     }
 
     /**
-     * Send email to email address from MailParams with code and depends on type email change subject and body of email
+     * Send email to email address with code from MailParams and depends on type email change subject and body of email
      * @param mailParams
      * @param emailType
      */

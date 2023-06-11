@@ -22,6 +22,9 @@ import pl.plantoplate.REST.entity.auth.Role;
 import javax.persistence.*;
 import java.util.Objects;
 
+/**
+ * Entity that represents User of project
+ */
 @Entity
 @Table(name = "app_user")
 @Getter

@@ -16,6 +16,9 @@ package pl.plantoplate.REST.mail;
 
 import lombok.*;
 
+/**
+ * Contains all required parametr to send email
+ */
 @Getter
 @Setter
 @Builder

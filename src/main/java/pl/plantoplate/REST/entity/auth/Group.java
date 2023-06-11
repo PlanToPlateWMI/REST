@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Entity that represents {@link pl.plantoplate.REST.entity.auth.User} group
+ */
 @Entity
 @Table(name = "user_group")
 @Getter

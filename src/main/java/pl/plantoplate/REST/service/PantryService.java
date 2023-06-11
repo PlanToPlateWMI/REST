@@ -54,11 +54,14 @@ public class PantryService {
     }
 
     /**
-     * Transfer products from shopping list to pantry (change product state to PATRY). If at least one product not found, user try to transfer not his product or
-     * product doesn't have state BOUGHT - throws exception. If the same product exists in pantry - only increase amount
+     * Change state of shop products {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with ids and state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
+     * to {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
+     * If the same product exists in pantry - increase amount
+     * If product not from user's group or doesn't have required state throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount}
      * @param email - email of user
-     * @param productId - idis of products
-     * @return
+     * @param productId - idis of products with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} state
+     * @exception {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} -if product not from user's group or doesn't have state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
+     * @return list of products in user's pantry
      */
     public List<ShopProduct> transferProductToPantry(String email, long[] productId ) {
         Group group = userService.findGroupOfUser(email);
@@ -93,11 +96,14 @@ public class PantryService {
 
 
     /**
-     * Add product to pantry from base
-     * @param productId - id of product in base
-     * @param amount -amount of product
+     * Save {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with product {@link pl.plantoplate.REST.entity.product.Product} with id productId
+     * and amount to group of user email parametrs. Set {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
+     * If the same product exists in pantry - increase amount
+     * @param productId - id of product {@link pl.plantoplate.REST.entity.product.Product}
+     * @param amount - amount of product to add
      * @param email - email of user to identify his group
-     * @return
+     * @return list of products in user's pantry
      */
     public List<ShopProduct> addProductToPantry(long productId, float amount, String email) {
 
@@ -139,10 +145,11 @@ public class PantryService {
 
 
     /**
-     * Delete product from pantry by product id and email of user
+     * Delete {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id parametr
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if user try to add not his product
      * @param pantryProductId - pantry Product id
      * @param email - email of user to identify his group
-     * @return
+     * @return list of products in user's pantry
      */
     public List<ShopProduct> deleteProduct(long pantryProductId, String email) {
 
@@ -164,11 +171,12 @@ public class PantryService {
 
 
     /**
-     * Modify amount of product in pantry
+     * Modify amount of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
      * @param pantryProductId - id of pantry product
      * @param email - email of ser to identify his group
      * @param amount - new amount of product
-     * @return
+     * @return list of products in user's pantry
      */
     public List<ShopProduct> modifyAmount(long pantryProductId, String email, float amount) {
 

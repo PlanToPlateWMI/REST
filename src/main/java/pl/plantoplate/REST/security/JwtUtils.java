@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Class to generate JWT Token by Authentication and check if JWT toke is valid
+ * Generates JWT Token by Authentication and checks if JWT token is valid
  */
 @Component
 public class JwtUtils {
@@ -41,10 +41,11 @@ public class JwtUtils {
     @Value("${jwt.expirationMills}")
     private int jwtExpirationMs;
 
+
     /**
-     * Generate JWT Token by Authentication. Token contains roles, groupID, expired Date - 1 week and user's email
+     * Generate JWT token by Authentication. Token contains groupId, roles , expired time - 30 days
      * @param authentication
-     * @return JWT Token
+     * @return
      */
     public String generateJwtToken(Authentication authentication) {
 
@@ -68,7 +69,7 @@ public class JwtUtils {
 
     /**
      * Check if JWT token is valid.
-     * @param authToken
+     * @param authToken - JWT token
      * @return is JWT token valid
      */
     public boolean isJwtTokenValid(String authToken) {

@@ -23,6 +23,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entity that represents invite code that generated to invite new member to group
+ */
 @Entity
 @Table(name = "invite_code")
 @Getter

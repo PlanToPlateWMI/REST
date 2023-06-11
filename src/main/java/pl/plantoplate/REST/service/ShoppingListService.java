@@ -54,11 +54,14 @@ public class ShoppingListService {
 
 
     /**
-     * add product from base to shopping list ( to buy section) . Return to buy product shopping list.
+     * Save {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with product {@link pl.plantoplate.REST.entity.product.Product} with id productId
+     * and amount to group of user email parametrs. Set {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
+     * If the same product exists with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}  - increase amount
      * @param productId - id of product from base
      * @param amount - amount of product
      * @param email - email of user to find his group
-     * @return
+     * @return list of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
      */
     public List<ShopProduct> addProductToShoppingList(long productId, float amount , String email) {
 
@@ -98,11 +101,11 @@ public class ShoppingListService {
     }
 
     /**
-     * Delete product from shopping list. If product was deleted from toBuy list - return shopping list of toBuy products.
-     * If product was deleted from bought list - return shopping list of bought products
+     * Delete {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id.
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} then user try to product not from hist group
      * @param id - shopping product id
-     * @param email - email of user to find his group
-     * @return
+     * @param email - email of user to identify his group
+     * @return list of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} of deleted product
      */
     public List<ShopProduct> deleteProduct(long id, String email) {
 
@@ -124,11 +127,12 @@ public class ShoppingListService {
     }
 
     /**
-     * Modify amount of product in shopping list
+     * Modify amount of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to modify product not with required state
      * @param id - id of shopping list product
      * @param email - email of ser to identify his group
      * @param amount - new amount of product
-     * @return
+     * @return list of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} state
      */
     public List<ShopProduct> modifyAmount(long id, String email, float amount) {
 
@@ -152,10 +156,10 @@ public class ShoppingListService {
     }
 
     /**
-     * Change is bought parametr of product. Return shopping products list.
+     * Change {@link pl.plantoplate.REST.entity.shoppinglist.ProductState} from BUY to BOUGHT or from BOUGHT to BUY of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
      * @param id - id of product to change type
      * @param email - email of user to identify group
-     * @return
+     * @return list of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} of user's group
      */
     public List<ShopProduct> changeProductStateOnShoppingList(long id, String email) {
 

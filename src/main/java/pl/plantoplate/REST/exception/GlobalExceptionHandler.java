@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 
+/**
+ * Global Exception Handler. Contains methods that handle exception and return
+ * ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse} with message from
+ * handled exception
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 

@@ -1,4 +1,4 @@
 /**
- * Contains custom RT Exceptions
+ * Contains custom RuntimeExceptions
  */
 package pl.plantoplate.REST.exception;

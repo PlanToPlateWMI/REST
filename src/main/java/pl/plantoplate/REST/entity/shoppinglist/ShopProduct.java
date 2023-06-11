@@ -24,6 +24,10 @@ import pl.plantoplate.REST.entity.product.Product;
 import javax.persistence.*;
 import java.util.Objects;
 
+/**
+ * Entity that represents {@link pl.plantoplate.REST.entity.product.Product}
+ * with amount, state and in specific group
+ */
 @Getter
 @Setter
 @NoArgsConstructor

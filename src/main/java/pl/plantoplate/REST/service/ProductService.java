@@ -59,12 +59,24 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    /**
+     * Returns Product with provided name
+     * @param productName - name of product
+     * @return Product {@link pl.plantoplate.REST.entity.product.Product} with provided name
+     * @throws EntityNotFound - if product with provided name doesn't exist
+     */
     @Transactional(readOnly = true)
     public Product findByName(String productName) throws EntityNotFound {
         return productRepository.findByName(productName).orElseThrow(() -> new EntityNotFound("Product [ " + productName
          + " not found."));
     }
 
+    /**
+     * Returns Product with provided id
+     * @param productId - id of product
+     * @return Product {@link pl.plantoplate.REST.entity.product.Product} with provided id
+     * @throws EntityNotFound - if product with provided id doesn't exist
+     */
     @Transactional(readOnly = true)
     public Product findById(long productId) throws EntityNotFound {
         return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
@@ -72,9 +84,9 @@ public class ProductService {
     }
 
     /**
-     * User can get all product of group by groupId
+     * Returns list of {@link pl.plantoplate.REST.entity.product.Product} of user's group
      * @param group - user's group
-     * @return
+     * @return list of {@link pl.plantoplate.REST.entity.product.Product}
      */
     @Transactional(readOnly = true)
     public List<Product> getProductsOfGroup(Group group) {
@@ -83,10 +95,11 @@ public class ProductService {
 
 
     /**
-     * User can delete product of his group.Moderator can delete general product
+     * Delete {@link pl.plantoplate.REST.entity.product.Product} by product id if it is product of user's group and delete
+     * {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with this product
      * @param productId - id of product to delete
      * @param groupId - group of user
-     * @throws ModifyGeneralProduct - User try to modify not his group product
+     * @throws ModifyGeneralProduct - user try to delete general product or product not his group
      * @throws EntityNotFound - product with id not found
      */
     public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct, EntityNotFound {
@@ -110,7 +123,8 @@ public class ProductService {
     }
 
     /**
-     * User can add new product to his group list. Moderator can add new product to general list that is available for all users.
+     * Saves product {@link pl.plantoplate.REST.entity.product.Product} with provided name, categoryName, unit to group
+     * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
      * @param name - product name
      * @param categoryName - product category
      * @param unit - product unit
@@ -137,9 +151,8 @@ public class ProductService {
 
 
     /**
-     * Only moderators can update general product. Users can update only products of their group.
-     * User cannot update product unit and name that already exists product with the same unit and name in general
-     * products or products of his group
+     * Update product {@link pl.plantoplate.REST.entity.product.Product} with product id and change provided name, categoryName, unit
+     * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
      * @param name - new product name
      * @param unit - new product unit
      * @param category - new product category
@@ -184,9 +197,9 @@ public class ProductService {
 
 
     /**
-     * Return general products and products of group
+     * Returns list of general products (products with group id = 1)  and products of group
      * @param userGroup - id of group
-     * @return
+     * @return list of general anf group products
      */
     public List<Product> generalAndProductsOfGroup(Group userGroup){
         List<Product> products = productRepository.findAllByCreatedBy(userGroup);

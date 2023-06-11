@@ -23,6 +23,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Entity that represents {@link pl.plantoplate.REST.entity.product.Product} category
+ */
 @Getter
 @Setter
 @AllArgsConstructor

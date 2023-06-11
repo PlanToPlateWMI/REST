@@ -30,6 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Once Per Request Filter to catch JWT token from Authorization Filter and set Authentication
+ */
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -43,14 +46,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-    /**
-     * UsernamePasswordAuthenticationFilter. Get JWT token from header Authorization and set Authentication
-     * @param request
-     * @param response
-     * @param filterChain
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 

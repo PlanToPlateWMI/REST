@@ -23,6 +23,9 @@ import org.springframework.stereotype.Component;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
 
+/**
+ * Implementation of UserDetailsService Interface
+ */
 @Component
 public class UserDetailServiceImpl implements UserDetailsService {
 
@@ -33,6 +36,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Returns UserDetails by email
+     * @param email - username
+     * @return UserDetails
+     * @throws UsernameNotFoundException - if user with provided email (username) not found
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("User with email : " + email + " not found."));

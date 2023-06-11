@@ -45,7 +45,7 @@ public class UserService {
 
 
     /**
-     * Save user to DB
+     * Save {@link pl.plantoplate.REST.entity.auth.User}
      * @param user - user to save
      * @return
      */
@@ -54,7 +54,7 @@ public class UserService {
     }
 
     /**
-     * Check if user with email exists in DB
+     * Check if user {@link pl.plantoplate.REST.entity.auth.User} with email exists
      * @param email - email to check
      * @return true - user exists, false- doesn't exist
      */
@@ -64,9 +64,10 @@ public class UserService {
     }
 
     /**
-     * Find user by email. If user not found - throw RT Exception
+     * Returs {@link pl.plantoplate.REST.entity.auth.User} by email.
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
      * @param email - user's email
-     * @return User with email passde as param
+     * @return User with provided email
      */
     @Transactional(readOnly = true)
     public User findByEmail(String email) {
@@ -74,9 +75,10 @@ public class UserService {
     }
 
     /**
-     *
-     * @param email
-     * @param newPassword
+     * Update password of {@link pl.plantoplate.REST.entity.auth.User} by user's email
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
+     * @param email - email of user
+     * @param newPassword - new password
      */
     public void resetPassword(String email, String newPassword)  {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
@@ -88,15 +90,16 @@ public class UserService {
     /**
      * Return user's group by user's email
      * @param email - user's email
-     * @return group of user
+     * @return group {@link pl.plantoplate.REST.entity.auth.Group} of user
      */
     @Transactional(readOnly = true)
     public Group findGroupOfUser(String email) {
         return this.findByEmail(email).getUserGroup();
     }
 
+
     /**
-     * Return if active user with email exists
+     * Check if {@link pl.plantoplate.REST.entity.auth.User} with parametr isActive true and email exists
      * @param email - user's email
      * @return true - user exists, false - not exists
      */
@@ -106,7 +109,8 @@ public class UserService {
     }
 
     /**
-     * Save user to DB with default role - ROLE_USER and active - false
+     * Save user {@link pl.plantoplate.REST.entity.auth.User} with provided email, username, password
+     * with default role - {@link pl.plantoplate.REST.entity.auth.Role#ROLE_USER} and active - false
      * @param email - user's email
      * @param password - user's password
      * @param username - user's username
@@ -136,10 +140,11 @@ public class UserService {
     }
 
     /**
-     * Update username of user with email and return new user info
+     * Update username of user {@link pl.plantoplate.REST.entity.auth.User} by email
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
      * @param email - user's email
      * @param username - new username
-     * @return updated user info
+     * @return updated user {@link pl.plantoplate.REST.entity.auth.User} info
      */
     public User updateUsername(String email, String username) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
@@ -148,9 +153,10 @@ public class UserService {
     }
 
     /**
-     * Return List of user of the same group as user with email
+     * Returns list of users {@link pl.plantoplate.REST.entity.auth.User} of the same group as user with provided email
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
      * @param email - user's email
-     * @return - list of users of the same group
+     * @return - list of users {@link pl.plantoplate.REST.entity.auth.User} of the same group
      */
     public List<User> getUserOfTheSameGroup(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
@@ -161,7 +167,8 @@ public class UserService {
     }
 
     /**
-     * Check is password of user matches with password from database
+     * Check is password of user {@link pl.plantoplate.REST.entity.auth.User} matches with password from DATABASE
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
      * @param email - user's email
      * @param password - user's password to check if matches
      * @return true - password matches, false - doesn't match
@@ -171,11 +178,13 @@ public class UserService {
         return passwordEncoder.matches(password, user.getPassword());
     }
 
+
     /**
-     * Update password of user with email and return updated user info
-     * @param email - email of user
-     * @param password - new password
-     * @return update user info
+     * Updates password of user{@link pl.plantoplate.REST.entity.auth.User} by email
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user not found
+     * @param email - new email of user
+     * @param password -  password
+     * @return update user {@link pl.plantoplate.REST.entity.auth.User} info
      */
     public User updatePassword(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
@@ -184,7 +193,8 @@ public class UserService {
     }
 
     /**
-     * Update user's email
+     * Updates email of user{@link pl.plantoplate.REST.entity.auth.User} by email
+     * Throws {@link pl.plantoplate.REST.exception.EmailAlreadyTaken} if user with newEmail already exists
      * @param email - old users' email
      * @param newEmail - new user's email
      */
@@ -197,7 +207,11 @@ public class UserService {
     }
 
     /**
-     * Update users roles by email and new role. Return updated users info of group
+     * Update users roles by email and new role
+     * Throws {@link pl.plantoplate.REST.exception.WrongRequestData} if role is not valid
+     * Throws {@link pl.plantoplate.REST.exception.EntityNotFound} if user with email not found
+     * Throws {@link pl.plantoplate.REST.exception.UserChangeHisRole} if user try to change his role
+     * Throws {@link pl.plantoplate.REST.exception.UserNotFromGroup} if user with provided email not from group of user with email
      * @param requests - list of emails and new roles of users
      * @param email - email of user who want to update roles
      * @return list of updated users

@@ -21,6 +21,9 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 
 import javax.persistence.*;
 
+/**
+ * Entity that represents Product
+ */
 @Getter
 @Setter
 @AllArgsConstructor
