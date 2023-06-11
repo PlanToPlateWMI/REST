@@ -38,7 +38,9 @@ import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.service.InviteCodeService;
 import pl.plantoplate.REST.service.UserService;
 
-
+/**
+ * REST controller with Endpoints connected with Invite Codes to join group
+ */
 @RestController
 @RequestMapping("api/invite-codes")
 @Slf4j
@@ -58,13 +60,13 @@ public class InviteCodeController {
 
 
     /**
-     * If inviteCode exists - add user to group of this code. Send back JWT token
-     * If invite code is wrong than - return  BadRequest status
-     * @param addToGroupByInviteCodeRequest
-     * @return JWT token
+     * Users invite code - adds user with provided email to group by invite code. Delete invite code if it is valid. Activates added user account.
+     * @param addToGroupByInviteCodeRequest DTO with email, password and invite code
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with generated JWT token and role
      */
     @PostMapping()
-    @Operation(summary="Join group",description = "User can join group by invite code ")
+    @Operation(summary="Join group by invite code",description = "Adds user to group by existing not expired invite code. " +
+            "Activates user's account (set isActive = true")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API sends back JWT Token and role",  content = @Content(
                                 schema = @Schema(implementation = JwtResponse.class))),
@@ -84,13 +86,15 @@ public class InviteCodeController {
 
 
     /**
-     * Admin can generate invite code to group to the ADMIN or USER.
-     * @param role - ADMIN or USER
-     * @return generated code
+     * Generates and saves invite code if user has role ADMIN. Expiration time of invite code is 30 minutes. Invite code is generate to group of user with
+     * provided role as Request Param ?role= USER or ADMIN.
+     * @param role ADMIN or USER
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated invite code.
      */
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Generate code to invite new user as ADMIN or USER",description = "User with role ADMIN can invite user to his group by invite code. Invite code has expiration time ")
+    @Operation(summary="Generates code to invite new user to your group as ADMIN or USER",
+            description = "Generates invite code with provided as request param role (?role = USER or ?role=ADMIN) and for join group of authenticated user with role ADMIN.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API sends back invite code",  content = @Content(
                             schema = @Schema(implementation = CodeResponse.class))),

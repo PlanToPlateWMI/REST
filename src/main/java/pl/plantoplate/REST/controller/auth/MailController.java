@@ -38,6 +38,9 @@ import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
 import pl.plantoplate.REST.service.UserService;
 
+/**
+ * REST controller with Endpoints connected to sending email
+ */
 @RestController
 @RequestMapping("api/mail/")
 @Slf4j
@@ -53,13 +56,16 @@ public class MailController {
     }
 
     /**
-     * Generate and send code to the email
-     * @param email
-     * @return generated code
+     * Sends generated code to provided as Request Param ?email= email address with body and subject depends on Request Param ?type=registration (default value) - to confirm
+     * email address during registration or ?type=reset - to confirm email address during resetting password.
+     * @param email email address to send code
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated code sent to provided email address
      */
     @GetMapping("/code")
-    @Operation(summary="Send code to email. There are 2 types of email - ?type=registration email to confirm registration and ?type=reset " +
-            "email to confirm reset password. Default value is registration. ",description = "If user doesn't receive previously generated code he will able to ask for resending a new code ")
+    @Operation(summary="Send code to email",
+            description = "Sends code to email provided as request param ?email and with subject and body " +
+                    "depends on request param ?type. There are 2 types of email - ?type=registration to confirm registration and ?type=reset" +
+                    " to confirm reset password. Default value is registration. Return code sent to provided email address.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API send back code that it sends to user's email", content = @Content(
                     schema = @Schema(implementation = CodeResponse.class))),

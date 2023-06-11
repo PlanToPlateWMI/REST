@@ -43,7 +43,7 @@ import pl.plantoplate.REST.service.UserService;
 
 
 /**
- *
+ * REST controller with Endpoints connected with Authentication and Authorization
  */
 @RestController
 @RequestMapping("api/auth/")
@@ -67,15 +67,15 @@ public class AuthController {
     }
 
     /**
-     * Create User's account. Before it check if user with this email already
-     * exists in DB. If it is so when we returns HttpStatus.CONFLICT.
-     * If user with email are not used by other user when send code to user's email and
-     * return this code to mobile app
-     * @param userSignupInfo
-     * @return verification code send to email address
+     * Create account by email, username and password.
+     * If email isn't already taken - sends generated code to provided email
+     * @param userSignupInfo DTO with username, email and password
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated code sent to provided email address
      */
     @PostMapping("signup")
-    @Operation(summary="Create an account",description = "User can create an account")
+    @Operation(summary="Creates an account",description = "Creates new account by email, username and password. Sends code to confirm email address " +
+            "to provided email. Set role to USER and isActive to false. To activate account user must create his group /api/auth/group or join group by invite code /api/invite-codes." +
+            "Returns code what was send to provided email.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully registered and API sends back code that it sends yo user's email",content = @Content(
                                                             schema = @Schema(implementation = CodeResponse.class))),
@@ -102,12 +102,13 @@ public class AuthController {
 
 
     /**
-     * Generate JWT token by user email and password
-     * @param emailPasswordRequest
-     * @return JWT token and role
+     * Generate JWT token by provided email and password
+     * @param emailPasswordRequest DTO with email and password
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with JWT token and role
      */
     @PostMapping("signin")
-    @Operation(summary="Sigin",description = "User can login.")
+    @Operation(summary="Sing in to existing account.",description = "Authenticates user by provided email and password. If credentials are " +
+            " correct - generate JWT token. Returns generated JWT token and user's role.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully login and API sends back JWT Token and role", content = @Content(
                                                                                             schema = @Schema(implementation = JwtResponse.class))),
@@ -128,11 +129,13 @@ public class AuthController {
 
 
     /**
-     * Create new group for user provided by email. Set this user Role - Role.ADMIN
-     * @return jwt token and role
+     * Create new group for user provided by email. Set role to {@link pl.plantoplate.REST.entity.auth.Role#ROLE_ADMIN}
+     * @param emailPasswordRequest DTO with email and password
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with JWT token and role
      */
     @PostMapping("/group")
-    @Operation(summary="Create new group",description = "User can create his own group and he will have ROLE_ADMIN ")
+    @Operation(summary="Create new group",description = "Created new group for user by provided email. Set user's role to ADMIN and activate user's account. (set isActivate to true)" +
+            "Generates JWT token. Returns generated JWT token and user's role.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API sends back JWT Token and role",  content = @Content(
                                                                     schema = @Schema(implementation = JwtResponse.class))),
@@ -146,12 +149,12 @@ public class AuthController {
     }
 
     /**
-     * Send email and new password and user's password with this email updated
-     * @param emailPasswordRequest
-     * @return
+     * Updates user's password
+     * @param emailPasswordRequest DTO with email and password
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}
      */
     @PostMapping("/password/reset")
-    @Operation(summary="Reset password",description = "User can reset password if doesn't remember his password ")
+    @Operation(summary="Reset password",description = "Updated user's password by provided email. Returns information that password was updated.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "API update password",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class))),

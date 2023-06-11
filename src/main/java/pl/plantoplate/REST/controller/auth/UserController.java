@@ -41,6 +41,9 @@ import pl.plantoplate.REST.service.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller with Endpoints connected Users settings
+ */
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -56,10 +59,15 @@ public class UserController {
     }
 
 
+    /**
+     * Checks is active user with provided email exists
+     * @param email email to check
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}. If HTTP STATUS is CONFLICT - exists, OK  - not exists
+     */
     @GetMapping("/emails")
-    @Operation(summary="Is user with email exists")
+    @Operation(summary="Check if active user with provided email exists. Returns information if user with email exists.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Not exists active user with email",  content = @Content(
+            @ApiResponse(responseCode = "200", description = "Doesn't exist active user with email",  content = @Content(
                    schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "409", description = "Exists active user with email",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
@@ -73,10 +81,13 @@ public class UserController {
     }
 
 
-
-    //TODO - discuss logic of changing username
+    /**
+     * Updates username of authenticated user
+     * @param usernameRequest DTO with new username
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated user info
+     */
     @PatchMapping("/username")
-    @Operation(summary="Change username. Return updated user info")
+    @Operation(summary="Updates username." , description = "Updates username of authenticated user. Returns updated user information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Username changed successfully",  content = @Content(
                     schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
@@ -90,8 +101,13 @@ public class UserController {
                 HttpStatus.OK);
     }
 
+    /**
+     * Updates password of authenticated user
+     * @param passwordRequest DTO with new password
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated user info
+     */
     @PatchMapping("/password")
-    @Operation(summary="Change password. Return  user info")
+    @Operation(summary="Updates password." , description = "Updates password of authenticated user. Returns updated user information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password changed successfully",  content = @Content(
                     schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
@@ -107,8 +123,13 @@ public class UserController {
     }
 
 
+    /**
+     * Updates email of authenticated user if active user with provided email doesn't exist. Generates new JWT token.
+     * @param emailPasswordRequest DTO with password and new email
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with generated JWT toke and role
+     */
     @PatchMapping("/email")
-    @Operation(summary="Change email. Return new JWT token and user role.")
+    @Operation(summary="Updates email.", description = "Updates email of authenticated user. Returns updated user information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password changed successfully",  content = @Content(
                     schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
@@ -123,8 +144,16 @@ public class UserController {
         return controllerUtils.generateJwtToken(emailPasswordRequest.getEmail(), emailPasswordRequest.getPassword());
     }
 
+
+    /**
+     * Checks if provided as Request Param ?password matches password in DATABSE of authenticated user
+     * @param password password to check if matches
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}. If HTTP STATUS is CONFLICT - doesn't match, OK  - matches
+     */
     @GetMapping("password/match")
-    @Operation(summary="Return 200 if password of user matches, 409 - if not. ")
+    @Operation(summary="Check is provided password matches with password of authenticated user", description =
+            "Check is provided password matches with password of authenticated user. Return HTTP STATUS CONFLICT if doesn't match and" +
+                    "OK if matches")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password matches with password from DB",  content = @Content(
                     array = @ArraySchema( schema = @Schema(implementation = SimpleResponse.class)))),
@@ -142,9 +171,12 @@ public class UserController {
     }
 
 
-
+    /**
+     * Returns information of users of group of authenticated user.
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse}
+     */
     @GetMapping("infos")
-    @Operation(summary="Info of all user of group : username, role, email ", description = "User have access to list of users of his group.")
+    @Operation(summary="Returns information of users of group of authenticated user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of user's info",  content = @Content(
                     array = @ArraySchema( schema = @Schema(implementation = UsernameRoleEmailResponse.class)))),
@@ -158,8 +190,12 @@ public class UserController {
     }
 
 
+    /**
+     * Returns information about authenticated user.
+     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse}
+     */
     @GetMapping()
-    @Operation(summary="Info of authenticated user")
+    @Operation(summary="Returns information of authenticated user.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Info of authenticated user",  content = @Content(
                   schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
@@ -173,9 +209,15 @@ public class UserController {
     }
 
 
+    /**
+     * Changes roles of users in group of authenticated user with role ADMIN by email. Valid roles - ADMIN and USEr
+     * @param requests List of {@link pl.plantoplate.REST.dto.Request.UsernameRequest} with email and new roles of users.
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated information of users in group
+     */
     @PatchMapping("roles")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Update roles by email", description = "user with role ADMIN can change roles of users of his group.")
+    @Operation(summary="Update roles of users in group by email.",
+            description = "User with role ADMIN can updates roles of members of his group by their email addresses")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of user's info",  content = @Content(
                     array = @ArraySchema( schema = @Schema(implementation = UsernameRoleEmailResponse.class)))),
