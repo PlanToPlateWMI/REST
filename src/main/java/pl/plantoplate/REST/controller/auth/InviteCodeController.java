@@ -110,13 +110,11 @@ public class InviteCodeController {
         }
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        int generateCode = controllerUtils.generateCode(100000, 899999);
         long groupId = userService.findByEmail(email).getUserGroup().getId();
 
-        inviteCodeService.saveCode(generateCode, groupId, Role.valueOf("ROLE_" + role));
+        int generatedCode = inviteCodeService.generatesAndSaveInviteCode(groupId, Role.valueOf("ROLE_" + role));
 
-        return ResponseEntity.ok(new CodeResponse(generateCode));
+        return ResponseEntity.ok(new CodeResponse( generatedCode));
     }
 
 

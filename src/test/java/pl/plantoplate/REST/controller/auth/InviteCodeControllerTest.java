@@ -167,7 +167,10 @@ public class InviteCodeControllerTest {
         group.addUser(user);
         user.setUserGroup(group);
 
+        int generatedCode = 123456;
+
         when(userService.findByEmail(email)).thenReturn(user);
+        when(inviteCodeService.generatesAndSaveInviteCode(groupId, Role.valueOf("ROLE_" + roleOfInviteCode))).thenReturn(generatedCode);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/invite-codes?role="+roleOfInviteCode))
@@ -175,9 +178,8 @@ public class InviteCodeControllerTest {
                 .andReturn();
 
         //then
-        ArgumentCaptor<Integer> codeArgumentCapture = ArgumentCaptor.forClass(Integer.class);
-        verify(inviteCodeService).saveCode(codeArgumentCapture.capture(), anyLong(), any(Role.class));
-        assertEquals(codeArgumentCapture.getValue(), mapper.readValue(mvcResult.getResponse().getContentAsString(), CodeResponse.class).getCode());
+        assertEquals(generatedCode,
+                mapper.readValue(mvcResult.getResponse().getContentAsString(), CodeResponse.class).getCode());
 
 
     }

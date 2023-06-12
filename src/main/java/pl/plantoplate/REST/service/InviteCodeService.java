@@ -25,8 +25,12 @@ import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.WrongInviteCode;
 import pl.plantoplate.REST.repository.InviteCodeRepository;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Service Layer of InviteCode JPA Repository
@@ -82,19 +86,51 @@ public class InviteCodeService {
     }
 
     /**
-     * Save invite code to group with role
-     * @param code generated invite code to save
+     * Deletes expired invite codes
+     */
+    private void deletesExpiredInviteCode(){
+        List<InviteCode> inviteCodeList = inviteCodeRepository.findAll();
+        for(int i = 0; i<inviteCodeList.size(); i++){
+            if(inviteCodeList.get(i).getExpiredTime().isBefore(LocalDateTime.now())){
+                inviteCodeRepository.delete(inviteCodeList.get(i));
+            }
+        }
+    }
+
+    /**
+     * Deletes expired invite codes.
+     * Generate unique invite code and saves to group with provided role.
      * @param groupId group id of invite code
      * @param role role of invite code
      */
-    public void saveCode(int code, long groupId, Role role) {
+    public int generatesAndSaveInviteCode(long groupId, Role role) {
+
+        deletesExpiredInviteCode();
+
+        List<InviteCode> inviteCodeList = inviteCodeRepository.findAll();
+        List<Integer> codes = inviteCodeList.stream().map(InviteCode::getCode).collect(Collectors.toList());
+
+        int generateCode = this.generateCode(100000, 899999);
+        while(codes.contains(generateCode)){
+            generateCode = this.generateCode(100000, 899999);
+        }
 
         Group group = groupService.findById(groupId);
 
         LocalDateTime time = LocalDateTime.now().plusMinutes(30);
-        InviteCode inviteCode = new InviteCode(code, group, role, time);
+        InviteCode inviteCode = new InviteCode(generateCode, group, role, time);
         inviteCodeRepository.save(inviteCode);
 
-        log.info("Invite code ["+code+"] was saved to group with id ["+group.getId()+"] and role ["+role.name()+"]");
+        log.info("Invite code ["+generateCode+"] was saved to group with id ["+group.getId()+"] and role ["+role.name()+"]");
+
+        return generateCode;
+    }
+
+
+    private int generateCode(int start, int bound){
+        Random r = new Random();
+        int number = start + r.nextInt(bound);
+        return number;
+
     }
 }

@@ -43,13 +43,12 @@ public class InviteCodeServiceTest {
         Group group = new Group();
         group.setId(groupId);
 
-        int code = 1111;
         Role role = Role.ROLE_ADMIN;
 
         when(groupService.findById(groupId)).thenReturn(group);
 
         //when
-        inviteCodeService.saveCode(code, groupId, role);
+        inviteCodeService.generatesAndSaveInviteCode(groupId, role);
         LocalTime time = LocalTime.now();
 
         //then
@@ -57,7 +56,6 @@ public class InviteCodeServiceTest {
         verify(inviteCodeRepository).save(inviteCodeArgumentCaptor.capture());
         InviteCode savedInviteCode = inviteCodeArgumentCaptor.getValue();
 
-        assertEquals(savedInviteCode.getCode(), code);
         assertEquals(savedInviteCode.getGroup(), group);
         assertEquals(savedInviteCode.getRole(), role);
 
