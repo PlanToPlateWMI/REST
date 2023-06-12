@@ -41,7 +41,7 @@ public class MailSenderServiceImpl implements MailSenderService{
     /**
      * Send email to email address with code from MailParams and depends on type email change subject and body of email
      * @param mailParams
-     * @param emailType
+     * @param emailType email type to send - for registration on reset password
      */
     @Override
     public void send(MailParams mailParams,  EmailType emailType) {
@@ -49,10 +49,14 @@ public class MailSenderServiceImpl implements MailSenderService{
         String messageBody = null;
         if (emailType.equals(EmailType.registration)) {
              mailSubject = "Activate account in PlanToPlate mobile app";
-             messageBody = String.format("To confirm your email address to continue registration use code :\n%d", mailParams.getCode());
+             messageBody = String.format("To confirm your email address to continue registration use code :\n%d\n" +
+                     "------------------------------------------------\n" +
+                     "Żeby potwierdzić adres mailowy użyj poniższego kodu żeby kontynuować rejestrację :\n%d", mailParams.getCode(), mailParams.getCode());
         }else if(emailType.equals(EmailType.reset)){
             mailSubject = "Reset password to your account in PlanToPlate mobile app";
-            messageBody = String.format("To confirm your email address to reset password use code :\n%d", mailParams.getCode());
+            messageBody = String.format("To confirm your email address to reset password use code :\n%d\n" +
+                    "------------------------------------------------\n" +
+                    "Żeby potwierdzić adres mailowy do resetowania hasła użyj poniższego kodu :\n%d", mailParams.getCode(), mailParams.getCode());
         }
         String emailTo = mailParams.getEmailTo();
 
