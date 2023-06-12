@@ -59,7 +59,7 @@ public class GroupService {
      * Add custom product - "miód wielokwiatowy", 2 product to {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
      * list - "Mleko" and "Boczek", 1 product {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} list - "Piwo jasne"
      * to created group
-     * @param email - email of user who wants to create new group
+     * @param email email of user who wants to create new group
      */
     public void createGroupAndAddAdmin(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ " + email + "] wasn't found"));
@@ -131,7 +131,7 @@ public class GroupService {
 
     /**
      * Returns Group object if it exists otherwise throws RT Exception {@link pl.plantoplate.REST.exception.EntityNotFound}
-     * @param id - group id
+     * @param id group id
      * @return Group object if group with id parametr exists
      */
     @Transactional(readOnly = true)

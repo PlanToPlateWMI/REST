@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * REST controller with Endpoints connected Products {@link pl.plantoplate.REST.entity.product.Product}
+ */
 @RestController
 @RequestMapping("api/products")
 public class BaseProductsController {
@@ -56,9 +59,19 @@ public class BaseProductsController {
         this.groupService = groupService;
     }
 
+
+    /**
+     * Returns products depends on request param ?type.
+     * If type = all - returns list of general products (available for all groups) and products of group (created by members of group).
+     * If type = group - return list of products of group (created by members of group)
+     * Default value of request param is all
+     * @param typeOfProduct type of products to return
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products (type of products depends on request param)
+     */
     @GetMapping
-    @Operation(summary="Get products of base depends on query param (default value without query param - all): type = all - all products, " +
-            "type = group - product of group",description = "User can get list of all products or group products")
+    @Operation(summary="Get list of products of group depends on request param ?type= ",
+            description = "Get list of products depends on request param : ?type= all - list of general products (available for all groups) and products of group (created by members of group)," +
+                    "?type = group - list of products of group (created by members of group). Default value of request param is all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "list of products depends on query param value",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
@@ -81,9 +94,15 @@ public class BaseProductsController {
     }
 
 
+    /**
+     * User with role ADMIN adds new product for his group by provided product name, category and unit
+     * @param baseProductRequest DTO with name, category and unit of product to add
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Add new product to group. Return list of products of group",description = "User with Role ADMIN can add new product to group")
+    @Operation(summary="User with role ADMIN adds new product to list of group's products",description = "User with role ADMIN adds new product to list of group's products." +
+            "If products with provided name and unit exists on list of all products of group - returns error.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully added ",   content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
@@ -100,9 +119,16 @@ public class BaseProductsController {
     }
 
 
+    /**
+     * User with role ADMIN changes product of his group by product id. User can change unit, category and name of products
+     * @param id id of product to change
+     * @param updateProductRequest DTO with name, category and unit to update
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     */
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Update product of group. Return list of products of group.",description = "User can update product of his group")
+    @Operation(summary="User with role ADMIN updates existing product of his group.",description = "User with role ADMIN updates existing product of his group." +
+            "If products with provided name and unit exists on list of all products of group - returns error.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully updated ",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
@@ -120,9 +146,16 @@ public class BaseProductsController {
     }
 
 
+    /**
+     * User with role ADMIN deletes product of his group by product id. Also deleted all Shopping Products {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
+     * with deleted product parametr
+     * @param id id of product to change
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary="Delete group product - from list of group products and from shopping list. Return list of products of group.",description = "User with Role ADMIN can delete group product")
+    @Operation(summary="User with role ADMIN deletes existing product of his group.",description = "User with role ADMIN deletes existing product of his group." +
+            "Also deleted Shopping Products with deleted Product parametr.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product successfully deleted ",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class)))),
@@ -141,6 +174,13 @@ public class BaseProductsController {
 
     }
 
+    /**
+     * Returns ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of provided product type
+     * If group of user has id equals 1 then returns list of general prodcuts
+     * @param usersGroup group of users from that product returns
+     * @param productsType type of products to return
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of provided product type
+     */
     private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(Group usersGroup, BaseProductType productsType) {
 
         List<Product> productsOfGroup = productService.getProductsOfGroup(usersGroup);

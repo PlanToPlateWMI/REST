@@ -100,9 +100,9 @@ public class PantryService {
      * and amount to group of user email parametrs. Set {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
      * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
      * If the same product exists in pantry - increase amount
-     * @param productId - id of product {@link pl.plantoplate.REST.entity.product.Product}
-     * @param amount - amount of product to add
-     * @param email - email of user to identify his group
+     * @param productId id of product {@link pl.plantoplate.REST.entity.product.Product}
+     * @param amount amount of product to add
+     * @param email email of user to identify his group
      * @return list of products in user's pantry
      */
     public List<ShopProduct> addProductToPantry(long productId, float amount, String email) {
@@ -147,8 +147,8 @@ public class PantryService {
     /**
      * Delete {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id parametr
      * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if user try to add not his product
-     * @param pantryProductId - pantry Product id
-     * @param email - email of user to identify his group
+     * @param pantryProductId pantry Product id
+     * @param email email of user to identify his group
      * @return list of products in user's pantry
      */
     public List<ShopProduct> deleteProduct(long pantryProductId, String email) {
@@ -173,9 +173,9 @@ public class PantryService {
     /**
      * Modify amount of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} by id
      * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
-     * @param pantryProductId - id of pantry product
-     * @param email - email of ser to identify his group
-     * @param amount - new amount of product
+     * @param pantryProductId id of pantry product
+     * @param email email of ser to identify his group
+     * @param amount new amount of product
      * @return list of products in user's pantry
      */
     public List<ShopProduct> modifyAmount(long pantryProductId, String email, float amount) {

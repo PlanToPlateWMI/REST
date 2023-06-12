@@ -61,9 +61,9 @@ public class ProductService {
 
     /**
      * Returns Product with provided name
-     * @param productName - name of product
+     * @param productName name of product
      * @return Product {@link pl.plantoplate.REST.entity.product.Product} with provided name
-     * @throws EntityNotFound - if product with provided name doesn't exist
+     * @throws EntityNotFound if product with provided name doesn't exist
      */
     @Transactional(readOnly = true)
     public Product findByName(String productName) throws EntityNotFound {
@@ -73,9 +73,9 @@ public class ProductService {
 
     /**
      * Returns Product with provided id
-     * @param productId - id of product
+     * @param productId id of product
      * @return Product {@link pl.plantoplate.REST.entity.product.Product} with provided id
-     * @throws EntityNotFound - if product with provided id doesn't exist
+     * @throws EntityNotFound if product with provided id doesn't exist
      */
     @Transactional(readOnly = true)
     public Product findById(long productId) throws EntityNotFound {
@@ -85,7 +85,7 @@ public class ProductService {
 
     /**
      * Returns list of {@link pl.plantoplate.REST.entity.product.Product} of user's group
-     * @param group - user's group
+     * @param group user's group
      * @return list of {@link pl.plantoplate.REST.entity.product.Product}
      */
     @Transactional(readOnly = true)
@@ -97,10 +97,10 @@ public class ProductService {
     /**
      * Delete {@link pl.plantoplate.REST.entity.product.Product} by product id if it is product of user's group and delete
      * {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with this product
-     * @param productId - id of product to delete
-     * @param groupId - group of user
-     * @throws ModifyGeneralProduct - user try to delete general product or product not his group
-     * @throws EntityNotFound - product with id not found
+     * @param productId id of product to delete
+     * @param groupId group of user
+     * @throws ModifyGeneralProduct user try to delete general product or product not his group
+     * @throws EntityNotFound product with id not found
      */
     public void deleteById(Long productId, Long groupId) throws ModifyGeneralProduct, EntityNotFound {
 
@@ -125,10 +125,10 @@ public class ProductService {
     /**
      * Saves product {@link pl.plantoplate.REST.entity.product.Product} with provided name, categoryName, unit to group
      * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
-     * @param name - product name
-     * @param categoryName - product category
-     * @param unit - product unit
-     * @param group - group of user
+     * @param name product name
+     * @param categoryName product category
+     * @param unit product unit
+     * @param group group of user
      */
     public void save(String name, String categoryName, String unit, Group group) {
 
@@ -153,11 +153,11 @@ public class ProductService {
     /**
      * Update product {@link pl.plantoplate.REST.entity.product.Product} with product id and change provided name, categoryName, unit
      * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
-     * @param name - new product name
-     * @param unit - new product unit
-     * @param category - new product category
-     * @param group - group of user
-     * @param productId - id of updated product
+     * @param name new product name
+     * @param unit new product unit
+     * @param category new product category
+     * @param group group of user
+     * @param productId id of updated product
      */
     public void updateProduct(String name, String unit, String category, Group group, long productId) {
 
@@ -198,7 +198,7 @@ public class ProductService {
 
     /**
      * Returns list of general products (products with group id = 1)  and products of group
-     * @param userGroup - id of group
+     * @param userGroup id of group
      * @return list of general anf group products
      */
     public List<Product> generalAndProductsOfGroup(Group userGroup){

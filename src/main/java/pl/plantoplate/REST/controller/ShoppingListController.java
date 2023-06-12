@@ -43,6 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller with Endpoints connected Products {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
+ * with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} and {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGT} states
+ */
 @RestController
 @RequestMapping("/api/shopping")
 public class ShoppingListController {
@@ -59,10 +63,19 @@ public class ShoppingListController {
     }
 
 
+    /**
+     * Returns ShopProducts {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} or {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * depends on request param bought of user's group list.
+     * If ?bought=true - returns with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
+     * If ?bought=false - returns with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * Default value of request param is true
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state depends on request param ?bought
+     */
     @GetMapping("")
-    @Operation(summary="Get shopping products depends on query param. ?bought=true - bought products. ?bought=false to buy products." +
-            " Default value is true",
-            description = "User can get list of products he wants to buy or he bought ")
+    @Operation(summary="Get list of shopProducts with BUY or BOUGHT state of user's group",
+            description = "Get list of shopProducts with BUY or BOUGHT state of user's group depends on request param ?bought." +
+                    "If ?bought=true - returns with state BOUGHT." +
+                    "If ?bought=false - returns with state BUY. Default value of request param is true")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products depends on query param ",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
@@ -84,9 +97,16 @@ public class ShoppingListController {
         return new ResponseEntity<>(shopProductList, HttpStatus.OK);
     }
 
+    /**
+     * Adds ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} to user's group list
+     * by provided {@link pl.plantoplate.REST.entity.product.Product} id and amount
+     * @param productRequest DTO with product id and amount to add
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
+     */
     @PostMapping()
-    @Operation(summary= "Add Product to Shopping list (to buy type) by product id and amount. Return to buy shopping product list. ",
-            description = "User can add product to shopping list ")
+    @Operation(summary= "Adds ShopProduct with state BUY to list of user's group ShopProducts ",
+            description = "Adds ShopProduct with state BUY to list of user's group ShopProducts by provided id of Product and amount. Amount cannot be negative or zero." +
+                    " Returns updated list of ShopProducts with BUY state.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully added",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
@@ -105,9 +125,16 @@ public class ShoppingListController {
     }
 
 
+    /**
+     * Changes amount ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * of user's group list
+     * @param amountRequest new amount
+     * @param id id of ShopProduct to change
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
+     */
     @PatchMapping("/{id}")
-    @Operation(summary="Modify product amount in toBuy shopping list section. Return to buy shopping product list.",
-            description = "User modify amount of product of toBuy list ")
+    @Operation(summary="Changes amount of ShopProduct with state BUY of user's group",
+            description = "Changes amount of ShopProduct with state BUY of user's group by provided amount. Amount cannot be negative or zero. Returns updated list of ShopProducts with BUY state")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Amount was modifies",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
@@ -124,9 +151,15 @@ public class ShoppingListController {
     }
 
 
+    /**
+     * Changes state of ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}. Is state was {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} - changes
+     * to {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} and vice versa
+     * @param id id of ShopProduct to change state
+     * @return ResponseEntity parametrized with 2 Lists bought and buy - of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY and BOUGH of user's group
+     */
     @PutMapping("/{id}")
-    @Operation(summary= "Change is_bought parameter of product in shopping list. Return 2 lists of " +
-            "shopping product list - toBuy and bought ",description = "User can change is_bought parameter of product in shopping list ")
+    @Operation(summary= "Changes state of ShopProduct of user's group from BUY to BOUGHT and vice versa.",
+            description = "Changes state of ShopProduct of user's group from BUY to BOUGHT and vice versa. Returns updated list of ShopProducts with BUY and BOUGHT state")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully change is_bought parametr",  content = @Content(
                     schema = @Schema(implementation =  ShoppingProductsResponse.class))),
@@ -148,10 +181,17 @@ public class ShoppingListController {
     }
 
 
+    /**
+     * Deletes ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} or {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
+     * from user's group by provided id
+     * @param id id of ShopProduct with state BUY or BOUGHT ro delete
+     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with the same state as state of deleted ShopProduct"
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary= "Delete product from shopping list. If product was deleted from toBuy list - return shopping list of toBuy products." +
-            "If product was deleted from bought list - return shopping list of bought products. ",description = "User can add delete to shopping list ")
+    @Operation(summary= "Deletes ShopProduct with state BUY or BOUGH from user's group list.",
+            description = "Deletes ShopProduct with state BUY or BOUGH  from user's group list by provided id. " +
+                    "Returns updated list of ShopProducts with the same state as state of deleted ShopProduct")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product was successfully deleted",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),

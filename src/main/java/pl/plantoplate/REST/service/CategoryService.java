@@ -37,7 +37,7 @@ public class CategoryService {
 
     /**
      * Returns Category object if it exists otherwise throws RT Exception {@link pl.plantoplate.REST.exception.EntityNotFound}
-     * @param name - category name to find
+     * @param name category name to find
      * @return Category object if category with name parametr exists
      */
     @Transactional(readOnly = true)
