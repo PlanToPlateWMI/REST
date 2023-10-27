@@ -36,6 +36,7 @@ import pl.plantoplate.REST.dto.Response.JwtResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
 import pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse;
 import pl.plantoplate.REST.entity.auth.User;
+import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
@@ -53,6 +54,7 @@ public class UserController {
     private final ControllerUtils controllerUtils;
 
     public UserController(UserService userService, PasswordEncoder passwordEncoder, ControllerUtils controllerUtils) {
+
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.controllerUtils = controllerUtils;

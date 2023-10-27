@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -93,8 +92,9 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
+        String fcmToken = "token";
         when(userService.existsByEmailAndActiveTrue(email)).thenReturn(false);
-        SignupRequest user = new SignupRequest(email, password, username);
+        SignupRequest user = new SignupRequest(email, password, username, fcmToken);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")
@@ -129,8 +129,9 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
+        String fcmToken = "token";
         when(userService.existsByEmailAndActiveTrue(email)).thenReturn(true);
-        SignupRequest user = new SignupRequest(email, password, username);
+        SignupRequest user = new SignupRequest(email, password, username, fcmToken);
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")

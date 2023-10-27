@@ -88,7 +88,10 @@ public class AuthController {
                     .body(new SimpleResponse(String.format("User with email already exists", userSignupInfo.getEmail())));
         }
 
-        userService.registerUser(userSignupInfo.getEmail(), encoder.encode(userSignupInfo.getPassword()), userSignupInfo.getUsername());
+        userService.registerUser(userSignupInfo.getEmail(),
+                                 encoder.encode(userSignupInfo.getPassword()),
+                                 userSignupInfo.getUsername(),
+                                 userSignupInfo.getFcmToken());
 
 
         //generate code and send it to user's email address

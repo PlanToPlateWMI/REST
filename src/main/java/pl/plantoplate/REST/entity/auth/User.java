@@ -16,9 +16,6 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.entity.auth;
 
 import lombok.*;
-import pl.plantoplate.REST.entity.auth.Group;
-import pl.plantoplate.REST.entity.auth.Role;
-
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -57,6 +54,9 @@ public class User {
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    @Column(name = "fcm_token", columnDefinition = "token")
+    private String fcmToken;
 
     public User(String username, String password, String email) {
         this.username = username;
