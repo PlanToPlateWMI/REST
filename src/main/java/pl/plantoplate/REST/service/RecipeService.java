@@ -37,7 +37,7 @@ public class RecipeService {
         log.info(String.format("get selected by group %d %s recipes", group.getId(), categoryName));
 
         if (!StringUtils.hasLength(categoryName))
-            return recipeRepository.findAllByGroup(group);
+            return recipeRepository.findAllByGroupId(group.getId());
         RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
         return recipeRepository.findAllByGroupAndCategoryId(category.getId(), group.getId());
     }

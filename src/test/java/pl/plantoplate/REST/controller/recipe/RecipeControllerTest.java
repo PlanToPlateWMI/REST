@@ -115,8 +115,9 @@ public class RecipeControllerTest {
         //given
         int numberOfElements = 10;
         Group groupOfUser = new Group();
+        long groupId = 1L;
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
-        when(recipeRepository.findAllByGroup(groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        when(recipeRepository.findAllByGroupId(groupId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/selected"))
