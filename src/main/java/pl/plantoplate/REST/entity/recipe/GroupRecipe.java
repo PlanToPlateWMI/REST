@@ -30,7 +30,4 @@ public class GroupRecipe {
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
-
-    @Column(name = "is_liked")
-    private boolean isLiked;
 }

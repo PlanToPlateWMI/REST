@@ -9,17 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Response.RecipeResponse;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
 import pl.plantoplate.REST.repository.RecipeRepository;
 import pl.plantoplate.REST.service.RecipeCategoryService;
+import pl.plantoplate.REST.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,9 +47,14 @@ public class RecipeControllerTest {
     private RecipeRepository recipeRepository;
 
     @MockBean
+    private UserService userService;
+
+    @MockBean
     private RecipeCategoryService recipeCategoryService;
 
     private static ObjectMapper mapper = new ObjectMapper();
+
+    private static final String USER_EMAIL = "test@gmail.com";
 
     @BeforeEach
     public void setup() {
@@ -64,7 +72,7 @@ public class RecipeControllerTest {
         when(recipeRepository.findAll()).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
 
         //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/all"))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -84,24 +92,67 @@ public class RecipeControllerTest {
 
         //given
         long categoryId = 1L;
-        long otherCategoryId = 2L;
         String categoryName = "category";
         int numberOfRecipes = 10;
-        int numberOfRecipesInOtherCategory = 5;
 
         when(recipeRepository.findAllByCategoryId(categoryId)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
-        when(recipeRepository.findAllByCategoryId(otherCategoryId)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipesInOtherCategory));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName, null));
 
         //when
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/all?category=" + categoryName))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes?category=" + categoryName))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        });
+        assertEquals(recipes.size(), numberOfRecipes);
+    }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnAllRecipesLikedByGroup() throws Exception {
+
+        //given
+        int numberOfElements = 10;
+        Group groupOfUser = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+        when(recipeRepository.findAllByGroup(groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/selected"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //then
         List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
         });
-        assertEquals(recipes.size(), numberOfRecipes);
+        assertEquals(recipes.size(), numberOfElements);
     }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnAllRecipesLikedByGroupAndSortedByGroup() throws Exception {
+
+        //given
+        long categoryId = 1L;
+        String categoryName = "category";
+        int numberOfElements = 10;
+        long groupId = 1L;
+        Group groupOfUser = new Group(groupId, "test", null, null);
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+        when(recipeRepository.findAllByGroupAndCategoryId(categoryId, groupId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName, null));
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/selected?category="+categoryName))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        });
+        assertEquals(recipes.size(), numberOfElements);
+    }
+
 
 }

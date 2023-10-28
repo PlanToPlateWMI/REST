@@ -1,5 +1,5 @@
 ALTER TABLE recipe_category
-ALTER COLUMN id
+    ALTER COLUMN id
         RESTART WITH 1;
 
 ALTER TABLE recipe

@@ -3,7 +3,7 @@ package pl.plantoplate.REST.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import pl.plantoplate.REST.entity.product.Category;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
 import pl.plantoplate.REST.repository.RecipeRepository;
@@ -22,13 +22,23 @@ public class RecipeService {
         this.recipeCategoryService = recipeCategoryService;
     }
 
-    public List<Recipe> getAllRecipesByCategory(String categoryName){
+    public List<Recipe> getAllRecipes(String categoryName) {
 
-        log.info("get all recipes by category");
+        log.info(String.format("get all %s recipes", categoryName));
 
-        if(StringUtils.isEmpty(categoryName))
+        if (!StringUtils.hasLength(categoryName))
             return recipeRepository.findAll();
         RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
         return recipeRepository.findAllByCategoryId(category.getId());
+    }
+
+    public List<Recipe> getSelectedByGroupRecipes(String categoryName, Group group) {
+
+        log.info(String.format("get selected by group %d %s recipes", group.getId(), categoryName));
+
+        if (!StringUtils.hasLength(categoryName))
+            return recipeRepository.findAllByGroup(group);
+        RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
+        return recipeRepository.findAllByGroupAndCategoryId(category.getId(), group.getId());
     }
 }
