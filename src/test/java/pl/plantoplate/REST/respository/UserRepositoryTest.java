@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("UserRepository Test")
-@Sql("/schema.sql")
+@Sql("/schema-test.sql")
 public class UserRepositoryTest {
 
     @Autowired
