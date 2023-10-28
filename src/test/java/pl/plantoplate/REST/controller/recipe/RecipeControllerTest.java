@@ -114,8 +114,9 @@ public class RecipeControllerTest {
 
         //given
         int numberOfElements = 10;
-        Group groupOfUser = new Group();
         long groupId = 1L;
+        Group groupOfUser = new Group();
+        groupOfUser.setId(groupId);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
         when(recipeRepository.findAllByGroupId(groupId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
 
