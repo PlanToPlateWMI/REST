@@ -15,6 +15,8 @@ public class RecipeResponse {
     private int time;
     private String level;
     private String image;
+    private String categoryName;
+    private boolean isVege;
 
     public RecipeResponse(Recipe recipe) {
         this.id = recipe.getId();
@@ -22,6 +24,8 @@ public class RecipeResponse {
         this.time = recipe.getTime();
         this.level = recipe.getLevel().name();
         this.image = recipe.getImage_source();
+        this.categoryName = recipe.getCategory().getTitle();
+        this.isVege = recipe.isVege();
     }
 
 }

@@ -26,11 +26,4 @@ public class RecipeCategory {
     @Column
     private String title;
 
-    @ManyToMany
-    @JoinTable(
-            name = "recipe_recipe_category",
-            joinColumns = { @JoinColumn(name = "category_id") },
-            inverseJoinColumns = { @JoinColumn(name = "recipe_id") }
-    )
-    private List<Recipe> recipes;
 }

@@ -29,7 +29,7 @@ public class RecipeService {
         if (!StringUtils.hasLength(categoryName))
             return recipeRepository.findAll();
         RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
-        return recipeRepository.findAllByCategoryId(category.getId());
+        return recipeRepository.findAllByCategoryTitle(category.getTitle());
     }
 
     public List<Recipe> getSelectedByGroupRecipes(String categoryName, Group group) {
@@ -39,6 +39,6 @@ public class RecipeService {
         if (!StringUtils.hasLength(categoryName))
             return recipeRepository.findAllByGroupId(group.getId());
         RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
-        return recipeRepository.findAllByGroupAndCategoryId(category.getId(), group.getId());
+        return recipeRepository.findAllByGroupSelectedAndCategoryId(group.getId(), category.getId());
     }
 }

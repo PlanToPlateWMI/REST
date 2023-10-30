@@ -46,10 +46,13 @@ public class Recipe {
     @Column
     private String steps;
 
+    @Column(name = "is_vege")
+    private boolean isVege;
+
     @ManyToOne
     private Group group;
 
-    @ManyToMany(mappedBy = "recipes")
-    private List<RecipeCategory> categories;
+    @ManyToOne
+    private RecipeCategory category;
 
 }

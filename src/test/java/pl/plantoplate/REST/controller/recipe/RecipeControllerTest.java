@@ -84,7 +84,7 @@ public class RecipeControllerTest {
 
     private List<Recipe> returnSpecificNumberOfRecipes(int number) {
 
-        return Collections.nCopies(number, new Recipe().builder().title("test").level(Level.EASY).image_source("test").id(1).build());
+        return Collections.nCopies(number, new Recipe().builder().title("test").level(Level.EASY).image_source("test").id(1).category(new RecipeCategory(1L, "category_name")).build());
     }
 
     @Test
@@ -95,8 +95,8 @@ public class RecipeControllerTest {
         String categoryName = "category";
         int numberOfRecipes = 10;
 
-        when(recipeRepository.findAllByCategoryId(categoryId)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
-        when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName, null));
+        when(recipeRepository.findAllByCategoryTitle(categoryName)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
+        when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes?category=" + categoryName))
@@ -142,8 +142,8 @@ public class RecipeControllerTest {
         long groupId = 1L;
         Group groupOfUser = new Group(groupId, "test", null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
-        when(recipeRepository.findAllByGroupAndCategoryId(categoryId, groupId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
-        when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName, null));
+        when(recipeRepository.findAllByGroupSelectedAndCategoryId(groupId, categoryId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/selected?category="+categoryName))

@@ -37,31 +37,31 @@ public class RecipeController {
 
 
     @GetMapping()
-    @Operation(summary = "Get list of Recipes sorted by Category",
-            description = "Get list of Recipes sorted by Category")
+    @Operation(summary = "Get list of recipes (optional sorting by category by request param)",
+            description = "Get list of recipes (optional sorting by category by request param)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of recipes", content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Category not found", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<RecipeResponse>> getAllRecipes(@RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName){
+    public ResponseEntity<List<RecipeResponse>> getAllRecipes(@RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName) {
 
-        List<RecipeResponse> recipeResponses = recipeService.getAllRecipes(categoryName ).stream()
+        List<RecipeResponse> recipeResponses = recipeService.getAllRecipes(categoryName).stream()
                 .map(RecipeResponse::new).collect(Collectors.toList());
 
         return new ResponseEntity<>(recipeResponses, HttpStatus.OK);
     }
 
     @GetMapping("/selected")
-    @Operation(summary = "Get list of selected by group recipes sorted by Category",
-            description = "Get list of selected by group recipes sorted by Category")
+    @Operation(summary = "Get list of selected by group recipes (optional sorting by category by request param)",
+            description = "Get list of selected by group recipes (optional sorting by category by request param)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of selected by group recipes", content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Category not found", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<List<RecipeResponse>> getAllSelectedByGroupRecipes(
-            @RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName){
+            @RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
