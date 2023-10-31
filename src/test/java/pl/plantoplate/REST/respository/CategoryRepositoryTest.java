@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @DisplayName("CategoryRepository Test ")
-@Sql("/schema.sql")
+@Sql("/schema-test.sql")
 public class CategoryRepositoryTest {
 
     @Autowired

@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 @DisplayName("GroupRepositoryTest")
-@Sql("/schema.sql")
+@Sql("/schema-test.sql")
 public class GroupRepositoryTest {
 
     @Autowired
