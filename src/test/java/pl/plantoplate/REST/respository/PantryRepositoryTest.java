@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @DisplayName("PantryRepository Test")
-@Sql("/schema.sql")
+@Sql("/schema-test.sql")
 public class PantryRepositoryTest {
 
     @Autowired
