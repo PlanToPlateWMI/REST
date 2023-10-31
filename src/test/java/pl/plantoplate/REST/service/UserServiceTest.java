@@ -31,6 +31,7 @@ public class UserServiceTest {
     @BeforeEach
     void setUp(){
         userRepository = mock(UserRepository.class);
+        pushNotificationService = mock(PushNotificationService.class);
         passwordEncoder = new BCryptPasswordEncoder();
         userService = new UserService(userRepository, passwordEncoder, pushNotificationService);
     }
@@ -124,7 +125,7 @@ public class UserServiceTest {
 
 
     @Test
-    void shouldRegisterUserWhenHeNotExists(){
+    void shouldRegisterUserWhenNotExists(){
 
         //given
         String email = "email";
@@ -354,6 +355,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdateUsersRoles(){
+        //given
         String userEmail = "test@gmail.com";
         String emailOfUserFromGroup = "test2@gmail.com";
         List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
@@ -379,8 +381,10 @@ public class UserServiceTest {
         when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
         when(userRepository.findByEmail(emailOfUserFromGroup)).thenReturn(java.util.Optional.of(user2));
 
+        //when
         List<User> returnedUsers = userService.updateRoles(userEmail, emailRoleRequestList);
 
+        //then
         assertTrue(returnedUsers.stream().anyMatch(e-> e.getEmail().equals(emailOfUserFromGroup) && e.getRole().equals(Role.ROLE_ADMIN)));
         verify(userRepository).save(user2);
     }

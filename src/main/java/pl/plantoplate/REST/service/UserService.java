@@ -129,6 +129,7 @@ public class UserService {
             user.setUsername(username);
             user.setRole(Role.ROLE_USER);
             user.setActive(false);
+            user.setFcmToken(fcmToken);
 
             userRepository.save(user);
             return;
