@@ -4,7 +4,6 @@ name: Deploy on Goole Cloud App Engine
 on:
   push:
     branches: ["INZ-334"]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,13 +23,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Echo a secret
-      run: echo "your secret token is ${{DEV_PROP_FILE}}"
-
-#    - name: Adding secret
-#      shell: bash
-#      run: |
-#        echo $DEV_PROP_FILE >> src/main/resources/application.properties
+    - shell: bash
+      env:
+        SUPER_SECRET: ${{ secrets.SECRET }}
+      run: |
+        echo "$SUPER_SECRET"
 
     - name: Read file
       id: file
