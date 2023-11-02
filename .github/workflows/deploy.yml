@@ -26,7 +26,7 @@ jobs:
 
     - name: Add secret to env variables and pass to file
       env:
-        MY_SECRET: ${{DEV_PROP_FILE}}
+        MY_SECRET: $DEV_PROP_FILE
       shell: bash
       run: |
           echo "$MY_SECRET" >> src/main/recources/application.properties
