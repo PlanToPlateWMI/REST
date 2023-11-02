@@ -25,7 +25,7 @@ jobs:
         cache: maven
 
     - name: Echo a secret
-        run: echo "your secret token is ${{DEV_PROP_FILE}}"
+      run: echo "your secret token is ${{DEV_PROP_FILE}}"
 
 #    - name: Adding secret
 #      shell: bash
