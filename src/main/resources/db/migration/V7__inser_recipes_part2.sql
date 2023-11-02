@@ -142,13 +142,6 @@ insert into recipe (title, time, level, portions, steps, source, image_source, i
  4);
 
 insert into recipe (title, time, level, portions, steps, source, image_source, is_vege, category_id) values
-('e', 45, 'HARD', 3, '',
- '',
- '',
- false,
- 4);
-
-insert into recipe (title, time, level, portions, steps, source, image_source, is_vege, category_id) values
 ('Omlet z kurczakiem i brokułami', 30, 'EASY', 4, 'Krok 1: Rozbij jaja i rozmieszaj je na jednolitą masę. & Krok 2: Umyj kurczaka, pokrój go w paski. Następnie przesmaż na oliwie z oliwek. & Krok 3: Podziel brokuł na małe różyczki i ugotuj w osolonej wodzie. & Krok 4: Rozpuść masło na rozgrzanej patelni, po czym wlej jaja, dodaj kurczaka oraz brokuły. Należy uważać, aby masło nie przypaliło się, inaczej potrawa będzie niezdrowa i niesmaczna. Smaż całość do momentu, kiedy jaja zaczną się ścinać. & Krok 5: Posyp omlet z wierzchu przyprawą do kurczaka i podawaj.',
  'https://www.przepisy.pl/przepis/omlet-z-kurczakiem-i-brokulami',
  'https://s3.przepisy.pl/przepisy3ii/img/variants/800x0/omlet-z-kurczakiem-i-brokulami592132.jpg',
