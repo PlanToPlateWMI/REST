@@ -1,3 +1,4 @@
+# https://github.com/marketplace/actions/read-file-content
 name: Deploy on Goole Cloud App Engine
 
 on:
@@ -23,16 +24,21 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Adding secret
+    - name: Add secret to env variables and pass to file
+      env:
+        MY_SECRET: ${{DEV_PROP_FILE}}
       shell: bash
       run: |
-        echo $DEV_PROP_FILE >> src/main/resources/application.properties
+          echo "$MY_SECRET" >> src/main/recources/application.properties
+          cat src/main/recources/application.properties
+
+#    - name: Adding secret
+#      shell: bash
+#      run: |
+#        echo $DEV_PROP_FILE >> src/main/resources/application.properties
 
     - name: Read file
       id: file
       uses: jaywcjlove/github-action-read-file@main
       with:
         path: src/main/resources/application.properties
-
-    - name: Echo package.json
-      run: echo "${{ steps.file.outputs.content }}"
