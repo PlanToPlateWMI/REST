@@ -28,7 +28,11 @@ jobs:
       run: |
         echo $DEV_PROP_FILE >> src/main/resources/application.properties
 
-    - name: Read secret
-      shell: bash
-      run: |
-        cat src/main/resources/application.properties
+    - name: Read file
+      id: file
+      uses: jaywcjlove/github-action-read-file@main
+      with:
+        path: src/main/resources/application.properties
+
+    - name: Echo package.json
+      run: echo "${{ steps.file.outputs.content }}"
