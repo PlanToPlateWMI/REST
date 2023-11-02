@@ -27,4 +27,8 @@ jobs:
       shell: bash
       run: |
         echo $DEV_PROP_FILE >> src/main/resources/application.properties
+
+    - name: Read secret
+      shell: bash
+      run: |
         cat src/main/resources/application.properties
