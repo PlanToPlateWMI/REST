@@ -24,13 +24,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Add secret to env variables and pass to file
-      env:
-        MY_SECRET: $DEV_PROP_FILE
-      shell: bash
-      run: |
-          echo "$MY_SECRET" >> src/main/recources/application.properties
-          cat src/main/recources/application.properties
+    - name: Echo a secret
+        run: echo "your secret token is ${{DEV_PROP_FILE}}"
 
 #    - name: Adding secret
 #      shell: bash
