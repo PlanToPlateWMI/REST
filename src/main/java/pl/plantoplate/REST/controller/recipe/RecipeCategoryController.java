@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.plantoplate.REST.dto.Response.RecipeCategoryResponse;
-import pl.plantoplate.REST.dto.Response.RecipeResponse;
 import pl.plantoplate.REST.service.RecipeCategoryService;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class RecipeCategoryController {
             description = "Get list of Categories")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of categories", content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = RecipeResponse.class))))})
+                    array = @ArraySchema(schema = @Schema(implementation = RecipeCategoryResponse.class))))})
     public ResponseEntity<List<RecipeCategoryResponse>> getAllRecipeCategories() {
         return new ResponseEntity<>(recipeCategoryService.findAll().stream()
                 .map(RecipeCategoryResponse::new).collect(Collectors.toList()), HttpStatus.OK);

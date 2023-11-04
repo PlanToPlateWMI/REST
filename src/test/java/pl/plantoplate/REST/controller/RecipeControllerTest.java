@@ -1,7 +1,8 @@
-package pl.plantoplate.REST.controller.recipe;
+package pl.plantoplate.REST.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,25 +10,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Response.RecipeResponse;
+import pl.plantoplate.REST.dto.Response.RecipeOverviewResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
-import pl.plantoplate.REST.repository.RecipeRepository;
 import pl.plantoplate.REST.service.RecipeCategoryService;
+import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,10 +47,10 @@ public class RecipeControllerTest {
     private WebApplicationContext context;
 
     @MockBean
-    private RecipeRepository recipeRepository;
+    private UserService userService;
 
     @MockBean
-    private UserService userService;
+    private RecipeService recipeService;
 
     @MockBean
     private RecipeCategoryService recipeCategoryService;
@@ -68,8 +71,9 @@ public class RecipeControllerTest {
     void shouldReturnAllRecipes() throws Exception {
 
         //given
-        int numberOfElements = 10;
-        when(recipeRepository.findAll()).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        int numberOfRecipes = 10;
+        List<Recipe> allRecipes = returnSpecificNumberOfRecipes(numberOfRecipes);
+        when(recipeService.getAllRecipes(null)).thenReturn(allRecipes);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes"))
@@ -77,14 +81,9 @@ public class RecipeControllerTest {
                 .andReturn();
 
         //then
-        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
         });
-        assertEquals(recipes.size(), numberOfElements);
-    }
-
-    private List<Recipe> returnSpecificNumberOfRecipes(int number) {
-
-        return Collections.nCopies(number, new Recipe().builder().title("test").level(Level.EASY).image_source("test").id(1).category(new RecipeCategory(1L, "category_name")).build());
+        assertEquals(recipes.size(), numberOfRecipes);
     }
 
     @Test
@@ -95,7 +94,7 @@ public class RecipeControllerTest {
         String categoryName = "category";
         int numberOfRecipes = 10;
 
-        when(recipeRepository.findAllByCategoryTitle(categoryName)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
+        when(recipeService.getAllRecipes(categoryName)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
 
         //when
@@ -103,7 +102,7 @@ public class RecipeControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         //then
-        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
         });
         assertEquals(recipes.size(), numberOfRecipes);
     }
@@ -113,12 +112,12 @@ public class RecipeControllerTest {
     void shouldReturnAllRecipesLikedByGroup() throws Exception {
 
         //given
-        int numberOfElements = 10;
+        int numberOfRecipes = 10;
         long groupId = 1L;
         Group groupOfUser = new Group();
         groupOfUser.setId(groupId);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
-        when(recipeRepository.findAllByGroupId(groupId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        when(recipeService.getSelectedByGroupRecipes(null,groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/selected"))
@@ -126,9 +125,9 @@ public class RecipeControllerTest {
                 .andReturn();
 
         //then
-        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
         });
-        assertEquals(recipes.size(), numberOfElements);
+        assertEquals(recipes.size(), numberOfRecipes);
     }
 
     @Test
@@ -138,11 +137,11 @@ public class RecipeControllerTest {
         //given
         long categoryId = 1L;
         String categoryName = "category";
-        int numberOfElements = 10;
+        int numberOfRecipes = 10;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null);
+        Group groupOfUser = new Group(groupId, "test", null, null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
-        when(recipeRepository.findAllByGroupSelectedAndCategoryId(groupId, categoryId)).thenReturn(returnSpecificNumberOfRecipes(numberOfElements));
+        when(recipeService.getSelectedByGroupRecipes(categoryName,groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
 
         //when
@@ -151,10 +150,35 @@ public class RecipeControllerTest {
                 .andReturn();
 
         //then
-        List<RecipeResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeResponse>>() {
+        List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
         });
-        assertEquals(recipes.size(), numberOfElements);
+        assertEquals(recipes.size(), numberOfRecipes);
     }
 
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldAddRecipeToSelected() throws Exception{
+
+        //given
+        long recipeId = 1L;
+        long groupId = 1L;
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of());
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/recipes/selected/" + recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(recipeService).addRecipeToSelectedByGroup(recipeId, groupOfUser);
+    }
+
+    private List<Recipe> returnSpecificNumberOfRecipes(int number) {
+
+        return Collections.nCopies(number, new Recipe().builder().title("test").level(Level.EASY).image_source("test").id(1).category(new RecipeCategory(1L, "category_name")).build());
+    }
 
 }

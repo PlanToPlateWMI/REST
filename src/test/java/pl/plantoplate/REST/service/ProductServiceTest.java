@@ -10,7 +10,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.exception.AddTheSameProduct;
+import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
@@ -262,7 +262,7 @@ public class ProductServiceTest {
 
 
     @Test
-    void shouldAddNewProduct() throws EntityNotFound, AddTheSameProduct, NoValidProductWithAmount {
+    void shouldAddNewProduct() throws EntityNotFound, DuplicateObject, NoValidProductWithAmount {
 
         //given
         String unit = Unit.L.name();
@@ -346,7 +346,7 @@ public class ProductServiceTest {
 
     @ParameterizedTest
     @CsvSource({"Muller, KG, Inne","Muller, , Inne",", KG, Inne"})
-    void shouldUpdateProduct(String updateName, String updateUnit, String updateCategoryName) throws EntityNotFound, ModifyGeneralProduct, AddTheSameProduct, NoValidProductWithAmount {
+    void shouldUpdateProduct(String updateName, String updateUnit, String updateCategoryName) throws EntityNotFound, ModifyGeneralProduct, DuplicateObject, NoValidProductWithAmount {
 
         //given
         long productId = 20L;
