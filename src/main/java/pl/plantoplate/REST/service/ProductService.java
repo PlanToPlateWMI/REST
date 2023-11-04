@@ -22,7 +22,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.exception.AddTheSameProduct;
+import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
@@ -124,7 +124,7 @@ public class ProductService {
 
     /**
      * Saves product {@link pl.plantoplate.REST.entity.product.Product} with provided name, categoryName, unit to group
-     * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
+     * If Product with the same name and unit exists in list of user's product throws {@link DuplicateObject}
      * @param name product name
      * @param categoryName product category
      * @param unit product unit
@@ -137,7 +137,7 @@ public class ProductService {
         List<Product> allProducts = generalAndProductsOfGroup(group);
 
         if(allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))){
-            throw new AddTheSameProduct("Product with name [" + name + "] and unit ["+unit + "] already exists.");
+            throw new DuplicateObject("Product with name [" + name + "] and unit ["+unit + "] already exists.");
         }
 
         Category categoryOfProduct = categoryService.findByName(categoryName);
@@ -152,7 +152,7 @@ public class ProductService {
 
     /**
      * Update product {@link pl.plantoplate.REST.entity.product.Product} with product id and change provided name, categoryName, unit
-     * If Product with the same name and unit exists in list of user's product throws {@link pl.plantoplate.REST.exception.AddTheSameProduct}
+     * If Product with the same name and unit exists in list of user's product throws {@link DuplicateObject}
      * @param name new product name
      * @param unit new product unit
      * @param category new product category
@@ -218,7 +218,7 @@ public class ProductService {
         }
 
         if (allProducts.stream().anyMatch(o -> o.getName().equals(name) && o.getUnit().name().equals(unit))) {
-            throw new AddTheSameProduct("Product with name [" + name + "] and unit [" + unit + "] already exists.");
+            throw new DuplicateObject("Product with name [" + name + "] and unit [" + unit + "] already exists.");
         }
     }
 

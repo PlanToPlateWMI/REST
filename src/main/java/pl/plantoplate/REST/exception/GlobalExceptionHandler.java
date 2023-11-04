@@ -33,8 +33,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    @ExceptionHandler(AddTheSameProduct.class)
-    public ResponseEntity<SimpleResponse> addTheSameProduct(AddTheSameProduct e) {
+    @ExceptionHandler(DuplicateObject.class)
+    public ResponseEntity<SimpleResponse> addTheSameProduct(DuplicateObject e) {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 

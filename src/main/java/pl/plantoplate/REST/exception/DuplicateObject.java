@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class AddTheSameProduct extends RuntimeException{
+public class DuplicateObject extends RuntimeException{
 
-    public AddTheSameProduct(String message) {
+    public DuplicateObject(String message) {
         super(message);
     }
 
-    public AddTheSameProduct(String message, Throwable cause) {
+    public DuplicateObject(String message, Throwable cause) {
         super(message, cause);
     }
 }

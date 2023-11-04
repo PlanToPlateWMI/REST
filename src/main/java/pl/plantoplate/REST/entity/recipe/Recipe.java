@@ -4,6 +4,7 @@ import lombok.*;
 import pl.plantoplate.REST.entity.auth.Group;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,10 +50,21 @@ public class Recipe {
     @Column(name = "is_vege")
     private boolean isVege;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "group_recipe",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
+    private List<Group> groupsSelectedRecipe =  new ArrayList<>();
+
     @ManyToOne
     private Group group;
 
     @ManyToOne
     private RecipeCategory category;
+
+    public void addGroupSelected(Group group){
+        groupsSelectedRecipe.add(group);
+    }
 
 }

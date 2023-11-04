@@ -6,6 +6,8 @@ import org.springframework.util.StringUtils;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
+import pl.plantoplate.REST.exception.DuplicateObject;
+import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
 import java.util.List;
@@ -40,5 +42,20 @@ public class RecipeService {
             return recipeRepository.findAllByGroupId(group.getId());
         RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
         return recipeRepository.findAllByGroupSelectedAndCategoryId(group.getId(), category.getId());
+    }
+
+    public void addRecipeToSelectedByGroup(long recipeId, Group group) {
+
+        Recipe recipe = findById(recipeId);
+
+        if (recipe.getGroupsSelectedRecipe().stream().anyMatch(g -> g.getId().equals(group.getId())))
+            throw new DuplicateObject("Recipe [" + recipeId + "] was already added to selected of group [" + group.getId() + "]");
+
+        recipe.addGroupSelected(group);
+        recipeRepository.save(recipe);
+    }
+
+    public Recipe findById(long recipeId){
+        return  recipeRepository.findById(recipeId).orElseThrow(() -> new EntityNotFound("Recipe with id [" + recipeId + "] was not found."));
     }
 }

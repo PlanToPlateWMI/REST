@@ -8,7 +8,7 @@ import pl.plantoplate.REST.entity.recipe.Recipe;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RecipeResponse {
+public class RecipeOverviewResponse {
 
     private long id;
     private String title;
@@ -18,7 +18,7 @@ public class RecipeResponse {
     private String categoryName;
     private boolean isVege;
 
-    public RecipeResponse(Recipe recipe) {
+    public RecipeOverviewResponse(Recipe recipe) {
         this.id = recipe.getId();
         this.title = recipe.getTitle();
         this.time = recipe.getTime();
