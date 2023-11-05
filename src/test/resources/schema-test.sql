@@ -169,7 +169,7 @@ create table recipe_ingredients
 (
     recipe_id bigint,
     ingredients_id bigint,
-    qty int,
+    qty float,
     primary key (recipe_id, ingredients_id)
 );
 
