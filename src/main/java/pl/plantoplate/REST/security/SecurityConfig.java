@@ -90,6 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers("/api/users/emails", "/api/auth/**", "/api/invite-codes", "/api/test/*", "/api/mail/*", "/api/recipes", "/api/recipe-categories").permitAll()
+               .regexMatchers("/api/recipes/(\\d+)").permitAll()
                         .and()
                 .authorizeRequests().anyRequest().authenticated();
 

@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.dto.Response.RecipeOverviewResponse;
+import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
@@ -27,6 +28,7 @@ import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -155,7 +157,6 @@ public class RecipeControllerTest {
         assertEquals(recipes.size(), numberOfRecipes);
     }
 
-
     @Test
     @WithMockUser(value = USER_EMAIL)
     void shouldAddRecipeToSelected() throws Exception{
@@ -179,6 +180,26 @@ public class RecipeControllerTest {
     private List<Recipe> returnSpecificNumberOfRecipes(int number) {
 
         return Collections.nCopies(number, new Recipe().builder().title("test").level(Level.EASY).image_source("test").id(1).category(new RecipeCategory(1L, "category_name")).build());
+    }
+
+    @Test
+    void shouldReturnRecipeOverview() throws Exception {
+
+        //given
+        long recipeId = 1L;
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
+        when(recipeService.findRecipeDetailById(recipeId)).thenReturn(new RecipeProductQty(recipe, new HashMap<>()));
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/" + recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(recipeService).findRecipeDetailById(recipeId);
+
     }
 
 }

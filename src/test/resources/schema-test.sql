@@ -1,13 +1,16 @@
+drop table if exists recipe_ingredient;
+drop table if exists invite_code;
+
 drop table if exists app_user;
 drop table if exists shop_product_group;
-drop table if exists invite_code;
-drop table if exists product;
-drop table if exists category;
-
 drop table if exists group_recipe;
+drop table if exists recipe_ingredients;
+
+drop table if exists product;
 drop table if exists recipe;
 drop table if exists recipe_category;
 drop table if exists user_group;
+drop table if exists category;
 
 create table app_user
 (
@@ -160,3 +163,23 @@ alter table group_recipe
 
 alter table group_recipe
     add constraint group_recipe_recipe_id_FK foreign key (recipe_id) references recipe;
+
+
+create table recipe_ingredients
+(
+    recipe_id bigint,
+    ingredients_id bigint,
+    qty float,
+    primary key (recipe_id, ingredients_id)
+);
+
+comment on table recipe_ingredients is 'Tabel to store ingredients of recipe';
+comment on column recipe_ingredients.recipe_id is 'FK to recipe table';
+comment on column recipe_ingredients.ingredients_id is 'FK to product table';
+comment on column recipe_ingredients.qty is 'Quantity of ths ingredient in recipe';
+
+alter table recipe_ingredients
+    add constraint recipe_ingredient_recipe_id_FK foreign key (recipe_id) references recipe;
+
+alter table recipe_ingredients
+    add constraint recipe_ingredient_product_id_FK foreign key (ingredients_id) references product;

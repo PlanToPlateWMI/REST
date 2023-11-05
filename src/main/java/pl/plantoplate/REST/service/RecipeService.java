@@ -3,14 +3,18 @@ package pl.plantoplate.REST.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -56,6 +60,20 @@ public class RecipeService {
     }
 
     public Recipe findById(long recipeId){
+
         return  recipeRepository.findById(recipeId).orElseThrow(() -> new EntityNotFound("Recipe with id [" + recipeId + "] was not found."));
+    }
+
+    public RecipeProductQty findRecipeDetailById(long recipeId){
+
+        Recipe recipe = findById(recipeId);
+        List<Product> ingredients = recipe.getIngredients();
+        Map<Product, Float> ingredientQuantity = new HashMap<>();
+        for(Product pr:ingredients){
+            Float qty = recipeRepository.findQtyByRecipeIdAndProductId(recipeId, pr.getId());
+            ingredientQuantity.put(pr, qty);
+        }
+        return new RecipeProductQty(recipe, ingredientQuantity);
+
     }
 }
