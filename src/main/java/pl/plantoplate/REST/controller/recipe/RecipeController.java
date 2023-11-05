@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.dto.Response.RecipeDetailsResponse;
 import pl.plantoplate.REST.dto.Response.RecipeOverviewResponse;
 import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
@@ -48,6 +50,22 @@ public class RecipeController {
         return new ResponseEntity<>(recipeOverviewRespons, HttpStatus.OK);
     }
 
+    @GetMapping("/{recipeId}")
+    @Operation(summary = "Get details of selected recipe",
+            description = "Get details of selected recipe")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of recipes", content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Recipe not found", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<RecipeDetailsResponse> getRecipeDetails(@PathVariable long recipeId) {
+
+        RecipeProductQty recipe = recipeService.findRecipeDetailById(recipeId);
+        RecipeDetailsResponse recipeDetailsResponse = new RecipeDetailsResponse(recipe);
+
+        return new ResponseEntity<>(recipeDetailsResponse, HttpStatus.OK);
+    }
+
     @GetMapping("/selected")
     @Operation(summary = "Get list of selected by group recipes (optional sorting by category by request param)",
             description = "Get list of selected by group recipes (optional sorting by category by request param)")
@@ -81,7 +99,7 @@ public class RecipeController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
 
-       recipeService.addRecipeToSelectedByGroup(recipeId, group);
+        recipeService.addRecipeToSelectedByGroup(recipeId, group);
 
         return new ResponseEntity<>(new SimpleResponse("Recipe was successfully added to selected"), HttpStatus.OK);
     }

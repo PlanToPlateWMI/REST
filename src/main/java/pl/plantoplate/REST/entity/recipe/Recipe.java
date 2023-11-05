@@ -2,6 +2,7 @@ package pl.plantoplate.REST.entity.recipe;
 
 import lombok.*;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.product.Product;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -66,5 +67,8 @@ public class Recipe {
     public void addGroupSelected(Group group){
         groupsSelectedRecipe.add(group);
     }
+
+    @OneToMany
+    List<Product> ingredients = new ArrayList<>();
 
 }
