@@ -10,6 +10,7 @@ import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
+import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.RecipeRepository;
@@ -19,9 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Recipe Service Test")
 public class RecipeServiceTest {
@@ -134,5 +135,64 @@ public class RecipeServiceTest {
         assertEquals(exception.getMessage(), "Recipe with id [" + recipeId + "] was not found.");
 
     }
+
+    @Test
+    void shouldThrowException_RecipeNotFound_TryToDeleteSelectedRecipe(){
+
+        //given
+        long recipeId = 1L;
+        Group group = new Group(1L, "name", null, null, null);
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.empty());
+
+        //when then
+        EntityNotFound exception = assertThrows(EntityNotFound.class, () -> recipeService.deleteRecipeFromSelectedByGroup(recipeId, group));
+        assertEquals(exception.getMessage(), "Recipe with id [" + recipeId + "] was not found.");
+
+    }
+
+    @Test
+    void shouldThrowException_DeleteNotSelectedByGroupRecipe(){
+
+        //given
+        long recipeId = 1L;
+        List<Recipe> emptyListOfRecipes = new ArrayList<>();
+        Group group = new Group(1L, "name", null, null, emptyListOfRecipes);
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+
+        //when then
+        DeleteNotSelected exception = assertThrows(DeleteNotSelected.class, () -> recipeService.deleteRecipeFromSelectedByGroup(recipeId, group));
+        assertEquals(exception.getMessage(), "Group [" + group.getId() + "] try to delete not selected by group recipe [" + recipeId + "]");
+
+    }
+
+    @Test
+    void shouldDeleteSelectedRecipe(){
+
+        //given
+        long recipeId = 1L;
+        long recipeId2 = 2L;
+        Group group = new Group(1L, "name", null, null, new ArrayList<>());
+        List<Group> selectedGroups = new ArrayList<>();
+        selectedGroups.add(group);
+
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).groupsSelectedRecipe(selectedGroups).build();
+
+        Recipe recipe2 = Recipe.builder().id(recipeId2).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).groupsSelectedRecipe(selectedGroups).build();
+
+        List<Recipe> selectedRecipes = new ArrayList<>();
+        selectedRecipes.add(recipe);
+        selectedRecipes.add(recipe2);
+        group.setSelectedRecipes(selectedRecipes);
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+
+        //when
+        recipeService.deleteRecipeFromSelectedByGroup(recipeId, group);
+
+    }
+
 
 }
