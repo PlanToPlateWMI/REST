@@ -202,4 +202,25 @@ public class RecipeControllerTest {
 
     }
 
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldDeleteRecipeFromSelected() throws Exception {
+
+        //given
+        long recipeId = 1L;
+        long groupId = 1L;
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of());
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/recipes/selected/" + recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(recipeService).deleteRecipeFromSelectedByGroup(recipeId, groupOfUser);
+
+    }
 }

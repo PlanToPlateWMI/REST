@@ -2,12 +2,14 @@ package pl.plantoplate.REST.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
+import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.RecipeRepository;
@@ -75,5 +77,19 @@ public class RecipeService {
         }
         return new RecipeProductQty(recipe, ingredientQuantity);
 
+    }
+
+    @Transactional
+    public void deleteRecipeFromSelectedByGroup(long recipeId, Group group) {
+
+        Recipe recipe = findById(recipeId);
+
+        List<Recipe> recipes = group.getSelectedRecipes();
+        if(recipes.stream().noneMatch(r -> r.getId() == recipeId))
+            throw new DeleteNotSelected("Group [" + group.getId() + "] try to delete not selected by group recipe [" + recipeId + "]");
+
+        recipeRepository.deleteRecipeFromSelected(group.getId(), recipeId);
+
+        log.info("Recipe [" + recipeId + "] was deleted from list of selected in group [" + group.getId() + "]");
     }
 }

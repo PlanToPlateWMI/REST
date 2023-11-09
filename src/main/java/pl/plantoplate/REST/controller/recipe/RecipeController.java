@@ -104,4 +104,23 @@ public class RecipeController {
         return new ResponseEntity<>(new SimpleResponse("Recipe was successfully added to selected"), HttpStatus.OK);
     }
 
+    @DeleteMapping("/selected/{recipeId}")
+    @Operation(summary = "Delete recipe from selected of group",
+            description = "Delete recipe from selected of group")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipe was deleted from selected", content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Recipe wasn't added to selected of this group or " +
+                    "recipe with given id doesn't exist", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> deleteRecipeFromSelectedOfGroup(@PathVariable long recipeId) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = userService.findGroupOfUser(email);
+
+        recipeService.deleteRecipeFromSelectedByGroup(recipeId, group);
+
+        return new ResponseEntity<>(new SimpleResponse("Recipe was successfully deleted from selected"), HttpStatus.OK);
+    }
+
 }

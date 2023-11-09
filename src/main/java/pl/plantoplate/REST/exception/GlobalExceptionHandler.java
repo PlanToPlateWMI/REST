@@ -63,6 +63,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(DeleteNotSelected.class)
+    public ResponseEntity<SimpleResponse> deleteNotSelectedByGroupRecipe(DeleteNotSelected e) {
+        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
     private static ResponseEntity<SimpleResponse> buildResponseEntity(Exception e, HttpStatus status) {
         return new ResponseEntity<>(new SimpleResponse(e.getMessage()),status );
     }

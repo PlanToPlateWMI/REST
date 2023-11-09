@@ -7,6 +7,7 @@ import pl.plantoplate.REST.entity.product.Product;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Entity that represents recipe
@@ -51,7 +52,7 @@ public class Recipe {
     @Column(name = "is_vege")
     private boolean isVege;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "group_recipe",
             joinColumns = @JoinColumn(name = "recipe_id"),
@@ -64,11 +65,23 @@ public class Recipe {
     @ManyToOne
     private RecipeCategory category;
 
+    @OneToMany
+    List<Product> ingredients = new ArrayList<>();
+
     public void addGroupSelected(Group group){
         groupsSelectedRecipe.add(group);
     }
 
-    @OneToMany
-    List<Product> ingredients = new ArrayList<>();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Recipe recipe = (Recipe) o;
+        return id == recipe.id;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
