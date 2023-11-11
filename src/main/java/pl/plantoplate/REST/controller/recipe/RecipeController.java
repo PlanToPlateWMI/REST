@@ -42,7 +42,8 @@ public class RecipeController {
                     array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Category not found", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<RecipeOverviewResponse>> getAllRecipesOverview(@RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName) {
+    public ResponseEntity<List<RecipeOverviewResponse>> getAllRecipesOverview(@RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string",
+            allowableValues = {"Napoje", "Zupy", "Desery", "Dania główne", "Przekąski"})) String categoryName) {
 
         List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getAllRecipes(categoryName).stream()
                 .map(RecipeOverviewResponse::new).collect(Collectors.toList());

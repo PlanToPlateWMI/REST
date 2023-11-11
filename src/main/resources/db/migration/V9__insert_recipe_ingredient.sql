@@ -1,4 +1,4 @@
-insert into recipe_ingredients(recipe_id,ingredients_id, qty) values
+insert into recipe_ingredient(recipe_id,ingredient_id, qty) values
 -- Ziemniaki w mundurkach z piekarnika
 (32, 47, 1),
 (32, 101, 30),

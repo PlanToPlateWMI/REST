@@ -3,16 +3,19 @@ package pl.plantoplate.REST.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.parameters.P;
 import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
+import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
 import java.util.ArrayList;
@@ -30,12 +33,14 @@ public class RecipeServiceTest {
     private RecipeRepository recipeRepository;
     private RecipeCategoryService recipeCategoryService;
     private RecipeService recipeService;
+    private RecipeIngredientRepository recipeIngredientRepository;
 
     @BeforeEach
     void init() {
         recipeRepository = mock(RecipeRepository.class);
         recipeCategoryService = mock(RecipeCategoryService.class);
-        recipeService = new RecipeService(recipeRepository, recipeCategoryService);
+        recipeIngredientRepository = mock(RecipeIngredientRepository.class);
+        recipeService = new RecipeService(recipeRepository, recipeCategoryService, recipeIngredientRepository);
     }
 
     @Test
@@ -58,7 +63,7 @@ public class RecipeServiceTest {
         Group group = new Group(1L, "name", null, null, null);
         List<Group> groupsSelectedRecipe = new ArrayList<>();
         Recipe recipe = Recipe.builder().id(recipeId).groupsSelectedRecipe(groupsSelectedRecipe).build();
-        when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.ofNullable(recipe));
+        when(recipeRepository.findById(recipeId)).thenReturn(Optional.ofNullable(recipe));
 
         //when
         recipeService.addRecipeToSelectedByGroup(recipeId, group);
@@ -110,9 +115,12 @@ public class RecipeServiceTest {
         Product ingredient = new Product(productName, category, group, productUnit);
         ingredient.setId(ingredientId);
         Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
-                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).ingredients(List.of(ingredient)).build();
-        when(recipeRepository.findQtyByRecipeIdAndProductId(recipeId, ingredientId)).thenReturn(ingredientQtyInRecipe);
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).ingredient(List.of(ingredient)).build();
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setQty(ingredientQtyInRecipe);
+        recipeIngredient.setIngredient(ingredient);
+        when(recipeIngredientRepository.findAllByRecipe(recipe)).thenReturn(List.of(recipeIngredient));
 
         // when
         RecipeProductQty recipeProductQty = recipeService.findRecipeDetailById(recipeId);

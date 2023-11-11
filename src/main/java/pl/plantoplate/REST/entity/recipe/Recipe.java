@@ -66,7 +66,7 @@ public class Recipe {
     private RecipeCategory category;
 
     @OneToMany
-    List<Product> ingredients = new ArrayList<>();
+    List<Product> ingredient = new ArrayList<>();
 
     public void addGroupSelected(Group group){
         groupsSelectedRecipe.add(group);

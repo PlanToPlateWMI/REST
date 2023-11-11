@@ -234,7 +234,6 @@ public class BaseProductControllerTest {
     void shouldAddProduct() throws Exception {
 
         //given
-        long productId = 1L;
         String email = "email@gmail.com";
         String name = "name";
         String category = "category";
