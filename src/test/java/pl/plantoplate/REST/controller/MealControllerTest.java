@@ -112,7 +112,7 @@ public class MealControllerTest {
         String date = "2022-11-11";
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/date?date=" + date)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + date)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
