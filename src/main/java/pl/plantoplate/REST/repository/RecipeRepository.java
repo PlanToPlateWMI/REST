@@ -21,9 +21,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
     @Query(nativeQuery = true, value = "SELECT * FROM recipe r join group_recipe gr on gr.recipe_id = r.id where gr.group_id =:groupId ")
     List<Recipe> findAllByGroupId(long groupId);
 
-    @Query(nativeQuery = true, value = "SELECT ri.qty FROM recipe r join recipe_ingredient ri on r.id = ri.recipe_id where ri.recipe_id =:recipeId and ri.ingredient_id=:productId")
-    Float findQtyByRecipeIdAndProductId(@Param("recipeId") long recipeId, @Param("productId") long product_id);
-
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM group_recipe gr where gr.recipe_id =:recipeId and gr.group_id=:groupId")
     void deleteRecipeFromSelected(@Param("groupId")Long groupId, @Param("recipeId")long recipeId);

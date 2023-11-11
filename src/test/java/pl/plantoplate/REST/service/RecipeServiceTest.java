@@ -3,12 +3,14 @@ package pl.plantoplate.REST.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.parameters.P;
 import pl.plantoplate.REST.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
+import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
@@ -114,15 +116,18 @@ public class RecipeServiceTest {
         ingredient.setId(ingredientId);
         Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
                 .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).ingredient(List.of(ingredient)).build();
-        when(recipeRepository.findQtyByRecipeIdAndProductId(recipeId, ingredientId)).thenReturn(ingredientQtyInRecipe);
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setQty(ingredientQtyInRecipe);
+        recipeIngredient.setIngredient(ingredient);
+        when(recipeIngredientRepository.findAllByRecipe(recipe)).thenReturn(List.of(recipeIngredient));
 
         // when
         RecipeProductQty recipeProductQty = recipeService.findRecipeDetailById(recipeId);
 
         //then
         assertEquals(recipeProductQty.getRecipe().getId(), recipeId);
-        //assertEquals(recipeProductQty.getIngredientQuantity().size(), 1);
+        assertEquals(recipeProductQty.getIngredientQuantity().size(), 1);
         assertEquals(recipeProductQty.getIngredientQuantity().get(ingredient), ingredientQtyInRecipe);
     }
 
