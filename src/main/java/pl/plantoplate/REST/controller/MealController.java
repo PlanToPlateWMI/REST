@@ -48,7 +48,7 @@ public class MealController {
         return new ResponseEntity<>(new SimpleResponse("Recipe [" + planMeal.getRecipeId() +"] was planned to " + planMeal.getMealType()), HttpStatus.CREATED);
     }
 
-    @GetMapping("/date")
+    @GetMapping()
     @Operation(summary = "Get planned meals overview by provided date",
             description = "Get planned meals overview by provided date")
     @ApiResponses(value = {

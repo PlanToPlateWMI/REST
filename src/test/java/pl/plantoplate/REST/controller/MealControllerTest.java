@@ -130,7 +130,7 @@ public class MealControllerTest {
         String dateIncorrect = "11-11-2022";
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/date?date=" + dateIncorrect)
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + dateIncorrect)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
