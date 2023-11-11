@@ -141,7 +141,7 @@ public class RecipeControllerTest {
         String categoryName = "category";
         int numberOfRecipes = 10;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, null);
+        Group groupOfUser = new Group(groupId, "test", null, null, null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
         when(recipeService.getSelectedByGroupRecipes(categoryName,groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
@@ -164,7 +164,7 @@ public class RecipeControllerTest {
         //given
         long recipeId = 1L;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, List.of());
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
 
         //when
@@ -210,7 +210,7 @@ public class RecipeControllerTest {
         //given
         long recipeId = 1L;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, List.of());
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
 
         //when

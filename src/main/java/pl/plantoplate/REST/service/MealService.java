@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.dto.Request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.dto.Response.MealOverviewResponse;
 import pl.plantoplate.REST.dto.model.IngredientQtUnit;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.meal.Meal;
@@ -90,5 +91,14 @@ public class MealService {
             mealProductRepository.save(mealProduct);
         }
 
+    }
+
+    public List<MealOverviewResponse> getMealOverviewByDate(LocalDate localDate, Group userGroup) {
+
+        List<Meal> mealsPlannedProvidedDate = userGroup.getPlannedMeals().stream().
+                filter(m -> m.getDate().isEqual(localDate)).collect(Collectors.toList());
+
+        return mealsPlannedProvidedDate.stream().map(m -> new MealOverviewResponse(m.getId(), m.getRecipe().getTitle(), m.getRecipe().getTime(),
+                m.getMealType())).collect(Collectors.toList());
     }
 }

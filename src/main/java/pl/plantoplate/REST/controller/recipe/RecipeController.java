@@ -56,7 +56,7 @@ public class RecipeController {
             description = "Get details of selected recipe")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of recipes", content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
+                    schema = @Schema(implementation = RecipeOverviewResponse.class))),
             @ApiResponse(responseCode = "400", description = "Recipe not found", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<RecipeDetailsResponse> getRecipeDetails(@PathVariable long recipeId) {
@@ -91,7 +91,7 @@ public class RecipeController {
             description = "Add recipe to selected of group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe was added to selected", content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+                 schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "Recipe was already added to selected of this group or " +
                     "recipe with given id doesn't exist", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
@@ -110,7 +110,7 @@ public class RecipeController {
             description = "Delete recipe from selected of group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe was deleted from selected", content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = SimpleResponse.class)))),
+                    schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "Recipe wasn't added to selected of this group or " +
                     "recipe with given id doesn't exist", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
