@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.dto.Request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.dto.Response.MealOverviewResponse;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.meal.Meal;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.WrongRequestData;
@@ -17,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -81,6 +84,38 @@ public class MealServiceTest {
 
         //then when
         assertThrows(WrongRequestData.class, () -> mealService.planMeal(request, group));
+    }
+
+    @Test
+    void shouldGetMealOverviewByDate(){
+
+        //given
+        Group group = new Group();
+        long mealId = 12L;
+        int time = 60;
+        String recipeTitle = "recipeTitle";
+        String mealType = MealType.BREAKFAST.name();
+        int year = 2022;
+        int month = 11;
+        int day = 20;
+
+        Meal meal = new Meal();
+        meal.setId(mealId);
+        meal.setMealType(mealType);
+        meal.setRecipe(Recipe.builder().time(time).title(recipeTitle).build());
+        meal.setDate(LocalDate.of(year, month, day));
+        group.setPlannedMeals(List.of(meal));
+
+        //then
+        List<MealOverviewResponse> responses = mealService.getMealOverviewByDate(LocalDate.of(year, month, day), group);
+
+        //when
+        assertEquals(responses.size(), 1);
+        assertEquals(responses.get(0).getMealId(), mealId);
+        assertEquals(responses.get(0).getMealType(), mealType);
+        assertEquals(responses.get(0).getRecipeTitle(), recipeTitle);
+        assertEquals(responses.get(0).getTime(), time);
+
     }
 
 

@@ -60,7 +60,7 @@ public class RecipeServiceTest {
 
         //given
         long recipeId = 1L;
-        Group group = new Group(1L, "name", null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null);
         List<Group> groupsSelectedRecipe = new ArrayList<>();
         Recipe recipe = Recipe.builder().id(recipeId).groupsSelectedRecipe(groupsSelectedRecipe).build();
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.ofNullable(recipe));
@@ -77,7 +77,7 @@ public class RecipeServiceTest {
 
         //given
         long recipeId = 1L;
-        Group group = new Group(1L, "name", null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null);
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.empty());
 
         //when then
@@ -91,7 +91,7 @@ public class RecipeServiceTest {
 
         //given
         long recipeId = 1L;
-        Group group = new Group(1L, "name", null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null);
         List<Group> groupsSelectedRecipe = new ArrayList<>(List.of(group));
         Recipe recipe = Recipe.builder().id(recipeId).groupsSelectedRecipe(groupsSelectedRecipe).build();
         when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.ofNullable(recipe));
@@ -110,7 +110,7 @@ public class RecipeServiceTest {
         float ingredientQtyInRecipe = 20;
         String productName = "product";
         Category category = new Category();
-        Group group = new Group(1L, "name", null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null);
         Unit productUnit = Unit.L;
         Product ingredient = new Product(productName, category, group, productUnit);
         ingredient.setId(ingredientId);
@@ -149,7 +149,7 @@ public class RecipeServiceTest {
 
         //given
         long recipeId = 1L;
-        Group group = new Group(1L, "name", null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null);
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.empty());
 
         //when then
@@ -164,7 +164,7 @@ public class RecipeServiceTest {
         //given
         long recipeId = 1L;
         List<Recipe> emptyListOfRecipes = new ArrayList<>();
-        Group group = new Group(1L, "name", null, null, emptyListOfRecipes);
+        Group group = new Group(1L, "name", null, null, emptyListOfRecipes, null);
         Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
                 .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.of(recipe));
@@ -181,7 +181,7 @@ public class RecipeServiceTest {
         //given
         long recipeId = 1L;
         long recipeId2 = 2L;
-        Group group = new Group(1L, "name", null, null, new ArrayList<>());
+        Group group = new Group(1L, "name", null, null, new ArrayList<>(), null);
         List<Group> selectedGroups = new ArrayList<>();
         selectedGroups.add(group);
 

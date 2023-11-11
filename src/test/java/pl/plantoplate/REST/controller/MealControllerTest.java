@@ -102,6 +102,39 @@ public class MealControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnMealOverviewByDate() throws Exception {
+
+        //given
+        Group group = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+        String date = "2022-11-11";
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/date?date=" + date)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(mealService).getMealOverviewByDate(LocalDate.of(2022, 11, 11), group);
+    }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnBadRequest_GetMealOverviewByIncorrectDate() throws Exception {
+
+        //given
+        Group group = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+        String dateIncorrect = "11-11-2022";
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/date?date=" + dateIncorrect)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
     private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
         return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();
