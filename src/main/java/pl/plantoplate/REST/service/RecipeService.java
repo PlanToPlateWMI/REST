@@ -1,5 +1,6 @@
 package pl.plantoplate.REST.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,9 +10,11 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
+import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
 import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
 import java.util.HashMap;
@@ -20,15 +23,12 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final RecipeCategoryService recipeCategoryService;
-
-    public RecipeService(RecipeRepository recipeRepository, RecipeCategoryService recipeCategoryService) {
-        this.recipeRepository = recipeRepository;
-        this.recipeCategoryService = recipeCategoryService;
-    }
+    private final RecipeIngredientRepository recipeIngredientRepository;
 
     public List<Recipe> getAllRecipes(String categoryName) {
 
@@ -69,11 +69,11 @@ public class RecipeService {
     public RecipeProductQty findRecipeDetailById(long recipeId){
 
         Recipe recipe = findById(recipeId);
-        List<Product> ingredients = recipe.getIngredients();
         Map<Product, Float> ingredientQuantity = new HashMap<>();
-        for(Product pr:ingredients){
-            Float qty = recipeRepository.findQtyByRecipeIdAndProductId(recipeId, pr.getId());
-            ingredientQuantity.put(pr, qty);
+        List<RecipeIngredient> recipeIngredients = recipeIngredientRepository.findAllByRecipe(recipe);
+
+        for(RecipeIngredient recipeIngredient: recipeIngredients){
+            ingredientQuantity.put(recipeIngredient.getIngredient(), recipeIngredient.getQty());
         }
         return new RecipeProductQty(recipe, ingredientQuantity);
 
