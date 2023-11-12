@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,15 +17,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.controller.dto.model.MealProductQty;
+import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.meal.Meal;
+import pl.plantoplate.REST.entity.recipe.Level;
+import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.service.MealService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -133,6 +135,33 @@ public class MealControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + dateIncorrect)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnMealOverview() throws Exception {
+
+        //given
+        Group group = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+
+        long mealId = 1L;
+        long recipeId = 1L;
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
+        Meal meal = new Meal();
+        meal.setRecipe(recipe);
+        when(mealService.findMealDetailById(mealId, group)).thenReturn(new MealProductQty(meal, new HashMap<>()));
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/" + mealId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(mealService).findMealDetailById(mealId, group);
+
     }
 
 

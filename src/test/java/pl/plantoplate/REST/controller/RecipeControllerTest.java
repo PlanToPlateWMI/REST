@@ -2,7 +2,6 @@ package pl.plantoplate.REST.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +16,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Response.RecipeOverviewResponse;
-import pl.plantoplate.REST.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.dto.response.RecipeOverviewResponse;
+import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;

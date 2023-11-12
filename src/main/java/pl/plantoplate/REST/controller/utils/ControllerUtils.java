@@ -16,7 +16,6 @@ governing permissions and limitations under the License.
 package pl.plantoplate.REST.controller.utils;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import pl.plantoplate.REST.dto.Response.JwtResponse;
+import pl.plantoplate.REST.controller.dto.response.JwtResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.security.JwtUtils;
 import pl.plantoplate.REST.security.UserDetailsImpl;

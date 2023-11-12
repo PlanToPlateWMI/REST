@@ -15,10 +15,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.service.CategoryService;
-import pl.plantoplate.REST.service.ShoppingListService;
 
 import java.util.List;
 

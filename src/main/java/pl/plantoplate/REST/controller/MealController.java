@@ -11,10 +11,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.dto.Request.PlanMealBasedOnRecipeRequest;
-import pl.plantoplate.REST.dto.Response.MealOverviewResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
+import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.model.MealProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.MealService;
 
@@ -63,5 +66,21 @@ public class MealController {
         List<MealOverviewResponse> response = mealService.getMealOverviewByDate(localDate, userGroup);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{mealId}")
+    @Operation(summary = "Get planned meals details",
+            description = "Get planned meals details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get planned meals details", content = @Content(
+                  schema = @Schema(implementation = CulinaryDetailsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Meal with provided id not in group", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<CulinaryDetailsResponse> getMealDetails(@PathVariable("mealId") long id){
+
+        Group group = utils.authorizeUserByEmail();
+        MealProductQty mealDetailsIngredientQty = mealService.findMealDetailById(id, group);
+
+        return ResponseEntity.ok(RecipeMealDetailsConverter.convertMealsToCulinaryDetailsResponse(mealDetailsIngredientQty));
     }
 }
