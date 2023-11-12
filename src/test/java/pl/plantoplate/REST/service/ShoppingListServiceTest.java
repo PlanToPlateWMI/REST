@@ -115,7 +115,7 @@ public class ShoppingListServiceTest {
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
-        verify(shopProductRepository).save(shopProductArgumentCaptor.capture());
+        verify(shopProductRepository).saveAndFlush(shopProductArgumentCaptor.capture());
         ShopProduct saved = shopProductArgumentCaptor.getValue();
 
         assertEquals(saved.getAmount(), oldAmount + addAmount);
@@ -150,7 +150,7 @@ public class ShoppingListServiceTest {
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
-        verify(shopProductRepository).save(shopProductArgumentCaptor.capture());
+        verify(shopProductRepository).saveAndFlush(shopProductArgumentCaptor.capture());
         ShopProduct saved = shopProductArgumentCaptor.getValue();
         assertEquals(saved.getAmount(), addAmount);
         assertEquals(saved.getProductState(), ProductState.BUY);

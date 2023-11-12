@@ -52,10 +52,10 @@ public class MealController {
     }
 
     @GetMapping()
-    @Operation(summary = "Get planned meals overview by provided date",
-            description = "Get planned meals overview by provided date")
+    @Operation(summary = "Get planned meal overview by provided date",
+            description = "Get planned meal overview by provided date")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get planned meals overview by provided date", content = @Content(
+            @ApiResponse(responseCode = "200", description = "Get planned meal overview by provided date", content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = MealOverviewResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Invalid date format: yyyy-MM-dd", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
@@ -69,10 +69,10 @@ public class MealController {
     }
 
     @GetMapping("/{mealId}")
-    @Operation(summary = "Get planned meals details",
-            description = "Get planned meals details")
+    @Operation(summary = "Get planned meal details",
+            description = "Get planned meal details")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get planned meals details", content = @Content(
+            @ApiResponse(responseCode = "200", description = "Get planned meal details", content = @Content(
                   schema = @Schema(implementation = CulinaryDetailsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Meal with provided id not in group", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})

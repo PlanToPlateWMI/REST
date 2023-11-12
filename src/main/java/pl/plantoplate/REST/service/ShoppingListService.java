@@ -17,6 +17,7 @@ package pl.plantoplate.REST.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
@@ -24,6 +25,8 @@ import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,16 +57,45 @@ public class ShoppingListService {
 
 
     /**
-     * Save {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with product {@link pl.plantoplate.REST.entity.product.Product} with id productId
-     * and amount to group of user email parametrs. Set {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
-     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
-     * If the same product exists with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}  - increase amount
+     * Save {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
      * @param productId id of product from base
      * @param amount amount of product
      * @param email email of user to find his group
      * @return list of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
      */
     public List<ShopProduct> addProductToShoppingList(long productId, float amount , String email) {
+
+        ShopProduct shopProduct = addProductToShoppingListLogic(productId, amount, email);
+        shopProductRepository.saveAndFlush(shopProduct);
+
+        return this.getProducts(email, ProductState.BUY);
+    }
+
+    /**
+     * Save array of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
+     * @param productRequest - arrays of id and amount of product to save
+     * @param email
+     * @return
+     */
+    public List<ShopProduct> addProductsToShoppingList(AddShopProductRequest[] productRequest, String email) {
+
+        List<ShopProduct> shopProductList = new ArrayList<>();
+        Arrays.stream(productRequest).forEach(e -> shopProductList.add(addProductToShoppingListLogic(e.getId(), e.getAmount(), email)));
+        shopProductRepository.saveAllAndFlush(shopProductList);
+        return this.getProducts(email, ProductState.BUY);
+    }
+
+    /**
+      * Algorithm return ShopProduct to save with product {@link pl.plantoplate.REST.entity.product.Product} with id productId
+     * and amount to group of user email parametrs. Set {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
+     * Throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} if amount is negative or zero or user try to add not his product
+     * If the same product exists with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}  - increase amount
+     * @param productId - productId to save
+     * @param amount - amount of product to save
+     * @param email - email of user to identify group
+     * @return  {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} to save
+     */
+    private ShopProduct addProductToShoppingListLogic(long productId, float amount , String email){
 
         Group group = userService.findGroupOfUser(email);
 
@@ -87,17 +119,13 @@ public class ShoppingListService {
                 p.getProduct().getUnit().equals(product.getUnit()))){
             ShopProduct shopProduct = shopProductRepository.findByProductAndProductStateAndGroup(product, ProductState.BUY, group).get();
             shopProduct.setAmount(shopProduct.getAmount() + amount);
-
-            shopProductRepository.save(shopProduct);
             log.info("Product with id [" + productId + "] exists in shopping list. Modified his amount.");
+            return shopProduct;
         }else{
             ShopProduct shopProduct = new ShopProduct(product, group, amount, ProductState.BUY);
-            shopProductRepository.save(shopProduct);
             log.info("Product with id [" + productId + "] added to shopping list.");
+            return shopProduct;
         }
-
-
-        return this.getProducts(email, ProductState.BUY);
     }
 
     /**

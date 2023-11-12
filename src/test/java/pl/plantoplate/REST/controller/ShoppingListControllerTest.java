@@ -31,6 +31,8 @@ import pl.plantoplate.REST.service.UserService;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -146,6 +148,33 @@ public class ShoppingListControllerTest {
 
         //then
         verify(productService).addProductToShoppingList(productId, amount, email);
+    }
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldAddProductsToShoppingList() throws Exception {
+
+        //given
+        String email = "email@gmail.com";
+        Group group = new Group();
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        long productId = 1L;
+        float amount = 10;
+        long productId2 = 2L;
+        float amount2 = 20;
+        AddShopProductRequest product1 = new AddShopProductRequest(productId, amount);
+        AddShopProductRequest product2 = new AddShopProductRequest(productId2, amount2);
+        AddShopProductRequest[] request = new AddShopProductRequest[]{product1, product2};
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/shopping/list")
+                .content(mapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(productService).addProductsToShoppingList(any(), anyString());
     }
 
 
