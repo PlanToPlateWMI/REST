@@ -1,23 +1,34 @@
 package pl.plantoplate.REST.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import pl.plantoplate.REST.controller.dto.model.MealProductQty;
+import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.controller.utils.MealType;
-import pl.plantoplate.REST.dto.Request.PlanMealBasedOnRecipeRequest;
-import pl.plantoplate.REST.dto.Response.MealOverviewResponse;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.meal.Meal;
+import pl.plantoplate.REST.entity.meal.MealIngredient;
+import pl.plantoplate.REST.entity.product.Category;
+import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
+import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.exception.NotValidGroup;
 import pl.plantoplate.REST.exception.WrongRequestData;
-import pl.plantoplate.REST.repository.MealProductRepository;
+import pl.plantoplate.REST.repository.MealIngredientRepository;
 import pl.plantoplate.REST.repository.MealsRepository;
 import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +42,7 @@ public class MealServiceTest {
     private RecipeService recipeService;
     private RecipeIngredientRepository recipeIngredientRepository;
     private ProductService productService;
-    private MealProductRepository mealProductRepository;
+    private MealIngredientRepository mealIngredientRepository;
     private MealService mealService;
 
     @BeforeEach
@@ -40,8 +51,8 @@ public class MealServiceTest {
         recipeService = mock(RecipeService.class);
         recipeIngredientRepository = mock(RecipeIngredientRepository.class);
         productService = mock(ProductService.class);
-        mealProductRepository = mock(MealProductRepository.class);
-        mealService = new MealService(mealsRepository, recipeService,recipeIngredientRepository, productService, mealProductRepository);
+        mealIngredientRepository = mock(MealIngredientRepository.class);
+        mealService = new MealService(mealsRepository, recipeService,recipeIngredientRepository, productService, mealIngredientRepository);
     }
 
     @Test
@@ -110,12 +121,81 @@ public class MealServiceTest {
         List<MealOverviewResponse> responses = mealService.getMealOverviewByDate(LocalDate.of(year, month, day), group);
 
         //when
-        assertEquals(responses.size(), 1);
-        assertEquals(responses.get(0).getMealId(), mealId);
-        assertEquals(responses.get(0).getMealType(), mealType);
-        assertEquals(responses.get(0).getRecipeTitle(), recipeTitle);
-        assertEquals(responses.get(0).getTime(), time);
+        Assertions.assertEquals(responses.size(), 1);
+        Assertions.assertEquals(responses.get(0).getMealId(), mealId);
+        Assertions.assertEquals(responses.get(0).getMealType(), mealType);
+        Assertions.assertEquals(responses.get(0).getRecipeTitle(), recipeTitle);
+        Assertions.assertEquals(responses.get(0).getTime(), time);
 
+    }
+
+    @Test
+    void shouldThrowException_MealNotFound_TryToGetMealDetails(){
+
+        //given
+        Group group = new Group();
+        long mealId = 1L;
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.empty());
+
+        //when then
+        EntityNotFound exception = assertThrows(EntityNotFound.class, () -> mealService.findMealDetailById(mealId, group));
+        Assertions.assertEquals(exception.getMessage(), "Meal with id [" + mealId + "] was not found.");
+    }
+
+    @Test
+    void shouldThrowException_MealNotOfGroup_TryToGetMealDetails(){
+
+        //given
+        long groupId = 1L;
+        long usersGroupId = 2L;
+        Group ownerGroup = new Group();
+        ownerGroup.setId(groupId);
+        Group usersGroup = new Group();
+        usersGroup.setId(usersGroupId);
+        long mealId = 1L;
+        Meal meal = new Meal();
+        meal.setGroup(ownerGroup);
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
+
+        //when then
+        NotValidGroup exception = assertThrows(NotValidGroup.class, () -> mealService.findMealDetailById(mealId, usersGroup));
+        Assertions.assertEquals(exception.getMessage(), "Meal with id [" + mealId +"] not found in lists of meals of user's group");
+    }
+
+    @Test
+    void shouldReturnMealDetails(){
+
+        //given
+        long recipeId = 2L;
+        long mealId = 1L;
+        long ingredientId = 3L;
+        float ingredientQtyInRecipe = 20;
+        String productName = "product";
+        Category category = new Category();
+        Group group = new Group(1L, "name", null, null, null, null);
+        Unit productUnit = Unit.L;
+        Product ingredient = new Product(productName, category, group, productUnit);
+        ingredient.setId(ingredientId);
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).ingredient(List.of(ingredient)).build();
+        Meal meal = new Meal();
+        meal.setGroup(group);
+        meal.setRecipe(recipe);
+        meal.setId(mealId);
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
+        MealIngredient mealIngredient = new MealIngredient();
+        mealIngredient.setQty(ingredientQtyInRecipe);
+        mealIngredient.setIngredient(ingredient);
+        when(mealIngredientRepository.findAllByMeal(meal)).thenReturn(List.of(mealIngredient));
+
+        // when
+        MealProductQty mealProductQty = mealService.findMealDetailById(mealId, group);
+
+        //then
+        Assertions.assertEquals(mealProductQty.getMeal().getId(), mealId);
+        Assertions.assertEquals(mealProductQty.getMeal().getRecipe().getId(), recipeId);
+        Assertions.assertEquals(mealProductQty.getIngredientQuantity().size(), 1);
+        Assertions.assertEquals(mealProductQty.getIngredientQuantity().get(ingredient), ingredientQtyInRecipe);
     }
 
 

@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.mail.EmailType;
-import pl.plantoplate.REST.dto.Response.CodeResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.response.CodeResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
@@ -59,7 +59,7 @@ public class MailController {
      * Sends generated code to provided as Request Param ?email= email address with body and subject depends on Request Param ?type=registration (default value) - to confirm
      * email address during registration or ?type=reset - to confirm email address during resetting password.
      * @param email email address to send code
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated code sent to provided email address
+     * @return ResponseEntity parametrized with {@link CodeResponse} with generated code sent to provided email address
      */
     @GetMapping("/code")
     @Operation(summary="Send code to email",

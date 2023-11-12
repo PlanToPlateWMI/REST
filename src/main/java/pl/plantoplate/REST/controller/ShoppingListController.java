@@ -28,11 +28,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
-import pl.plantoplate.REST.dto.Request.AmountRequest;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
-import pl.plantoplate.REST.dto.Response.ShoppingProductsResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
+import pl.plantoplate.REST.controller.dto.request.AmountRequest;
+import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
+import pl.plantoplate.REST.controller.dto.response.ShoppingProductsResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.exception.WrongRequestData;
@@ -69,7 +69,7 @@ public class ShoppingListController {
      * If ?bought=true - returns with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
      * If ?bought=false - returns with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
      * Default value of request param is true
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state depends on request param ?bought
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state depends on request param ?bought
      */
     @GetMapping("")
     @Operation(summary="Get list of shopProducts with BUY or BOUGHT state of user's group",
@@ -101,7 +101,7 @@ public class ShoppingListController {
      * Adds ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} to user's group list
      * by provided {@link pl.plantoplate.REST.entity.product.Product} id and amount
      * @param productRequest DTO with product id and amount to add
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
      */
     @PostMapping()
     @Operation(summary= "Adds ShopProduct with state BUY to list of user's group ShopProducts ",
@@ -130,7 +130,7 @@ public class ShoppingListController {
      * of user's group list
      * @param amountRequest new amount
      * @param id id of ShopProduct to change
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY of user's group
      */
     @PatchMapping("/{id}")
     @Operation(summary="Changes amount of ShopProduct with state BUY of user's group",
@@ -155,7 +155,7 @@ public class ShoppingListController {
      * Changes state of ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}. Is state was {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} - changes
      * to {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} and vice versa
      * @param id id of ShopProduct to change state
-     * @return ResponseEntity parametrized with 2 Lists bought and buy - of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY and BOUGH of user's group
+     * @return ResponseEntity parametrized with 2 Lists bought and buy - of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state BUY and BOUGH of user's group
      */
     @PutMapping("/{id}")
     @Operation(summary= "Changes state of ShopProduct of user's group from BUY to BOUGHT and vice versa.",
@@ -185,7 +185,7 @@ public class ShoppingListController {
      * Deletes ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} or {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
      * from user's group by provided id
      * @param id id of ShopProduct with state BUY or BOUGHT ro delete
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with the same state as state of deleted ShopProduct"
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with the same state as state of deleted ShopProduct"
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

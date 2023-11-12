@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.plantoplate.REST.dto.Response.RecipeCategoryResponse;
+import pl.plantoplate.REST.controller.dto.response.RecipeCategoryResponse;
 import pl.plantoplate.REST.service.RecipeCategoryService;
 
 import java.util.List;

@@ -11,10 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.Response.RecipeDetailsResponse;
-import pl.plantoplate.REST.dto.Response.RecipeOverviewResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
+import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
+import pl.plantoplate.REST.controller.dto.response.RecipeOverviewResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
@@ -59,12 +60,11 @@ public class RecipeController {
                     schema = @Schema(implementation = RecipeOverviewResponse.class))),
             @ApiResponse(responseCode = "400", description = "Recipe not found", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<RecipeDetailsResponse> getRecipeDetails(@PathVariable long recipeId) {
+    public ResponseEntity<CulinaryDetailsResponse> getRecipeDetails(@PathVariable long recipeId) {
 
         RecipeProductQty recipe = recipeService.findRecipeDetailById(recipeId);
-        RecipeDetailsResponse recipeDetailsResponse = new RecipeDetailsResponse(recipe);
 
-        return new ResponseEntity<>(recipeDetailsResponse, HttpStatus.OK);
+        return new ResponseEntity<>(RecipeMealDetailsConverter.convertRecipeToCulinaryDetailsResponse(recipe), HttpStatus.OK);
     }
 
     @GetMapping("/selected")

@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Global Exception Handler. Contains methods that handle exception and return
- * ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse} with message from
+ * ResponseEntity parametrized with {@link SimpleResponse} with message from
  * handled exception
  */
 @ControllerAdvice
@@ -72,6 +72,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DeleteNotSelected.class)
     public ResponseEntity<SimpleResponse> deleteNotSelectedByGroupRecipe(DeleteNotSelected e) {
+        return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotValidGroup.class)
+    public ResponseEntity<SimpleResponse> getMealNotExistsInGroup(NotValidGroup e) {
         return buildResponseEntity(e, HttpStatus.BAD_REQUEST);
     }
 
