@@ -1,9 +1,14 @@
 INSERT INTO user_group(name) VALUES ('admins');
+INSERT INTO user_group(name) VALUES ('google-admins');
 
 -- moderator
 INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
 ('plantoplatemobileapp@gmail.com', 'plantoplate', '$2a$10$SjxWexEjOJzrFR3CrQFaRehmWM1S6YzyALcSkTPDCbyFDNpypKfFK',
  'ROLE_ADMIN', 1, true);
+
+INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
+('plantoplatetestapp@gmail.com', 'googletest', '$2a$10$r5R9PdjktlR2i1zPzFcvlO2skw6VQHeuPcRCSpsNUAOvLqO/PFqvC',
+ 'ROLE_ADMIN', 2, true);
 
 
 INSERT INTO category (category) VALUES
