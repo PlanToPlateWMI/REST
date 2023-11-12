@@ -124,6 +124,26 @@ public class ShoppingListController {
         return new ResponseEntity<>(shopProductList, HttpStatus.OK);
     }
 
+    @PostMapping("/list")
+    @Operation(summary= "Add list of ShopProducts with state BUY to list of user's group ShopProducts ",
+            description = "Adds list of ShopProducts with state BUY to list of user's group ShopProducts by provided id of Product and amount. Amount cannot be negative or zero." +
+                    " Returns updated list of ShopProducts with BUY state.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Products were successfully added",  content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "User try to add product not of his group " +
+                    "or amount is negative or 0",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<ShoppingProductResponse>> addProductToShoppingListFromBase(@RequestBody AddShopProductRequest[] productRequest) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ShoppingProductResponse> shopProductList = shoppingListService.addProductsToShoppingList(productRequest, email).stream()
+                        .map(ShoppingProductResponse::new)
+                        .collect(Collectors.toList());
+
+        return new ResponseEntity<>(shopProductList, HttpStatus.OK);
+    }
+
 
     /**
      * Changes amount ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
