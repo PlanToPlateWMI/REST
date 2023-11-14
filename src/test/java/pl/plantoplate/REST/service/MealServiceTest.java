@@ -5,10 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
-import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
-import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
+import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.meal.Meal;
 import pl.plantoplate.REST.entity.meal.MealIngredient;
@@ -16,7 +15,6 @@ import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
-import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NotValidGroup;
@@ -30,10 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Meal Service Test")
 public class MealServiceTest {
@@ -196,6 +192,71 @@ public class MealServiceTest {
         Assertions.assertEquals(mealProductQty.getMeal().getRecipe().getId(), recipeId);
         Assertions.assertEquals(mealProductQty.getIngredientQuantity().size(), 1);
         Assertions.assertEquals(mealProductQty.getIngredientQuantity().get(ingredient), ingredientQtyInRecipe);
+    }
+
+    @Test
+    void shouldDeleteMealWithIngredients(){
+
+        //given
+        long recipeId = 2L;
+        long mealId = 1L;
+        long ingredientId = 3L;
+        float ingredientQtyInRecipe = 20;
+        String productName = "product";
+        Category category = new Category();
+        Group group = new Group(1L, "name", null, null, null, null);
+        Unit productUnit = Unit.L;
+        Product ingredient = new Product(productName, category, group, productUnit);
+        ingredient.setId(ingredientId);
+        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).ingredient(List.of(ingredient)).build();
+        Meal meal = new Meal();
+        meal.setGroup(group);
+        meal.setRecipe(recipe);
+        meal.setId(mealId);
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
+        MealIngredient mealIngredient = new MealIngredient();
+        mealIngredient.setQty(ingredientQtyInRecipe);
+        mealIngredient.setIngredient(ingredient);
+        when(mealIngredientRepository.findAllByMeal(meal)).thenReturn(List.of(mealIngredient));
+
+        //then
+        mealService.deleteMealById(mealId, group);
+
+        //when
+        verify(mealsRepository).delete(meal);
+    }
+
+    @Test
+    void shouldThrowException_MealNotFound(){
+
+        //given
+        long mealId = 1L;
+        Meal meal = new Meal();
+        meal.setId(mealId);
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.empty());
+        Group group = new Group(1L, "name", null, null, null, null);
+
+        //then
+         assertThrows(EntityNotFound.class, () -> mealService.deleteMealById(mealId, group));
+    }
+
+    @Test
+    void shouldThrowException_DeleteMealNotFromGroup(){
+
+        //given
+        long mealId = 1L;
+        long mealGroupId = 1L;
+        long usersGroupId = 2L;
+        Meal meal = new Meal();
+        meal.setId(mealId);
+        Group group = new Group(mealGroupId, "name", null, null, null, null);
+        meal.setGroup(group);
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
+        Group usersGroup = new Group(usersGroupId, "name", null, null, null, null);
+
+        //then
+        assertThrows(NotValidGroup.class, () -> mealService.deleteMealById(mealId, usersGroup));
     }
 
 
