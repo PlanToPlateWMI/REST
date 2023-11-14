@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import pl.plantoplate.REST.controller.dto.request.AddRecipeToShoppingList;
 import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
 import pl.plantoplate.REST.controller.dto.request.AmountRequest;
 import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
@@ -158,16 +159,10 @@ public class ShoppingListControllerTest {
         String email = "email@gmail.com";
         Group group = new Group();
         when(userService.findGroupOfUser(email)).thenReturn(group);
-        long productId = 1L;
-        float amount = 10;
-        long productId2 = 2L;
-        float amount2 = 20;
-        AddShopProductRequest product1 = new AddShopProductRequest(productId, amount);
-        AddShopProductRequest product2 = new AddShopProductRequest(productId2, amount2);
-        AddShopProductRequest[] request = new AddShopProductRequest[]{product1, product2};
+        AddRecipeToShoppingList request = new AddRecipeToShoppingList();
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/shopping/list")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/shopping/recipe")
                 .content(mapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

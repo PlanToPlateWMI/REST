@@ -15,19 +15,24 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
+import pl.plantoplate.REST.controller.dto.model.IngredientQtUnit;
+import pl.plantoplate.REST.controller.dto.request.AddRecipeToShoppingList;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
+import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,19 +42,14 @@ import java.util.stream.Stream;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ShoppingListService {
 
     private final ShopProductRepository shopProductRepository;
     private final ProductService productService;
     private final UserService userService;
-
-
-    public ShoppingListService(ShopProductRepository shopProductRepository, ProductService productService, UserService userService) {
-        this.shopProductRepository = shopProductRepository;
-        this.productService = productService;
-        this.userService = userService;
-    }
-
+    private final RecipeIngredientRepository recipeIngredientRepository;
+    private final RecipeService recipeService;
 
     public void save(ShopProduct shopProduct){
         shopProductRepository.save(shopProduct);
@@ -72,15 +72,38 @@ public class ShoppingListService {
     }
 
     /**
-     * Save array of {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
-     * @param productRequest - arrays of id and amount of product to save
+     * Add ingredients of provided  recipe to shopping list based on portions
+     * @param request - information about recipe id, portions and ingredient to add
      * @param email
      * @return
      */
-    public List<ShopProduct> addProductsToShoppingList(AddShopProductRequest[] productRequest, String email) {
+    public List<ShopProduct> addProductsToShoppingList(AddRecipeToShoppingList request, String email) {
+
+        long recipeId = request.getRecipeId();
+        Recipe recipe = recipeService.findById(recipeId);
+
+        // ingredients (Map of ingredientId to qty/UNIT in original recipe)
+        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe= recipeIngredientRepository.
+                findAllByRecipe(recipe).stream().collect(Collectors.toMap(
+                r-> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
+        // ingredient ids provided by user
+        List<Long> ingredientIdsList = request.getIngredientsId();
+
+        long portionsInOriginalRecipe = recipe.getPortions();
+        long portionsPlanned = request.getPortions();
+        float proportionIngredientQty = (float) portionsPlanned/portionsInOriginalRecipe;
 
         List<ShopProduct> shopProductList = new ArrayList<>();
-        Arrays.stream(productRequest).forEach(e -> shopProductList.add(addProductToShoppingListLogic(e.getId(), e.getAmount(), email)));
+
+        for(Long ingredientToPlanId: ingredientIdsList){
+            IngredientQtUnit originalQtyUnit = ingredientIdToUnitQtyInOriginalRecipe.get(ingredientToPlanId);
+            float qtyPlanned = proportionIngredientQty * originalQtyUnit.getQty();
+            if(originalQtyUnit.getUnit().equals(Unit.SZT))
+                qtyPlanned = (int) Math.ceil(qtyPlanned);
+
+            shopProductList.add(addProductToShoppingListLogic(ingredientToPlanId, qtyPlanned, email));
+
+        }
         shopProductRepository.saveAllAndFlush(shopProductList);
         return this.getProducts(email, ProductState.BUY);
     }
