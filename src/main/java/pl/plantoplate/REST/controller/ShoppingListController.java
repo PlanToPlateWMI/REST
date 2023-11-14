@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.controller.dto.request.AddRecipeToShoppingList;
 import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
 import pl.plantoplate.REST.controller.dto.request.AmountRequest;
 import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
@@ -124,20 +125,19 @@ public class ShoppingListController {
         return new ResponseEntity<>(shopProductList, HttpStatus.OK);
     }
 
-    @PostMapping("/list")
-    @Operation(summary= "Add list of ShopProducts with state BUY to list of user's group ShopProducts ",
-            description = "Adds list of ShopProducts with state BUY to list of user's group ShopProducts by provided id of Product and amount. Amount cannot be negative or zero." +
-                    " Returns updated list of ShopProducts with BUY state.")
+    @PostMapping("/recipe")
+    @Operation(summary= "Add ingredients of recipe based on number of portions with state BUY to list of user's group ShopProducts",
+            description = "Add ingredients of recipe based on number of portions with state BUY to list of user's group ShopProducts)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Products were successfully added",  content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = ShoppingProductResponse.class)))),
-            @ApiResponse(responseCode = "400", description = "User try to add product not of his group " +
-                    "or amount is negative or 0",  content = @Content(
+            @ApiResponse(responseCode = "400", description = "Recipe with provided id not found/number of portions less than 1",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<List<ShoppingProductResponse>> addProductToShoppingListFromBase(@RequestBody AddShopProductRequest[] productRequest) {
+    public ResponseEntity<List<ShoppingProductResponse>> addProductToShoppingListBasedOnRecipeIdAndPortions(
+            @RequestBody AddRecipeToShoppingList request, @PathVariable(value = "synchronize", required = false) boolean synchronize) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ShoppingProductResponse> shopProductList = shoppingListService.addProductsToShoppingList(productRequest, email).stream()
+        List<ShoppingProductResponse> shopProductList = shoppingListService.addProductsToShoppingList(request, email).stream()
                         .map(ShoppingProductResponse::new)
                         .collect(Collectors.toList());
 
