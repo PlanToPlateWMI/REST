@@ -164,6 +164,24 @@ public class MealControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+    void shouldDeleteMealById() throws Exception{
+
+        //given
+        long mealId = 1L;
+        Group group = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/meals/" + mealId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(mealService).deleteMealById(mealId, group);
+
+    }
+
 
     private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
         return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();

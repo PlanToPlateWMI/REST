@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
@@ -82,5 +83,22 @@ public class MealController {
         MealProductQty mealDetailsIngredientQty = mealService.findMealDetailById(id, group);
 
         return ResponseEntity.ok(RecipeMealDetailsConverter.convertMealsToCulinaryDetailsResponse(mealDetailsIngredientQty));
+    }
+
+    @DeleteMapping("/{mealId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete planned meal (only with ADMIN role)",
+            description = "Delete planned meal (only with ADMIN role)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get planned meal details", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Meal with provided id not in group/not found", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> deleteMeal(@PathVariable("mealId") long mealId){
+
+        Group group = utils.authorizeUserByEmail();
+        mealService.deleteMealById(mealId, group);
+
+        return ResponseEntity.ok(new SimpleResponse("Meal " + mealId + " of group [" + group.getId() + "] was successfully deleted"));
     }
 }

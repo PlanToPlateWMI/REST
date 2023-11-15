@@ -2,6 +2,7 @@ package pl.plantoplate.REST.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
@@ -128,4 +129,17 @@ public class MealService {
     public Meal findMealById(long mealId){
         return  mealsRepository.findById(mealId).orElseThrow(() -> new EntityNotFound("Meal with id [" + mealId + "] was not found."));
     }
+
+    @Transactional
+    public void deleteMealById(long mealId, Group group) {
+
+        Meal meal = this.findMealById(mealId);
+        if(!meal.getGroup().getId().equals(group.getId()))
+            throw new NotValidGroup("Meal with id [" + mealId +"] not found in lists of meals of user's group");
+
+        mealIngredientRepository.deleteByMeal(meal);
+        mealIngredientRepository.flush();
+        mealsRepository.delete(meal);
+    }
+
 }
