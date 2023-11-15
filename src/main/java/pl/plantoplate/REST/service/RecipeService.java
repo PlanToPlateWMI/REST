@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
+import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.recipe.RecipeCategory;
 import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
@@ -30,14 +31,20 @@ public class RecipeService {
     private final RecipeCategoryService recipeCategoryService;
     private final RecipeIngredientRepository recipeIngredientRepository;
 
-    public List<Recipe> getAllRecipes(String categoryName) {
+    public List<Recipe> getAllRecipes(String categoryName, String level) {
 
         log.info(String.format("get all %s recipes", categoryName));
 
-        if (!StringUtils.hasLength(categoryName))
-            return recipeRepository.findAll();
-        RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
-        return recipeRepository.findAllByCategoryTitle(category.getTitle());
+        if (StringUtils.hasLength(categoryName) && StringUtils.hasLength(level))
+            return recipeRepository.findAllByCategoryTitleAndLevel(categoryName, Level.valueOf(level));
+
+        if(StringUtils.hasLength(level))
+            return recipeRepository.findAllByLevel(Level.valueOf(level));
+
+        if(StringUtils.hasLength(categoryName))
+            return recipeRepository.findAllByCategoryTitle(categoryName);
+
+        return recipeRepository.findAll();
     }
 
     public List<Recipe> getSelectedByGroupRecipes(String categoryName, Group group) {

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
 import pl.plantoplate.REST.controller.dto.response.RecipeOverviewResponse;
 import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.validator.RecipeValidator;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
@@ -25,28 +27,27 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/recipes")
+@RequiredArgsConstructor
 public class RecipeController {
 
     private final RecipeService recipeService;
     private final UserService userService;
-
-    public RecipeController(RecipeService recipeService, UserService userService) {
-        this.recipeService = recipeService;
-        this.userService = userService;
-    }
+    private final RecipeValidator validator;
 
     @GetMapping()
-    @Operation(summary = "Get list of recipes (optional sorting by category by request param)",
-            description = "Get list of recipes (optional sorting by category by request param)")
+    @Operation(summary = "Get list of recipes (optional sorting by category, level by request param)",
+            description = "Get list of recipes (optional sorting by category, level by request param)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of recipes", content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
-            @ApiResponse(responseCode = "400", description = "Category not found", content = @Content(
+            @ApiResponse(responseCode = "400", description = "Category or level is wrong", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<List<RecipeOverviewResponse>> getAllRecipesOverview(@RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string",
-            allowableValues = {"Napoje", "Zupy", "Desery", "Dania główne", "Przekąski"})) String categoryName) {
+            allowableValues = {"Napoje", "Zupy", "Desery", "Dania główne", "Przekąski"})) String categoryName, @RequestParam(name = "level", required = false) @Parameter(schema = @Schema(description = "level of recipe", type = "string",
+            allowableValues = {"EASY", "MEDIUM", "HARD"})) String level) {
 
-        List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getAllRecipes(categoryName).stream()
+        validator.validateRecipeSortValues(categoryName, level);
+        List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getAllRecipes(categoryName, level).stream()
                 .map(RecipeOverviewResponse::new).collect(Collectors.toList());
 
         return new ResponseEntity<>(recipeOverviewRespons, HttpStatus.OK);

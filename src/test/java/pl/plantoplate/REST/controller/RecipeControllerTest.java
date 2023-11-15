@@ -74,7 +74,7 @@ public class RecipeControllerTest {
         //given
         int numberOfRecipes = 10;
         List<Recipe> allRecipes = returnSpecificNumberOfRecipes(numberOfRecipes);
-        when(recipeService.getAllRecipes(null)).thenReturn(allRecipes);
+        when(recipeService.getAllRecipes(null, null)).thenReturn(allRecipes);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes"))
@@ -92,11 +92,12 @@ public class RecipeControllerTest {
 
         //given
         long categoryId = 1L;
-        String categoryName = "category";
+        String categoryName = "Napoje";
         int numberOfRecipes = 10;
 
-        when(recipeService.getAllRecipes(categoryName)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
+        when(recipeService.getAllRecipes(categoryName, null)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
+        when(recipeCategoryService.findAll()).thenReturn(List.of(new RecipeCategory(categoryId, categoryName)));
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes?category=" + categoryName))
