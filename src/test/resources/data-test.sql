@@ -141,4 +141,12 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Jaja', 13, 1, 'SZT');
 
 
+insert into recipe_category (title) values
+('Napoje'),
+('Zupy'),
+('Desery'),
+('Dania główne'),
+('Przekąski');
+
+
 -- miód wielokwiatowy
