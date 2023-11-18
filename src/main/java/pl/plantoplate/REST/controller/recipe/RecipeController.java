@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
@@ -88,8 +89,9 @@ public class RecipeController {
     }
 
     @PutMapping("/selected/{recipeId}")
-    @Operation(summary = "Add recipe to selected of group",
-            description = "Add recipe to selected of group")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Add recipe to selected of group (only with ADMIN role)",
+            description = "Add recipe to selected of group (only with ADMIN role)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe was added to selected", content = @Content(
                  schema = @Schema(implementation = SimpleResponse.class))),
@@ -107,8 +109,9 @@ public class RecipeController {
     }
 
     @DeleteMapping("/selected/{recipeId}")
-    @Operation(summary = "Delete recipe from selected of group",
-            description = "Delete recipe from selected of group")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete recipe from selected of group (only with ADMIN role)",
+            description = "Delete recipe from selected of group (only with ADMIN role)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Recipe was deleted from selected", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class))),

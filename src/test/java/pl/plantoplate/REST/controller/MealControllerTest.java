@@ -66,7 +66,7 @@ public class MealControllerTest {
     }
 
     @Test
-    @WithMockUser(value = USER_EMAIL)
+    @WithMockUser(value = USER_EMAIL,  roles = {"ADMIN"})
     void shouldPlanRecipe() throws Exception {
 
         //given

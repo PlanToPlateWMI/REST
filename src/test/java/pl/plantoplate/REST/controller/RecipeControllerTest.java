@@ -158,7 +158,7 @@ public class RecipeControllerTest {
     }
 
     @Test
-    @WithMockUser(value = USER_EMAIL)
+    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
     void shouldAddRecipeToSelected() throws Exception{
 
         //given
@@ -204,7 +204,7 @@ public class RecipeControllerTest {
 
 
     @Test
-    @WithMockUser(value = USER_EMAIL)
+    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
     void shouldDeleteRecipeFromSelected() throws Exception {
 
         //given

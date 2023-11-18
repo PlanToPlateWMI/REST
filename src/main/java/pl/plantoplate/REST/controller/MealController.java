@@ -36,8 +36,9 @@ public class MealController {
 
 
     @PostMapping
-    @Operation(summary = "Plan recipe to provided date, meal type, portions",
-            description = "Plan recipe to provided date, meal type, portions")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Plan recipe to provided date, meal type, portions (only with ADMIN role)",
+            description = "Plan recipe to provided date, meal type, portions (only with ADMIN role)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Recipe has been planned", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class))),
