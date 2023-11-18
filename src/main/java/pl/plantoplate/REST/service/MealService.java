@@ -105,7 +105,7 @@ public class MealService {
                 filter(m -> m.getDate().isEqual(localDate)).collect(Collectors.toList());
 
         return mealsPlannedProvidedDate.stream().map(m -> new MealOverviewResponse(m.getId(), m.getRecipe().getTitle(), m.getRecipe().getTime(),
-                m.getMealType())).collect(Collectors.toList());
+                m.getMealType(), m.getRecipe().getImage_source())).collect(Collectors.toList());
     }
 
     public MealProductQty findMealDetailById(long id, Group group) {

@@ -15,4 +15,5 @@ public class MealOverviewResponse {
     private String recipeTitle;
     private int time;
     private String mealType;
+    private String image;
 }
