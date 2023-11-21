@@ -166,6 +166,7 @@ public class MealServiceTest {
         long mealId = 1L;
         long ingredientId = 3L;
         float ingredientQtyInRecipe = 20;
+        int mealPortions = 10;
         String productName = "product";
         Category category = new Category();
         Group group = new Group(1L, "name", null, null, null, null);
@@ -178,6 +179,7 @@ public class MealServiceTest {
         meal.setGroup(group);
         meal.setRecipe(recipe);
         meal.setId(mealId);
+        meal.setPortions(mealPortions);
         when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
         MealIngredient mealIngredient = new MealIngredient();
         mealIngredient.setQty(ingredientQtyInRecipe);
@@ -191,6 +193,7 @@ public class MealServiceTest {
         Assertions.assertEquals(mealProductQty.getMeal().getId(), mealId);
         Assertions.assertEquals(mealProductQty.getMeal().getRecipe().getId(), recipeId);
         Assertions.assertEquals(mealProductQty.getIngredientQuantity().size(), 1);
+        Assertions.assertEquals(mealProductQty.getMeal().getPortions(), mealPortions);
         Assertions.assertEquals(mealProductQty.getIngredientQuantity().get(ingredient), ingredientQtyInRecipe);
     }
 

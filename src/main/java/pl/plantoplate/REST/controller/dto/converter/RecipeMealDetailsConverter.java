@@ -47,7 +47,7 @@ public class RecipeMealDetailsConverter {
         response.setImage(recipe.getImage_source());
         response.setTime(recipe.getTime());
         response.setLevel(recipe.getLevel().name());
-        response.setPortions(recipe.getPortions());
+        response.setPortions(mealProductQty.getMeal().getPortions());
         response.setSteps(Arrays.stream(recipe.getSteps().split("&")).collect(Collectors.toList()));
         response.setVege(recipe.isVege());
         response.setSource(recipe.getSource());
