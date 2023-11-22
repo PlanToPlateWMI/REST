@@ -13,12 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
-import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
-import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
-import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
-import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.controller.dto.response.MealDetailsResponse;
+import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
+import pl.plantoplate.REST.controller.utils.ControllerUtils;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.MealService;
 
@@ -75,15 +75,15 @@ public class MealController {
             description = "Get planned meal details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get planned meal details", content = @Content(
-                  schema = @Schema(implementation = CulinaryDetailsResponse.class))),
+                  schema = @Schema(implementation = MealDetailsResponse.class))),
             @ApiResponse(responseCode = "400", description = "Meal with provided id not in group", content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity<CulinaryDetailsResponse> getMealDetails(@PathVariable("mealId") long id){
+    public ResponseEntity<MealDetailsResponse> getMealDetails(@PathVariable("mealId") long id){
 
         Group group = utils.authorizeUserByEmail();
         MealProductQty mealDetailsIngredientQty = mealService.findMealDetailById(id, group);
 
-        return ResponseEntity.ok(RecipeMealDetailsConverter.convertMealsToCulinaryDetailsResponse(mealDetailsIngredientQty));
+        return ResponseEntity.ok(RecipeMealDetailsConverter.convertMealsToMealDetailsResponse(mealDetailsIngredientQty));
     }
 
     @DeleteMapping("/{mealId}")

@@ -4,6 +4,7 @@ import pl.plantoplate.REST.controller.dto.model.MealProductQty;
 import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
 import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
 import pl.plantoplate.REST.controller.dto.response.IngredientResponse;
+import pl.plantoplate.REST.controller.dto.response.MealDetailsResponse;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Recipe;
 
@@ -38,11 +39,12 @@ public class RecipeMealDetailsConverter {
         return response;
     }
 
-    public static CulinaryDetailsResponse convertMealsToCulinaryDetailsResponse(MealProductQty mealProductQty){
+    public static MealDetailsResponse convertMealsToMealDetailsResponse(MealProductQty mealProductQty){
 
-        CulinaryDetailsResponse response = new CulinaryDetailsResponse();
+        MealDetailsResponse response = new MealDetailsResponse();
         Recipe recipe = mealProductQty.getMeal().getRecipe();
         response.setId(mealProductQty.getMeal().getId());
+        response.setRecipeId(recipe.getId());
         response.setTitle(recipe.getTitle());
         response.setImage(recipe.getImage_source());
         response.setTime(recipe.getTime());
