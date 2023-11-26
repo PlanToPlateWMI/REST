@@ -40,9 +40,13 @@ jobs:
         reporter: java-junit
         fail-on-error: true
 
-    - name: Check code coverage
-      uses: codecov/codecov-action@v3
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./coverage/reports/
-        files: /home/runner/work/SIESTAstepper/SIESTAstepper/coverage.xml
+    - name: Install dependencies
+      run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+    - name: Run tests and collect coverage
+      run: mvn -B test
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4-beta
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
