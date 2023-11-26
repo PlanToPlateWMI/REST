@@ -40,13 +40,8 @@ jobs:
         reporter: java-junit
         fail-on-error: true
 
-    - name: Install dependencies
-      run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
-    - name: Run tests and collect coverage
-      run: mvn -B test
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4-beta
+    - name: Analyze with SonarCloud
+      run: ./mvnw -B verify sonar:sonar -Dsonar.projectKey=plantoplatewmi -Dsonar.organization=PlanToPlateWMI_REST -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
