@@ -40,6 +40,8 @@ jobs:
         reporter: java-junit
         fail-on-error: true
 
+    - name: Run tests and collect coverage
+          run: mvn -B test
     - name: Check code coverage
       uses: codecov/codecov-action@v3
       with:
