@@ -96,7 +96,7 @@ public class PantryControllertTest {
 
 
     @Test
-    @WithMockUser(value = "email@gmail.com")
+    @WithMockUser(value = "email@gmail.com", roles = {"ADMIN"})
     void shouldTransferProductsToPantry() throws Exception {
         String email = "email@gmail.com";
 

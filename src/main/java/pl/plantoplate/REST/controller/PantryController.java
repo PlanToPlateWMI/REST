@@ -80,11 +80,12 @@ public class PantryController {
      * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @PostMapping("/transfer")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary= "Changes state of ShopProducts from BOUGHT to PANTRY",
             description = "Change state of ShopProducts from BOUGHT to PANTRY of user's group by provided arrays of idis. Returns updated list of ShopProducts with PANTRY state.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products of pantry",  content = @Content(
-                    schema = @Schema(implementation =  Long.class))),
+                    array = @ArraySchema(schema = @Schema(implementation =  ShoppingProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Product not found, User try to move not his product or product wasn't bought",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<List<ShoppingProductResponse>> transferProductsFromShoppingListBoughtToPantry(@RequestBody long[] toPantryId){
