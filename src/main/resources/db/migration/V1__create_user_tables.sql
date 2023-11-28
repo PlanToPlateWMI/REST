@@ -7,7 +7,6 @@ create table app_user
     role varchar(255) check (role in ('ROLE_USER', 'ROLE_ADMIN')),
     group_id bigint,
     is_active bool,
-    fcm_token varchar(255) default 'token',
     primary key (id)
 );
 

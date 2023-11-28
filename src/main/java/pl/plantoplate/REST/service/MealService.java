@@ -24,15 +24,16 @@ import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
 import pl.plantoplate.REST.controller.dto.model.IngredientQtUnit;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
 import pl.plantoplate.REST.entity.auth.Group;
+import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.entity.meal.Meal;
 import pl.plantoplate.REST.entity.meal.MealIngredient;
 import pl.plantoplate.REST.entity.meal.MealIngredientId;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Recipe;
-import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NotValidGroup;
 import pl.plantoplate.REST.exception.WrongRequestData;
+import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.MealIngredientRepository;
 import pl.plantoplate.REST.repository.MealsRepository;
 import pl.plantoplate.REST.repository.RecipeIngredientRepository;
@@ -53,8 +54,10 @@ public class MealService {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final ProductService productService;
     private final MealIngredientRepository mealIngredientRepository;
+    private final PushNotificationService pushNotificationService;
+    private final UserService userService;
 
-    public void planMeal(PlanMealBasedOnRecipeRequest planMeal, Group group){
+    public void planMeal(PlanMealBasedOnRecipeRequest planMeal, Group group, String email){
 
         long recipeId = planMeal.getRecipeId();
 
@@ -108,6 +111,12 @@ public class MealService {
             mealIngredient.setMealIngredientId(new MealIngredientId(mealId, ingredientToPlanId));
             mealIngredientRepository.save(mealIngredient);
         }
+
+        List<String> tokens = userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
+        for(String token:tokens){
+            pushNotificationService.send(token, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString(), "MEAL");
+        }
+
 
     }
 

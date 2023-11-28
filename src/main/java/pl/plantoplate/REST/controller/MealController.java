@@ -26,6 +26,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
@@ -63,7 +64,7 @@ public class MealController {
     public ResponseEntity<SimpleResponse> planMealsBasedOnRecipe(@RequestBody @Valid PlanMealBasedOnRecipeRequest planMeal){
 
         Group userGroup = utils.authorizeUserByEmail();
-        mealService.planMeal(planMeal, userGroup);
+        mealService.planMeal(planMeal, userGroup, SecurityContextHolder.getContext().getAuthentication().getName());
 
         return new ResponseEntity<>(new SimpleResponse("Recipe [" + planMeal.getRecipeId() +"] was planned to " + planMeal.getMealType()), HttpStatus.CREATED);
     }

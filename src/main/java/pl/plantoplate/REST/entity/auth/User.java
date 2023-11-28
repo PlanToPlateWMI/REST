@@ -55,7 +55,7 @@ public class User {
     @Column(name = "is_active")
     private boolean isActive;
 
-    @Column(name = "fcm_token", columnDefinition = "token")
+    @Column(name = "fcm_token")
     private String fcmToken;
 
     public User(String username, String password, String email) {

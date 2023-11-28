@@ -253,7 +253,7 @@ public class UserService {
             User userFromGroup = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFound("User with email [ "  + request.getEmail() + " ] not found"));
             userFromGroup.setRole(Role.valueOf("ROLE_"  + request.getRole()));
             userRepository.save(userFromGroup);
-            pushNotificationService.send(user.getFcmToken(), "Your role was changed to " + request.getRole());
+            pushNotificationService.send(userFromGroup.getFcmToken(), "ROLE", "Your role was changed to " + request.getRole());
         }
 
         return group.getUsers();

@@ -83,7 +83,7 @@ public class MealControllerTest {
                 .andExpect(status().isCreated());
 
         //then
-        verify(mealService).planMeal(any(PlanMealBasedOnRecipeRequest.class), any(Group.class));
+        verify(mealService).planMeal(any(PlanMealBasedOnRecipeRequest.class), any(Group.class), any(String.class));
     }
 
     @ParameterizedTest

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PushNotificationService {
 
-    public void send(String targetToken, String title) {
+    public void send(String targetToken, String title, String topic) {
 
         Notification notification = Notification.builder()
                 .setTitle(title)
@@ -18,6 +18,7 @@ public class PushNotificationService {
         Message message = Message.builder()
                 .setNotification(notification)
                 .setToken(targetToken)
+                .setTopic(topic)
                 .build();
 
         try {
