@@ -26,10 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
-import pl.plantoplate.REST.dto.Request.AmountRequest;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
+import pl.plantoplate.REST.controller.dto.request.AmountRequest;
+import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.service.PantryService;
 
@@ -53,7 +53,7 @@ public class PantryController {
     /**
      * Returns ShopProducts {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
      * state of user's group
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @GetMapping()
     @Operation(summary="Get list of shopProducts with PANTRY state of user's group",
@@ -77,14 +77,15 @@ public class PantryController {
      * Changes state of ShopProducts {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}  provided by array of ids
      * with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} state of user's group to new state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
      * @param toPantryId arrays of idis of ShopProduct with state BOUGHT
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @PostMapping("/transfer")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary= "Changes state of ShopProducts from BOUGHT to PANTRY",
             description = "Change state of ShopProducts from BOUGHT to PANTRY of user's group by provided arrays of idis. Returns updated list of ShopProducts with PANTRY state.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of products of pantry",  content = @Content(
-                    schema = @Schema(implementation =  Long.class))),
+                    array = @ArraySchema(schema = @Schema(implementation =  ShoppingProductResponse.class)))),
             @ApiResponse(responseCode = "400", description = "Product not found, User try to move not his product or product wasn't bought",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<List<ShoppingProductResponse>> transferProductsFromShoppingListBoughtToPantry(@RequestBody long[] toPantryId){
@@ -100,7 +101,7 @@ public class PantryController {
      * Adds ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY} to user's group list
      * by provided {@link pl.plantoplate.REST.entity.product.Product} id and amount
      * @param productRequest DTO with product id and amount to add
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @PostMapping()
     @Operation(summary= "Adds ShopProduct with state PANTRY to list of user's group ShopProducts ",
@@ -128,7 +129,7 @@ public class PantryController {
      * Deletes ShopProduct {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#PANTRY}
      * from user's group by provided id
      * @param id id of ShopProduct with state PANTRY ro delete
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -156,7 +157,7 @@ public class PantryController {
      * of user's group list
      * @param amountRequest new amount
      * @param id id of ShopProduct to change
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
+     * @return ResponseEntity parametrized with List of {@link ShoppingProductResponse} with id, name, category, unit and amount of products with state PANTRY of user's group
      */
     @PatchMapping("/{id}")
     @Operation(summary="Changes amount of ShopProduct with state PANTRY of user's group",

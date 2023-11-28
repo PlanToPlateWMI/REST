@@ -29,10 +29,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.dto.Request.AddToGroupByInviteCodeRequest;
-import pl.plantoplate.REST.dto.Response.CodeResponse;
-import pl.plantoplate.REST.dto.Response.JwtResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.AddToGroupByInviteCodeRequest;
+import pl.plantoplate.REST.controller.dto.response.CodeResponse;
+import pl.plantoplate.REST.controller.dto.response.JwtResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.service.InviteCodeService;
@@ -62,7 +62,7 @@ public class InviteCodeController {
     /**
      * Users invite code - adds user with provided email to group by invite code. Delete invite code if it is valid. Activates added user account.
      * @param addToGroupByInviteCodeRequest DTO with email, password and invite code
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with generated JWT token and role
+     * @return ResponseEntity parametrized with {@link JwtResponse} with generated JWT token and role
      */
     @PostMapping()
     @Operation(summary="Join group by invite code",description = "Adds user to group by existing not expired invite code. " +
@@ -89,7 +89,7 @@ public class InviteCodeController {
      * Generates and saves invite code if user has role ADMIN. Expiration time of invite code is 30 minutes. Invite code is generate to group of user with
      * provided role as Request Param ?role= USER or ADMIN.
      * @param role ADMIN or USER
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated invite code.
+     * @return ResponseEntity parametrized with {@link CodeResponse} with generated invite code.
      */
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")

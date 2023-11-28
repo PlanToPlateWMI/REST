@@ -12,6 +12,7 @@ import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class ShoppingListServiceTest {
     private ProductService productService;
     private ShoppingListService shoppingListService;
     private UserService userService;
+    private RecipeIngredientRepository recipeIngredientRepository;
+    private RecipeService recipeService;
 
 
     @BeforeEach
@@ -35,7 +38,9 @@ public class ShoppingListServiceTest {
         shopProductRepository = mock(ShopProductRepository.class);
         productService = mock(ProductService.class);
         userService = mock(UserService.class);
-        shoppingListService = new ShoppingListService(shopProductRepository, productService, userService);
+        recipeIngredientRepository = mock(RecipeIngredientRepository.class);
+        recipeService = mock(RecipeService.class);
+        shoppingListService = new ShoppingListService(shopProductRepository, productService, userService, recipeIngredientRepository, recipeService);
     }
 
 
@@ -115,7 +120,7 @@ public class ShoppingListServiceTest {
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
-        verify(shopProductRepository).save(shopProductArgumentCaptor.capture());
+        verify(shopProductRepository).saveAndFlush(shopProductArgumentCaptor.capture());
         ShopProduct saved = shopProductArgumentCaptor.getValue();
 
         assertEquals(saved.getAmount(), oldAmount + addAmount);
@@ -150,7 +155,7 @@ public class ShoppingListServiceTest {
 
         //then
         ArgumentCaptor<ShopProduct> shopProductArgumentCaptor = ArgumentCaptor.forClass(ShopProduct.class);
-        verify(shopProductRepository).save(shopProductArgumentCaptor.capture());
+        verify(shopProductRepository).saveAndFlush(shopProductArgumentCaptor.capture());
         ShopProduct saved = shopProductArgumentCaptor.getValue();
         assertEquals(saved.getAmount(), addAmount);
         assertEquals(saved.getProductState(), ProductState.BUY);

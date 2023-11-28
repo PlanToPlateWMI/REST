@@ -7,11 +7,11 @@ ALTER TABLE recipe
         RESTART WITH 1;
 
 insert into recipe_category (title) values
-('napoje'),
-('zupy'),
-('desery'),
-('danie główne'),
-('przekąski');
+('Napoje'),
+('Zupy'),
+('Desery'),
+('Dania główne'),
+('Przekąski');
 
 
 insert into recipe (title, time, level, portions, steps, source, image_source, is_vege, category_id) values

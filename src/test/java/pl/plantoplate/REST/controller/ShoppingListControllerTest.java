@@ -11,28 +11,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
-import pl.plantoplate.REST.dto.Request.AmountRequest;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
+import pl.plantoplate.REST.controller.dto.request.AddRecipeToShoppingList;
+import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
+import pl.plantoplate.REST.controller.dto.request.AmountRequest;
+import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.shoppinglist.ProductState;
 import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
-import pl.plantoplate.REST.security.JwtUtils;
 import pl.plantoplate.REST.service.ShoppingListService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -148,6 +149,27 @@ public class ShoppingListControllerTest {
 
         //then
         verify(productService).addProductToShoppingList(productId, amount, email);
+    }
+
+    @Test
+    @WithMockUser(value = "email@gmail.com")
+    void shouldAddProductsToShoppingList() throws Exception {
+
+        //given
+        String email = "email@gmail.com";
+        Group group = new Group();
+        when(userService.findGroupOfUser(email)).thenReturn(group);
+        AddRecipeToShoppingList request = new AddRecipeToShoppingList();
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/shopping/recipe")
+                .content(mapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(productService).addProductsToShoppingList(any(), anyString());
     }
 
 

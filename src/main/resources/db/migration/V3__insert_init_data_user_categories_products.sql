@@ -1,9 +1,14 @@
 INSERT INTO user_group(name) VALUES ('admins');
+INSERT INTO user_group(name) VALUES ('google-admins');
 
 -- moderator
 INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
 ('plantoplatemobileapp@gmail.com', 'plantoplate', '$2a$10$SjxWexEjOJzrFR3CrQFaRehmWM1S6YzyALcSkTPDCbyFDNpypKfFK',
  'ROLE_ADMIN', 1, true);
+
+INSERT INTO app_user(email, username, password, role, group_id, is_active) VALUES
+('plantoplatetestapp@gmail.com', 'googletest', '$2a$10$r5R9PdjktlR2i1zPzFcvlO2skw6VQHeuPcRCSpsNUAOvLqO/PFqvC',
+ 'ROLE_ADMIN', 2, true);
 
 
 INSERT INTO category (category) VALUES
@@ -28,8 +33,8 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Jogurt', 2, 1, 'ML'),
 ('Kefir', 2, 1, 'L'),
 ('Maślanka', 2, 1, 'L'),
-('Śmietanka', 2, 1, 'GR'),
-('Śmietana', 2, 1, 'L'),
+('Śmietanka 36%', 2, 1, 'ML'),
+('Śmietana', 2, 1, 'ML'),
 ('Ser Gouda', 2, 1, 'GR'),
 ('Ser Mozzarella', 2, 1, 'GR'),
 ('Ser Cheddar', 2, 1, 'GR'),
@@ -112,7 +117,7 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Sól', 9, 1, 'KG'),
 ('Papryka ostra melona', 9, 1, 'GR'),
 ('Papryka słodka melona', 9, 1, 'GR'),
-('Cukier', 9, 1, 'KG'),
+('Cukier', 9, 1, 'GR'),
 
 
 ('Orzechy włoskie', 10, 1, 'GR'),
@@ -137,8 +142,10 @@ INSERT INTO product (name, category_id, group_created_id, unit) VALUES
 ('Piwo ciemne', 11, 1, 'L'),
 ('Piwo jasne', 11, 1, 'L'),
 
+('Jaja', 9, 1, 'SZT'),
 
-('Jaja', 13, 1, 'SZT');
+('Olej rzepakowy', 13, 1, 'ML'),
+('Mięta', 9, 1, 'GR');
 
 
 -- miód wielokwiatowy

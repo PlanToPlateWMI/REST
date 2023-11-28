@@ -50,12 +50,12 @@ public class MailSenderServiceImpl implements MailSenderService{
         if (emailType.equals(EmailType.registration)) {
              mailSubject = "Activate account in PlanToPlate mobile app";
              messageBody = String.format("To confirm your email address to continue registration use code :\n%d\n" +
-                     "------------------------------------------------\n" +
+                     "\n\n\n" +
                      "Żeby potwierdzić adres mailowy użyj poniższego kodu żeby kontynuować rejestrację :\n%d", mailParams.getCode(), mailParams.getCode());
         }else if(emailType.equals(EmailType.reset)){
             mailSubject = "Reset password to your account in PlanToPlate mobile app";
             messageBody = String.format("To confirm your email address to reset password use code :\n%d\n" +
-                    "------------------------------------------------\n" +
+                    "\n\n\n" +
                     "Żeby potwierdzić adres mailowy do resetowania hasła użyj poniższego kodu :\n%d", mailParams.getCode(), mailParams.getCode());
         }
         String emailTo = mailParams.getEmailTo();

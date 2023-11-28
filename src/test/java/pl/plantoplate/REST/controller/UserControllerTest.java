@@ -1,6 +1,5 @@
 package pl.plantoplate.REST.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,19 +16,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
-import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
-import pl.plantoplate.REST.dto.Request.PasswordRequest;
-import pl.plantoplate.REST.dto.Request.UsernameRequest;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
-import pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse;
+import pl.plantoplate.REST.controller.dto.request.EmailPasswordRequest;
+import pl.plantoplate.REST.controller.dto.request.EmailRoleRequest;
+import pl.plantoplate.REST.controller.dto.request.UsernameRequest;
+import pl.plantoplate.REST.controller.dto.response.UsernameRoleEmailResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.repository.UserRepository;
 import pl.plantoplate.REST.service.UserService;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 

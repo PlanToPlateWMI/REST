@@ -11,15 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import pl.plantoplate.REST.dto.Request.AddShopProductRequest;
-import pl.plantoplate.REST.dto.Request.AmountRequest;
-import pl.plantoplate.REST.dto.Response.ShoppingProductResponse;
+import pl.plantoplate.REST.controller.dto.request.AddShopProductRequest;
+import pl.plantoplate.REST.controller.dto.request.AmountRequest;
+import pl.plantoplate.REST.controller.dto.response.ShoppingProductResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
@@ -97,7 +96,7 @@ public class PantryControllertTest {
 
 
     @Test
-    @WithMockUser(value = "email@gmail.com")
+    @WithMockUser(value = "email@gmail.com", roles = {"ADMIN"})
     void shouldTransferProductsToPantry() throws Exception {
         String email = "email@gmail.com";
 

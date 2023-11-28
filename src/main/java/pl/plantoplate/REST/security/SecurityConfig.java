@@ -84,12 +84,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-       http.headers().frameOptions().disable().and()
+       http.cors().and().headers().frameOptions().disable().and()
                  .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers("/api/users/emails", "/api/auth/**", "/api/invite-codes", "/api/test/*", "/api/mail/*", "/api/recipes", "/api/recipe-categories").permitAll()
+               .regexMatchers("/api/recipes/(\\d+)").permitAll()
                         .and()
                 .authorizeRequests().anyRequest().authenticated();
 

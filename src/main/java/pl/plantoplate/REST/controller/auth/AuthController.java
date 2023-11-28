@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
-import pl.plantoplate.REST.dto.Request.SignupRequest;
-import pl.plantoplate.REST.dto.Response.CodeResponse;
-import pl.plantoplate.REST.dto.Response.JwtResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.EmailPasswordRequest;
+import pl.plantoplate.REST.controller.dto.request.SignupRequest;
+import pl.plantoplate.REST.controller.dto.response.CodeResponse;
+import pl.plantoplate.REST.controller.dto.response.JwtResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.mail.EmailType;
 import pl.plantoplate.REST.mail.MailParams;
 import pl.plantoplate.REST.mail.MailSenderService;
@@ -70,7 +70,7 @@ public class AuthController {
      * Create account by email, username and password.
      * If email isn't already taken - sends generated code to provided email
      * @param userSignupInfo DTO with username, email and password
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.CodeResponse} with generated code sent to provided email address
+     * @return ResponseEntity parametrized with {@link CodeResponse} with generated code sent to provided email address
      */
     @PostMapping("signup")
     @Operation(summary="Creates an account",description = "Creates new account by email, username and password. Sends code to confirm email address " +
@@ -107,7 +107,7 @@ public class AuthController {
     /**
      * Generate JWT token by provided email and password
      * @param emailPasswordRequest DTO with email and password
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with JWT token and role
+     * @return ResponseEntity parametrized with {@link JwtResponse} with JWT token and role
      */
     @PostMapping("signin")
     @Operation(summary="Sing in to existing account.",description = "Authenticates user by provided email and password. If credentials are " +
@@ -134,7 +134,7 @@ public class AuthController {
     /**
      * Create new group for user provided by email. Set role to {@link pl.plantoplate.REST.entity.auth.Role#ROLE_ADMIN}
      * @param emailPasswordRequest DTO with email and password
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with JWT token and role
+     * @return ResponseEntity parametrized with {@link JwtResponse} with JWT token and role
      */
     @PostMapping("/group")
     @Operation(summary="Create new group",description = "Created new group for user by provided email. Set user's role to ADMIN and activate user's account. (set isActivate to true)" +
@@ -154,7 +154,7 @@ public class AuthController {
     /**
      * Updates user's password
      * @param emailPasswordRequest DTO with email and password
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}
+     * @return ResponseEntity parametrized with {@link SimpleResponse}
      */
     @PostMapping("/password/reset")
     @Operation(summary="Reset password",description = "Updated user's password by provided email. Returns information that password was updated.")

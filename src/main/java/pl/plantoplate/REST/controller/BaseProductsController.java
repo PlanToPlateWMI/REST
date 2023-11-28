@@ -27,9 +27,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.BaseProductType;
-import pl.plantoplate.REST.dto.Request.BaseProductRequest;
-import pl.plantoplate.REST.dto.Response.ProductResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.request.BaseProductRequest;
+import pl.plantoplate.REST.controller.dto.response.ProductResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.exception.WrongRequestData;
@@ -66,7 +66,7 @@ public class BaseProductsController {
      * If type = group - return list of products of group (created by members of group)
      * Default value of request param is all
      * @param typeOfProduct type of products to return
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products (type of products depends on request param)
+     * @return ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products (type of products depends on request param)
      */
     @GetMapping
     @Operation(summary="Get list of products of group depends on request param ?type= ",
@@ -97,7 +97,7 @@ public class BaseProductsController {
     /**
      * User with role ADMIN adds new product for his group by provided product name, category and unit
      * @param baseProductRequest DTO with name, category and unit of product to add
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     * @return ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products of user's group
      */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -123,7 +123,7 @@ public class BaseProductsController {
      * User with role ADMIN changes product of his group by product id. User can change unit, category and name of products
      * @param id id of product to change
      * @param updateProductRequest DTO with name, category and unit to update
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     * @return ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products of user's group
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -150,7 +150,7 @@ public class BaseProductsController {
      * User with role ADMIN deletes product of his group by product id. Also deleted all Shopping Products {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
      * with deleted product parametr
      * @param id id of product to change
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of user's group
+     * @return ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products of user's group
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -175,11 +175,11 @@ public class BaseProductsController {
     }
 
     /**
-     * Returns ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of provided product type
+     * Returns ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products of provided product type
      * If group of user has id equals 1 then returns list of general prodcuts
      * @param usersGroup group of users from that product returns
      * @param productsType type of products to return
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.ProductResponse} with id, name, category and unit of products of provided product type
+     * @return ResponseEntity parametrized with List of {@link ProductResponse} with id, name, category and unit of products of provided product type
      */
     private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(Group usersGroup, BaseProductType productsType) {
 

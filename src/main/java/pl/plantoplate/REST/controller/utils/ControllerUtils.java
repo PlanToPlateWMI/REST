@@ -15,7 +15,7 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.controller.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,23 +23,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import pl.plantoplate.REST.dto.Response.JwtResponse;
+import pl.plantoplate.REST.controller.dto.response.JwtResponse;
+import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.security.JwtUtils;
 import pl.plantoplate.REST.security.UserDetailsImpl;
+import pl.plantoplate.REST.service.UserService;
 
 import java.util.Random;
 
 @Component
+@AllArgsConstructor
 public class ControllerUtils {
 
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
-
-    @Autowired
-    public ControllerUtils(JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
-        this.jwtUtils = jwtUtils;
-        this.authenticationManager = authenticationManager;
-    }
+    private final UserService userService;
 
 
     public ResponseEntity<JwtResponse> generateJwtToken(String email, String password) {
@@ -57,11 +55,16 @@ public class ControllerUtils {
                 role));
     }
 
-
     public static int generateCode(int start, int bound){
         Random r = new Random();
         int number = start + r.nextInt(bound);
         return number;
 
+    }
+
+    public Group authorizeUserByEmail(){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.findGroupOfUser(email);
     }
 }

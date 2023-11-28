@@ -28,13 +28,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.dto.Request.EmailPasswordRequest;
-import pl.plantoplate.REST.dto.Request.EmailRoleRequest;
-import pl.plantoplate.REST.dto.Request.PasswordRequest;
-import pl.plantoplate.REST.dto.Request.UsernameRequest;
-import pl.plantoplate.REST.dto.Response.JwtResponse;
-import pl.plantoplate.REST.dto.Response.SimpleResponse;
-import pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse;
+import pl.plantoplate.REST.controller.dto.request.EmailPasswordRequest;
+import pl.plantoplate.REST.controller.dto.request.EmailRoleRequest;
+import pl.plantoplate.REST.controller.dto.request.PasswordRequest;
+import pl.plantoplate.REST.controller.dto.request.UsernameRequest;
+import pl.plantoplate.REST.controller.dto.response.JwtResponse;
+import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
+import pl.plantoplate.REST.controller.dto.response.UsernameRoleEmailResponse;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.service.UserService;
@@ -64,7 +64,7 @@ public class UserController {
     /**
      * Checks is active user with provided email exists
      * @param email email to check
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}. If HTTP STATUS is CONFLICT - exists, OK  - not exists
+     * @return ResponseEntity parametrized with {@link SimpleResponse}. If HTTP STATUS is CONFLICT - exists, OK  - not exists
      */
     @GetMapping("/emails")
     @Operation(summary="Check if active user with provided email exists. Returns information if user with email exists.")
@@ -86,7 +86,7 @@ public class UserController {
     /**
      * Updates username of authenticated user
      * @param usernameRequest DTO with new username
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated user info
+     * @return ResponseEntity parametrized with {@link UsernameRoleEmailResponse} with updated user info
      */
     @PatchMapping("/username")
     @Operation(summary="Updates username." , description = "Updates username of authenticated user. Returns updated user information.")
@@ -106,7 +106,7 @@ public class UserController {
     /**
      * Updates password of authenticated user
      * @param passwordRequest DTO with new password
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated user info
+     * @return ResponseEntity parametrized with {@link UsernameRoleEmailResponse} with updated user info
      */
     @PatchMapping("/password")
     @Operation(summary="Updates password." , description = "Updates password of authenticated user. Returns updated user information.")
@@ -128,7 +128,7 @@ public class UserController {
     /**
      * Updates email of authenticated user if active user with provided email doesn't exist. Generates new JWT token.
      * @param emailPasswordRequest DTO with password and new email
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.JwtResponse} with generated JWT toke and role
+     * @return ResponseEntity parametrized with {@link JwtResponse} with generated JWT toke and role
      */
     @PatchMapping("/email")
     @Operation(summary="Updates email.", description = "Updates email of authenticated user. Returns updated user information.")
@@ -150,7 +150,7 @@ public class UserController {
     /**
      * Checks if provided as Request Param ?password matches password in DATABSE of authenticated user
      * @param password password to check if matches
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.SimpleResponse}. If HTTP STATUS is CONFLICT - doesn't match, OK  - matches
+     * @return ResponseEntity parametrized with {@link SimpleResponse}. If HTTP STATUS is CONFLICT - doesn't match, OK  - matches
      */
     @GetMapping("password/match")
     @Operation(summary="Check is provided password matches with password of authenticated user", description =
@@ -175,7 +175,7 @@ public class UserController {
 
     /**
      * Returns information of users of group of authenticated user.
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse}
+     * @return ResponseEntity parametrized with List of {@link UsernameRoleEmailResponse}
      */
     @GetMapping("infos")
     @Operation(summary="Returns information of users of group of authenticated user.")
@@ -194,7 +194,7 @@ public class UserController {
 
     /**
      * Returns information about authenticated user.
-     * @return ResponseEntity parametrized with {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse}
+     * @return ResponseEntity parametrized with {@link UsernameRoleEmailResponse}
      */
     @GetMapping()
     @Operation(summary="Returns information of authenticated user.")
@@ -213,8 +213,8 @@ public class UserController {
 
     /**
      * Changes roles of users in group of authenticated user with role ADMIN by email. Valid roles - ADMIN and USEr
-     * @param requests List of {@link pl.plantoplate.REST.dto.Request.UsernameRequest} with email and new roles of users.
-     * @return ResponseEntity parametrized with List of {@link pl.plantoplate.REST.dto.Response.UsernameRoleEmailResponse} with updated information of users in group
+     * @param requests List of {@link UsernameRequest} with email and new roles of users.
+     * @return ResponseEntity parametrized with List of {@link UsernameRoleEmailResponse} with updated information of users in group
      */
     @PatchMapping("roles")
     @PreAuthorize("hasRole('ADMIN')")
