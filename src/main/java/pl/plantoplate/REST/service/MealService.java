@@ -100,14 +100,11 @@ public class MealService {
 
         for(Long ingredientToPlanId: ingredientIdsList){
             IngredientQtUnit originalQtyUnit = ingredientIdToUnitQtyInOriginalRecipe.get(ingredientToPlanId);
-            float qtyPlanned = proportionIngredientQty * originalQtyUnit.getQty();
-            if(originalQtyUnit.getUnit().equals(Unit.SZT))
-                qtyPlanned = (int) Math.ceil(qtyPlanned);
 
             MealIngredient mealIngredient = new MealIngredient();
             mealIngredient.setMeal(meal);
             mealIngredient.setIngredient(productService.findById(ingredientToPlanId));
-            mealIngredient.setQty(qtyPlanned);
+            mealIngredient.setQty(CalculateIngredientsService.calculateIngredientsQty(proportionIngredientQty, originalQtyUnit));
             mealIngredient.setMealIngredientId(new MealIngredientId(mealId, ingredientToPlanId));
             mealIngredientRepository.save(mealIngredient);
         }
