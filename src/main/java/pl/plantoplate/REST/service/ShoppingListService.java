@@ -97,11 +97,8 @@ public class ShoppingListService {
 
         for(Long ingredientToPlanId: ingredientIdsList){
             IngredientQtUnit originalQtyUnit = ingredientIdToUnitQtyInOriginalRecipe.get(ingredientToPlanId);
-            float qtyPlanned = proportionIngredientQty * originalQtyUnit.getQty();
-            if(originalQtyUnit.getUnit().equals(Unit.SZT))
-                qtyPlanned = (int) Math.ceil(qtyPlanned);
 
-            shopProductList.add(addProductToShoppingListLogic(ingredientToPlanId, qtyPlanned, email));
+            shopProductList.add(addProductToShoppingListLogic(ingredientToPlanId, CalculateIngredientsService.calculateIngredientsQty(proportionIngredientQty, originalQtyUnit), email));
 
         }
         shopProductRepository.saveAllAndFlush(shopProductList);
