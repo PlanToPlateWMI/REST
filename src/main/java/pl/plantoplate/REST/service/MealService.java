@@ -113,9 +113,7 @@ public class MealService {
         }
 
         List<String> tokens = userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
-        for(String token:tokens){
-            pushNotificationService.send(token, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString(), "MEAL");
-        }
+        pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
 
 
     }
