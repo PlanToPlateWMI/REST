@@ -92,8 +92,9 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
+        String fcmToken = "token";
         when(userService.existsByEmailAndActiveTrue(email)).thenReturn(false);
-        SignupRequest user = new SignupRequest(email, password, username);
+        SignupRequest user = new SignupRequest(email, password, username, fcmToken);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")
@@ -128,8 +129,9 @@ public class AuthControllerTest {
         String email = "test@gmail.com";
         String username = "username";
         String password = "password";
+        String fcmToken = "token";
         when(userService.existsByEmailAndActiveTrue(email)).thenReturn(true);
-        SignupRequest user = new SignupRequest(email, password, username);
+        SignupRequest user = new SignupRequest(email, password, username, fcmToken);
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/signup")

@@ -11,6 +11,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.*;
+import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -25,12 +26,14 @@ public class UserServiceTest {
     private UserService userService;
     private PasswordEncoder passwordEncoder;
     private UserRepository userRepository;
+    private PushNotificationService pushNotificationService;
 
     @BeforeEach
     void setUp(){
         userRepository = mock(UserRepository.class);
+        pushNotificationService = mock(PushNotificationService.class);
         passwordEncoder = new BCryptPasswordEncoder();
-        userService = new UserService(userRepository, passwordEncoder);
+        userService = new UserService(userRepository, passwordEncoder, pushNotificationService);
     }
 
     @Test
@@ -122,17 +125,18 @@ public class UserServiceTest {
 
 
     @Test
-    void shouldRegisterUserWhenHeNotExists(){
+    void shouldRegisterUserWhenNotExists(){
 
         //given
         String email = "email";
         String password = "password";
         String login = "login";
+        String fcmToken = "fcmToken";
         when(userRepository.existsByEmail(email)).thenReturn(true);
         when(userRepository.findByEmail(email)).thenReturn(java.util.Optional.of(new User()));
 
         //when
-        userService.registerUser(email, password, login);
+        userService.registerUser(email, password, login, fcmToken);
 
 
         //then
@@ -153,10 +157,11 @@ public class UserServiceTest {
         String email = "email";
         String password = "password";
         String login = "login";
+        String fcmtoken = "token";
         when(userRepository.existsByEmail(email)).thenReturn(false);
 
         //when
-        userService.registerUser(email, password, login);
+        userService.registerUser(email, password, login, fcmtoken);
 
 
         //then
@@ -350,6 +355,7 @@ public class UserServiceTest {
 
     @Test
     void shouldUpdateUsersRoles(){
+        //given
         String userEmail = "test@gmail.com";
         String emailOfUserFromGroup = "test2@gmail.com";
         List<EmailRoleRequest> emailRoleRequestList = new ArrayList<>();
@@ -375,8 +381,10 @@ public class UserServiceTest {
         when(userRepository.findByEmail(userEmail)).thenReturn(java.util.Optional.of(user));
         when(userRepository.findByEmail(emailOfUserFromGroup)).thenReturn(java.util.Optional.of(user2));
 
+        //when
         List<User> returnedUsers = userService.updateRoles(userEmail, emailRoleRequestList);
 
+        //then
         assertTrue(returnedUsers.stream().anyMatch(e-> e.getEmail().equals(emailOfUserFromGroup) && e.getRole().equals(Role.ROLE_ADMIN)));
         verify(userRepository).save(user2);
     }

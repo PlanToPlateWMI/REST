@@ -24,6 +24,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
 import pl.plantoplate.REST.exception.*;
+import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.UserRepository;
 
 import java.util.List;
@@ -36,11 +37,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PushNotificationService pushNotificationService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PushNotificationService pushNotificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.pushNotificationService = pushNotificationService;
     }
 
 
@@ -115,7 +118,10 @@ public class UserService {
      * @param password user's password
      * @param username user's username
      */
-    public void registerUser(String email, String password, String username) {
+    public void registerUser(String email,
+                             String password,
+                             String username,
+                             String fcmToken) {
 
         if(userRepository.existsByEmail(email)){
             User user = userRepository.findByEmail(email).get();
@@ -123,6 +129,7 @@ public class UserService {
             user.setUsername(username);
             user.setRole(Role.ROLE_USER);
             user.setActive(false);
+            user.setFcmToken(fcmToken);
 
             userRepository.save(user);
             return;
@@ -134,6 +141,7 @@ public class UserService {
         user.setUsername(username);
         user.setRole(Role.ROLE_USER);
         user.setActive(false);
+        user.setFcmToken(fcmToken);
 
         userRepository.save(user);
 
@@ -245,6 +253,7 @@ public class UserService {
             User userFromGroup = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFound("User with email [ "  + request.getEmail() + " ] not found"));
             userFromGroup.setRole(Role.valueOf("ROLE_"  + request.getRole()));
             userRepository.save(userFromGroup);
+            pushNotificationService.send(userFromGroup.getFcmToken(), "Your role was changed to " + request.getRole());
         }
 
         return group.getUsers();

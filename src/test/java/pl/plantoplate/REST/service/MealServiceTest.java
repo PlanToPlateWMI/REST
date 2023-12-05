@@ -19,6 +19,7 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NotValidGroup;
 import pl.plantoplate.REST.exception.WrongRequestData;
+import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.MealIngredientRepository;
 import pl.plantoplate.REST.repository.MealsRepository;
 import pl.plantoplate.REST.repository.RecipeIngredientRepository;
@@ -40,6 +41,8 @@ public class MealServiceTest {
     private ProductService productService;
     private MealIngredientRepository mealIngredientRepository;
     private MealService mealService;
+    private UserService userService;
+    private PushNotificationService pushNotificationService;
 
     @BeforeEach
     void setUp(){
@@ -48,7 +51,9 @@ public class MealServiceTest {
         recipeIngredientRepository = mock(RecipeIngredientRepository.class);
         productService = mock(ProductService.class);
         mealIngredientRepository = mock(MealIngredientRepository.class);
-        mealService = new MealService(mealsRepository, recipeService,recipeIngredientRepository, productService, mealIngredientRepository);
+        userService = mock(UserService.class);
+        pushNotificationService = mock(PushNotificationService.class);
+        mealService = new MealService(mealsRepository, recipeService,recipeIngredientRepository, productService, mealIngredientRepository, pushNotificationService, userService);
     }
 
     @Test
@@ -61,7 +66,7 @@ public class MealServiceTest {
         when(recipeService.findById(recipeId)).thenThrow(EntityNotFound.class);
 
         //then when
-        assertThrows(EntityNotFound.class, () -> mealService.planMeal(request, group));
+        assertThrows(EntityNotFound.class, () -> mealService.planMeal(request, group, "email"));
 
     }
 
@@ -76,7 +81,7 @@ public class MealServiceTest {
         when(recipeService.findById(recipeId)).thenReturn(recipe);
 
         //then when
-        assertThrows(WrongRequestData.class, () -> mealService.planMeal(request, group));
+        assertThrows(WrongRequestData.class, () -> mealService.planMeal(request, group, "email"));
     }
 
     @Test
@@ -90,7 +95,7 @@ public class MealServiceTest {
         when(recipeService.findById(recipeId)).thenReturn(recipe);
 
         //then when
-        assertThrows(WrongRequestData.class, () -> mealService.planMeal(request, group));
+        assertThrows(WrongRequestData.class, () -> mealService.planMeal(request, group, "email"));
     }
 
     @Test

@@ -26,4 +26,5 @@ public class SignupRequest {
     private String email;
     private String password;
     private String username;
+    private String fcmToken;
 }
