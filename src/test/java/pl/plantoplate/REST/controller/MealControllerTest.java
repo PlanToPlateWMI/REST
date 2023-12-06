@@ -182,6 +182,27 @@ public class MealControllerTest {
 
     }
 
+    @Test
+    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+    void shouldPrepareMealById() throws Exception{
+
+        //given
+        long mealId = 1L;
+        Group group = new Group();
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+        Meal meal = new Meal();
+        meal.setGroup(group);
+        meal.setPrepared(false);
+        when(mealService.findMealById(mealId)).thenReturn(meal);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/meals/prepare/" + mealId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(mealService).prepareMeal(mealId, group);
+
+    }
 
     private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
         return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();

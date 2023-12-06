@@ -118,4 +118,21 @@ public class MealController {
 
         return ResponseEntity.ok(new SimpleResponse("Meal " + mealId + " of group [" + group.getId() + "] was successfully deleted"));
     }
+
+    @PutMapping("/prepare/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Prepare planned meal (only with ADMIN role)",
+            description = "Prepare planned meal (only with ADMIN role)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Meal prepared successfully", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Meal with provided id not in group/not found or was already preapred", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> prepareMeal(@PathVariable("id") long mealId){
+
+        Group group = utils.authorizeUserByEmail();
+        mealService.prepareMeal(mealId, group);
+
+        return ResponseEntity.ok(new SimpleResponse("Meal with id [" + mealId + "] was prepared"));
+    }
 }

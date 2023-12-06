@@ -124,7 +124,7 @@ public class MealService {
                 filter(m -> m.getDate().isEqual(localDate)).collect(Collectors.toList());
 
         return mealsPlannedProvidedDate.stream().map(m -> new MealOverviewResponse(m.getId(), m.getRecipe().getTitle(), m.getRecipe().getTime(),
-                m.getMealType(), m.getRecipe().getImage_source(), m.getRecipe().isVege())).collect(Collectors.toList());
+                m.getMealType(), m.getRecipe().getImage_source(), m.getRecipe().isVege(), m.isPrepared())).collect(Collectors.toList());
     }
 
     public MealProductQty findMealDetailById(long id, Group group) {
@@ -161,4 +161,19 @@ public class MealService {
         mealsRepository.delete(meal);
     }
 
+    public void prepareMeal(long mealId, Group group) {
+
+        Meal meal = findMealById(mealId);
+        long mealGroupId = meal.getGroup().getId();
+        if(mealGroupId != group.getId()){
+            throw new NotValidGroup("Meal with id [" + mealId +"] not found in lists of meals of user's group");
+        }
+
+        if(meal.isPrepared()){
+            throw new NotValidGroup("Meal with id [" + mealId + "] have been already prepared");
+        }
+
+        meal.setPrepared(true);
+        mealsRepository.save(meal);
+    }
 }

@@ -216,3 +216,5 @@ alter table meal_ingredient
 
 alter table meal_ingredient
     add constraint meal_ingredient_product_id_FK foreign key (ingredient_id) references product;
+
+ALTER TABLE meal ADD COLUMN is_prepared bool;

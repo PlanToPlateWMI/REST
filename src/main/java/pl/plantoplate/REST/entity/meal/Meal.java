@@ -38,6 +38,9 @@ public class Meal {
 
     private LocalDate date;
 
+    @Column(name = "is_prepared")
+    private boolean isPrepared;
+
     @OneToMany
     List<Product> ingredient = new ArrayList<>();
 

@@ -17,4 +17,5 @@ public class MealOverviewResponse {
     private String mealType;
     private String image;
     private boolean isVege;
+    private boolean isPrepared;
 }
