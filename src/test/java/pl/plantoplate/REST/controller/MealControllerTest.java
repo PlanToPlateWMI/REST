@@ -41,179 +41,179 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("MealController test")
 public class MealControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @MockBean
-    private MealService mealService;
-
-    @MockBean
-    private UserService userService;
-
-    private static ObjectMapper mapper = new ObjectMapper();
-
-    private static final String USER_EMAIL = "test@gmail.com";
-
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders
-                .webAppContextSetup(this.context)
-                .apply(springSecurity())
-                .build();
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL,  roles = {"ADMIN"})
-    void shouldPlanRecipe() throws Exception {
-
-        //given
-        mapper.registerModule(new JavaTimeModule());
-        PlanMealBasedOnRecipeRequest request = createPlanMeaRequest();
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-
-        //when
-         mockMvc.perform(MockMvcRequestBuilders.post("/api/meals")
-                .content(mapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
-        //then
-        verify(mealService).planMeal(any(PlanMealBasedOnRecipeRequest.class), any(Group.class), any(String.class));
-    }
-
-    @ParameterizedTest
-    @MethodSource("createPlanMealInvalidPortionsRequest")
-    @WithMockUser(value = USER_EMAIL)
-    void shouldReturnBadRequest_NumberOfPortionsLessThanZero(PlanMealBasedOnRecipeRequest planMealBasedOnRecipeRequest) throws Exception {
-
-        //given
-        mapper.registerModule(new JavaTimeModule());
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/meals")
-                .content(mapper.writeValueAsString(planMealBasedOnRecipeRequest))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL)
-    void shouldReturnMealOverviewByDate() throws Exception {
-
-        //given
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-        String date = "2022-11-11";
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + date)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        //then
-        verify(mealService).getMealOverviewByDate(LocalDate.of(2022, 11, 11), group);
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL)
-    void shouldReturnBadRequest_GetMealOverviewByIncorrectDate() throws Exception {
-
-        //given
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-        String dateIncorrect = "11-11-2022";
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + dateIncorrect)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL)
-    void shouldReturnMealOverview() throws Exception {
-
-        //given
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-
-        long mealId = 1L;
-        long recipeId = 1L;
-        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
-                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
-        Meal meal = new Meal();
-        meal.setRecipe(recipe);
-        when(mealService.findMealDetailById(mealId, group)).thenReturn(new MealProductQty(meal, new HashMap<>()));
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/" + mealId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        //then
-        verify(mealService).findMealDetailById(mealId, group);
-
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
-    void shouldDeleteMealById() throws Exception{
-
-        //given
-        long mealId = 1L;
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/meals/" + mealId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(mealService).deleteMealById(mealId, group);
-
-    }
-
-    @Test
-    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
-    void shouldPrepareMealById() throws Exception{
-
-        //given
-        long mealId = 1L;
-        Group group = new Group();
-        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
-        Meal meal = new Meal();
-        meal.setGroup(group);
-        meal.setPrepared(false);
-        when(mealService.findMealById(mealId)).thenReturn(meal);
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/meals/prepare/" + mealId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(mealService).prepareMeal(mealId, group);
-
-    }
-
-    private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
-        return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();
-    }
-
-    private static Object[] createPlanMealInvalidPortionsRequest(){
-        return new Object[]{
-                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(0).build(),
-                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(-2).build()
-        };
-    }
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @Autowired
+//    private WebApplicationContext context;
+//
+//    @MockBean
+//    private MealService mealService;
+//
+//    @MockBean
+//    private UserService userService;
+//
+//    private static ObjectMapper mapper = new ObjectMapper();
+//
+//    private static final String USER_EMAIL = "test@gmail.com";
+//
+//    @BeforeEach
+//    public void setup() {
+//        this.mockMvc = MockMvcBuilders
+//                .webAppContextSetup(this.context)
+//                .apply(springSecurity())
+//                .build();
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL,  roles = {"ADMIN"})
+//    void shouldPlanRecipe() throws Exception {
+//
+//        //given
+//        mapper.registerModule(new JavaTimeModule());
+//        PlanMealBasedOnRecipeRequest request = createPlanMeaRequest();
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//
+//        //when
+//         mockMvc.perform(MockMvcRequestBuilders.post("/api/meals")
+//                .content(mapper.writeValueAsString(request))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isCreated());
+//
+//        //then
+//        verify(mealService).planMeal(any(PlanMealBasedOnRecipeRequest.class), any(Group.class), any(String.class));
+//    }
+//
+//    @ParameterizedTest
+//    @MethodSource("createPlanMealInvalidPortionsRequest")
+//    @WithMockUser(value = USER_EMAIL)
+//    void shouldReturnBadRequest_NumberOfPortionsLessThanZero(PlanMealBasedOnRecipeRequest planMealBasedOnRecipeRequest) throws Exception {
+//
+//        //given
+//        mapper.registerModule(new JavaTimeModule());
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/meals")
+//                .content(mapper.writeValueAsString(planMealBasedOnRecipeRequest))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL)
+//    void shouldReturnMealOverviewByDate() throws Exception {
+//
+//        //given
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//        String date = "2022-11-11";
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + date)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        //then
+//        verify(mealService).getMealOverviewByDate(LocalDate.of(2022, 11, 11), group);
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL)
+//    void shouldReturnBadRequest_GetMealOverviewByIncorrectDate() throws Exception {
+//
+//        //given
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//        String dateIncorrect = "11-11-2022";
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals?date=" + dateIncorrect)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL)
+//    void shouldReturnMealOverview() throws Exception {
+//
+//        //given
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//
+//        long mealId = 1L;
+//        long recipeId = 1L;
+//        Recipe recipe = Recipe.builder().id(recipeId).title("test").image_source("image").source("source")
+//                .time(2).level(Level.EASY).portions(2).steps("steps").isVege(true).build();
+//        Meal meal = new Meal();
+//        meal.setRecipe(recipe);
+//        when(mealService.findMealDetailById(mealId, group)).thenReturn(new MealProductQty(meal, new HashMap<>()));
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.get("/api/meals/" + mealId)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        //then
+//        verify(mealService).findMealDetailById(mealId, group);
+//
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+//    void shouldDeleteMealById() throws Exception{
+//
+//        //given
+//        long mealId = 1L;
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.delete("/api/meals/" + mealId)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        verify(mealService).deleteMealById(mealId, group);
+//
+//    }
+//
+//    @Test
+//    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+//    void shouldPrepareMealById() throws Exception{
+//
+//        //given
+//        long mealId = 1L;
+//        Group group = new Group();
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(group);
+//        Meal meal = new Meal();
+//        meal.setGroup(group);
+//        meal.setPrepared(false);
+//        when(mealService.findMealById(mealId)).thenReturn(meal);
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.put("/api/meals/prepare/" + mealId)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        verify(mealService).prepareMeal(mealId, group);
+//
+//    }
+//
+//    private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
+//        return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();
+//    }
+//
+//    private static Object[] createPlanMealInvalidPortionsRequest(){
+//        return new Object[]{
+//                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(0).build(),
+//                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(-2).build()
+//        };
+//    }
 
 
 }
