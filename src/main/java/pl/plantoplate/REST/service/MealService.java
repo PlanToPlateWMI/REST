@@ -233,4 +233,12 @@ public class MealService {
             }
         }
     }
+
+    public List<Meal> getMealsByBeforePlannedDate(LocalDate localDate){
+        return mealsRepository.findAllByDateBefore(localDate);
+    }
+
+    public void deleteAll(List<Meal> meal){
+        mealsRepository.deleteAll(meal);
+    }
 }
