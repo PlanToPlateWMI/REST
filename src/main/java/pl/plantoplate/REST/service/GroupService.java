@@ -73,55 +73,6 @@ public class GroupService {
 
             groupRepository.save(group);
 
-            // create custom product for this new group
-            String categoryName = "Inne";
-            Category category = null;
-            try {
-                category = categoryService.findByName(categoryName);
-            } catch (EntityNotFound categoryNotFound) {
-                categoryNotFound.printStackTrace();
-            }
-
-            Product customProduct = new Product();
-            customProduct.setName("Miód wielokwiatowy");
-            customProduct.setCategory(category);
-            customProduct.setUnit(Unit.GR);
-            customProduct.setCreatedBy(group);
-
-            productService.save(customProduct);
-
-            // add 3 products to shopping list of this group
-            String productName1 = "Mleko";
-            String productName2 = "Boczek";
-            String productName3 = "Piwo jasne";
-            Product product1 = productService.findByName(productName1);
-            Product product2 = productService.findByName(productName2);
-            Product product3 = productService.findByName(productName3);
-
-            ShopProduct shopProduct = new ShopProduct();
-            shopProduct.setProduct(product1);
-            shopProduct.setGroup(group);
-            shopProduct.setAmount(2);
-            shopProduct.setProductState(ProductState.BUY);
-
-            shoppingListService.save(shopProduct);
-
-            ShopProduct shopProduct2 = new ShopProduct();
-            shopProduct2.setProduct(product2);
-            shopProduct2.setGroup(group);
-            shopProduct2.setAmount(3);
-            shopProduct2.setProductState(ProductState.BUY);
-
-            shoppingListService.save(shopProduct2);
-
-            ShopProduct shopProduct3 = new ShopProduct();
-            shopProduct3.setProduct(product3);
-            shopProduct3.setGroup(group);
-            shopProduct3.setAmount(10);
-            shopProduct3.setProductState(ProductState.BOUGHT);
-
-            shoppingListService.save(shopProduct3);
-
             log.info("User with email [" + email + "] created new group");
         }
 
