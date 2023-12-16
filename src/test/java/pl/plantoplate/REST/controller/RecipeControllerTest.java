@@ -74,7 +74,7 @@ public class RecipeControllerTest {
         //given
         int numberOfRecipes = 10;
         List<Recipe> allRecipes = returnSpecificNumberOfRecipes(numberOfRecipes);
-        when(recipeService.getAllRecipes(null, null)).thenReturn(allRecipes);
+        when(recipeService.getAllRecipes(null, null, "anonymousUser")).thenReturn(allRecipes);
 
         //when
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes"))
@@ -95,7 +95,7 @@ public class RecipeControllerTest {
         String categoryName = "Napoje";
         int numberOfRecipes = 10;
 
-        when(recipeService.getAllRecipes(categoryName, null)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
+        when(recipeService.getAllRecipes(categoryName, null, "anonymousUser")).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
         when(recipeCategoryService.findAll()).thenReturn(List.of(new RecipeCategory(categoryId, categoryName)));
 
@@ -103,6 +103,29 @@ public class RecipeControllerTest {
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes?category=" + categoryName))
                 .andExpect(status().isOk())
                 .andReturn();
+        //then
+        List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
+        });
+        assertEquals(recipes.size(), numberOfRecipes);
+    }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL)
+    void shouldReturnOwnedByGroupRecipes() throws Exception{
+
+        //given
+        int numberOfRecipes = 10;
+        long groupId = 1L;
+        Group groupOfUser = new Group();
+        groupOfUser.setId(groupId);
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+        when(recipeService.getOwnedByGroupRecipe(null,groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/api/recipes/owned"))
+                .andExpect(status().isOk())
+                .andReturn();
+
         //then
         List<RecipeOverviewResponse> recipes = mapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<RecipeOverviewResponse>>() {
         });
@@ -141,7 +164,7 @@ public class RecipeControllerTest {
         String categoryName = "category";
         int numberOfRecipes = 10;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, null, null);
+        Group groupOfUser = new Group(groupId, "test", null, null, null, null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
         when(recipeService.getSelectedByGroupRecipes(categoryName,groupOfUser)).thenReturn(returnSpecificNumberOfRecipes(numberOfRecipes));
         when(recipeCategoryService.findRecipeCategoryByName(categoryName)).thenReturn(new RecipeCategory(categoryId, categoryName));
@@ -164,7 +187,7 @@ public class RecipeControllerTest {
         //given
         long recipeId = 1L;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null);
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
 
         //when
@@ -210,7 +233,7 @@ public class RecipeControllerTest {
         //given
         long recipeId = 1L;
         long groupId = 1L;
-        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null);
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null, null);
         when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
 
         //when

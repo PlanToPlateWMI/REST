@@ -178,7 +178,7 @@ public class MealServiceTest {
         int mealPortions = 10;
         String productName = "product";
         Category category = new Category();
-        Group group = new Group(1L, "name", null, null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null, null);
         Unit productUnit = Unit.L;
         Product ingredient = new Product(productName, category, group, productUnit);
         ingredient.setId(ingredientId);
@@ -216,7 +216,7 @@ public class MealServiceTest {
         float ingredientQtyInRecipe = 20;
         String productName = "product";
         Category category = new Category();
-        Group group = new Group(1L, "name", null, null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null, null);
         Unit productUnit = Unit.L;
         Product ingredient = new Product(productName, category, group, productUnit);
         ingredient.setId(ingredientId);
@@ -247,7 +247,7 @@ public class MealServiceTest {
         Meal meal = new Meal();
         meal.setId(mealId);
         when(mealsRepository.findById(mealId)).thenReturn(Optional.empty());
-        Group group = new Group(1L, "name", null, null, null, null);
+        Group group = new Group(1L, "name", null, null, null, null, null);
 
         //then
          assertThrows(EntityNotFound.class, () -> mealService.deleteMealById(mealId, group));
@@ -262,10 +262,10 @@ public class MealServiceTest {
         long usersGroupId = 2L;
         Meal meal = new Meal();
         meal.setId(mealId);
-        Group group = new Group(mealGroupId, "name", null, null, null, null);
+        Group group = new Group(mealGroupId, "name", null, null, null, null, null);
         meal.setGroup(group);
         when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
-        Group usersGroup = new Group(usersGroupId, "name", null, null, null, null);
+        Group usersGroup = new Group(usersGroupId, "name", null, null, null, null, null);
 
         //then
         assertThrows(NotValidGroup.class, () -> mealService.deleteMealById(mealId, usersGroup));

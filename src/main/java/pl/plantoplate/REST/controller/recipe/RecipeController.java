@@ -37,7 +37,8 @@ public class RecipeController {
 
     @GetMapping()
     @Operation(summary = "Get list of recipes (optional sorting by category, level by request param)",
-            description = "Get list of recipes (optional sorting by category, level by request param)")
+            description = "Get list of recipes (optional sorting by category, level by request param). If user is authorized - returned" +
+                    "also recipes of user's group. ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of recipes", content = @Content(
                     array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
@@ -47,8 +48,9 @@ public class RecipeController {
             allowableValues = {"Napoje", "Zupy", "Desery", "Dania główne", "Przekąski"})) String categoryName, @RequestParam(name = "level", required = false) @Parameter(schema = @Schema(description = "level of recipe", type = "string",
             allowableValues = {"EASY", "MEDIUM", "HARD"})) String level) {
 
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         validator.validateRecipeSortValues(categoryName, level);
-        List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getAllRecipes(categoryName, level).stream()
+        List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getAllRecipes(categoryName, level, email).stream()
                 .map(RecipeOverviewResponse::new).collect(Collectors.toList());
 
         return new ResponseEntity<>(recipeOverviewRespons, HttpStatus.OK);
@@ -83,6 +85,25 @@ public class RecipeController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
         List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getSelectedByGroupRecipes(categoryName, group).stream()
+                .map(RecipeOverviewResponse::new).collect(Collectors.toList());
+
+        return new ResponseEntity<>(recipeOverviewRespons, HttpStatus.OK);
+    }
+
+    @GetMapping("/owned")
+    @Operation(summary = "Get list of owned by group recipes (optional sorting by category by request param)",
+            description = "Get list of owned by group recipes (optional sorting by category by request param)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of owned by group recipes", content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = RecipeOverviewResponse.class)))),
+            @ApiResponse(responseCode = "400", description = "Category not found", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<List<RecipeOverviewResponse>> getAllOwnedByGroupRecipes(
+            @RequestParam(name = "category", required = false) @Parameter(schema = @Schema(description = "category of recipe", type = "string", allowableValues = {"napoje", "zupy", "desery", "danie główne", "przystawki", "wege"})) String categoryName) {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = userService.findGroupOfUser(email);
+        List<RecipeOverviewResponse> recipeOverviewRespons = recipeService.getOwnedByGroupRecipe(categoryName, group).stream()
                 .map(RecipeOverviewResponse::new).collect(Collectors.toList());
 
         return new ResponseEntity<>(recipeOverviewRespons, HttpStatus.OK);

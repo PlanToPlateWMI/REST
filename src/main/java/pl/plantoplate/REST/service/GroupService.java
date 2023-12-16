@@ -22,11 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.auth.Role;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.entity.product.Category;
-import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.entity.shoppinglist.ProductState;
-import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
-import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
@@ -40,18 +35,11 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private final CategoryService categoryService;
-    private final ProductService productService;
-    private final ShoppingListService shoppingListService;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, CategoryService categoryService, ProductService productService, ShoppingListService shoppingListService) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
-
-        this.categoryService = categoryService;
-        this.productService = productService;
-        this.shoppingListService = shoppingListService;
     }
 
     /**

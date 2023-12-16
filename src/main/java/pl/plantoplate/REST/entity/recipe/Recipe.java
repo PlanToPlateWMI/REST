@@ -60,7 +60,8 @@ public class Recipe {
     private List<Group> groupsSelectedRecipe =  new ArrayList<>();
 
     @ManyToOne
-    private Group group;
+    @JoinColumn(name = "group_id")
+    private Group ownerGroup;
 
     @ManyToOne
     private RecipeCategory category;

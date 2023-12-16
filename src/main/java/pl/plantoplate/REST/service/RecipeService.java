@@ -18,9 +18,12 @@ import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -30,21 +33,60 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecipeCategoryService recipeCategoryService;
     private final RecipeIngredientRepository recipeIngredientRepository;
+    private final GroupService groupService;
+    private final UserService userService;
 
-    public List<Recipe> getAllRecipes(String categoryName, String level) {
+    /**
+     * Get Recipes by category, level (then user authorized - return also his recipes)
+     * @param categoryName
+     * @param level
+     * @param email
+     * @return
+     */
+    public List<Recipe> getAllRecipes(String categoryName, String level, String email) {
 
         log.info(String.format("get all %s recipes", categoryName));
+        Group adminGroup = groupService.findById(1L);
 
-        if (StringUtils.hasLength(categoryName) && StringUtils.hasLength(level))
-            return recipeRepository.findAllByCategoryTitleAndLevel(categoryName, Level.valueOf(level));
+        // than user not authorized
+        if(email.equals("anonymousUser")) {
 
-        if(StringUtils.hasLength(level))
-            return recipeRepository.findAllByLevel(Level.valueOf(level));
+            if (StringUtils.hasLength(categoryName) && StringUtils.hasLength(level))
+                return recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName, Level.valueOf(level), adminGroup);
 
-        if(StringUtils.hasLength(categoryName))
-            return recipeRepository.findAllByCategoryTitle(categoryName);
+            if (StringUtils.hasLength(level))
+                return recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), adminGroup);
 
-        return recipeRepository.findAll();
+            if (StringUtils.hasLength(categoryName))
+                return recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, adminGroup);
+
+            return recipeRepository.findAllByOwnerGroup(adminGroup);
+        }
+        else{
+
+            Group authorizedGroup = userService.findGroupOfUser(email);
+            if (StringUtils.hasLength(categoryName) && StringUtils.hasLength(level))
+                return Stream.of(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName, Level.valueOf(level), adminGroup),
+                        recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName, Level.valueOf(level), authorizedGroup))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+
+            if (StringUtils.hasLength(level))
+                return Stream.of(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level),adminGroup),
+                        recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), authorizedGroup))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+
+            if (StringUtils.hasLength(categoryName))
+                return Stream.of(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName,adminGroup),
+                        recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, authorizedGroup))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+
+            return Stream.of(recipeRepository.findAllByOwnerGroup(adminGroup), recipeRepository.findAllByOwnerGroup(authorizedGroup))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+        }
     }
 
     public List<Recipe> getSelectedByGroupRecipes(String categoryName, Group group) {
@@ -98,5 +140,15 @@ public class RecipeService {
         recipeRepository.deleteRecipeFromSelected(group.getId(), recipeId);
 
         log.info("Recipe [" + recipeId + "] was deleted from list of selected in group [" + group.getId() + "]");
+    }
+
+    public List<Recipe> getOwnedByGroupRecipe(String categoryName, Group group) {
+
+        log.info(String.format("get woned by group %d %s recipes", group.getId(), categoryName));
+
+        if (!StringUtils.hasLength(categoryName))
+            return recipeRepository.findAllByOwnerGroup(group);
+        RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
+        return recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, group);
     }
 }
