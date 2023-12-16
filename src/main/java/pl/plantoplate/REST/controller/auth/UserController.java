@@ -27,16 +27,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.plantoplate.REST.controller.dto.request.*;
 import pl.plantoplate.REST.controller.utils.ControllerUtils;
-import pl.plantoplate.REST.controller.dto.request.EmailPasswordRequest;
-import pl.plantoplate.REST.controller.dto.request.EmailRoleRequest;
-import pl.plantoplate.REST.controller.dto.request.PasswordRequest;
-import pl.plantoplate.REST.controller.dto.request.UsernameRequest;
 import pl.plantoplate.REST.controller.dto.response.JwtResponse;
 import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
 import pl.plantoplate.REST.controller.dto.response.UsernameRoleEmailResponse;
 import pl.plantoplate.REST.entity.auth.User;
-import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.service.UserService;
 
 import java.util.List;
@@ -99,6 +95,21 @@ public class UserController {
     public ResponseEntity<UsernameRoleEmailResponse> changeUsername(@RequestBody UsernameRequest usernameRequest){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User updatedUser = userService.updateUsername(email, usernameRequest.getUsername());
+        return new ResponseEntity<>(new UsernameRoleEmailResponse(updatedUser),
+                HttpStatus.OK);
+    }
+
+    @PatchMapping("/fcmtoken")
+    @Operation(summary="Updates fcm token." , description = "Updates fcm token of authenticated user. Returns updated user information.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "fcm token  changed successfully",  content = @Content(
+                    schema = @Schema(implementation = UsernameRoleEmailResponse.class))),
+            @ApiResponse(responseCode = "400", description = "User not found",  content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))
+    })
+    public ResponseEntity<UsernameRoleEmailResponse> changeFcmToken(@RequestBody FcmTokenRequest request){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User updatedUser = userService.updateFcmToken(email, request.getFcmToken());
         return new ResponseEntity<>(new UsernameRoleEmailResponse(updatedUser),
                 HttpStatus.OK);
     }

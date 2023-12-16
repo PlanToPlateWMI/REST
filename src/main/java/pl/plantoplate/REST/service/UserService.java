@@ -258,4 +258,10 @@ public class UserService {
 
         return group.getUsers();
     }
+
+    public User updateFcmToken(String email, String fcmToken) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFound("User with email [ "  + email + " ] not found"));
+        user.setFcmToken(fcmToken);
+        return userRepository.save(user);
+    }
 }
