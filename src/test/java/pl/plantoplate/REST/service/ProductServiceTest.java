@@ -16,6 +16,7 @@ import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.ProductRepository;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class ProductServiceTest {
     private CategoryService categoryService;
     private ProductService productService;
     private GroupRepository groupRepository;
+    private RecipeIngredientRepository recipeIngredientRepository;
 
 
     @BeforeEach
@@ -44,7 +46,8 @@ public class ProductServiceTest {
         shopProductRepository = mock(ShopProductRepository.class);
         categoryService = mock(CategoryService.class);
         groupRepository = mock(GroupRepository.class);
-        productService = new ProductService(productRepository, shopProductRepository, categoryService, groupRepository);
+        recipeIngredientRepository = mock(RecipeIngredientRepository.class);
+        productService = new ProductService(productRepository, shopProductRepository, categoryService, groupRepository, recipeIngredientRepository);
     }
 
 

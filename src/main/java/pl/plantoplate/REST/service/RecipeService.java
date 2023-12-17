@@ -6,22 +6,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.dto.request.CreateRecipeRequest;
+import pl.plantoplate.REST.controller.dto.request.IngredientQtyRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.product.Product;
-import pl.plantoplate.REST.entity.recipe.Level;
-import pl.plantoplate.REST.entity.recipe.Recipe;
-import pl.plantoplate.REST.entity.recipe.RecipeCategory;
-import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
+import pl.plantoplate.REST.entity.recipe.*;
 import pl.plantoplate.REST.exception.DeleteNotSelected;
 import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
+import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.RecipeRepository;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,6 +32,7 @@ public class RecipeService {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final GroupService groupService;
     private final UserService userService;
+    private final ProductService productService;
 
     /**
      * Get Recipes by category, level (then user authorized - return also his recipes)
@@ -99,13 +97,16 @@ public class RecipeService {
         return recipeRepository.findAllByGroupSelectedAndCategoryId(group.getId(), category.getId());
     }
 
-    public void addRecipeToSelectedByGroup(long recipeId, Group group) {
+    public void addRecipeToSelectedByGroup(long recipeId, Group group, String email) {
 
         Recipe recipe = findById(recipeId);
 
         if (recipe.getGroupsSelectedRecipe().stream().anyMatch(g -> g.getId().equals(group.getId())))
             throw new DuplicateObject("Recipe [" + recipeId + "] was already added to selected of group [" + group.getId() + "]");
 
+        if(this.getAllRecipes("", "",email ).stream().noneMatch(r -> r.getId() == (recipe.getId()))){
+            throw new WrongRequestData("Recipe " + recipeId + " not of this group");
+        }
         recipe.addGroupSelected(group);
         recipeRepository.save(recipe);
     }
@@ -148,7 +149,56 @@ public class RecipeService {
 
         if (!StringUtils.hasLength(categoryName))
             return recipeRepository.findAllByOwnerGroup(group);
-        RecipeCategory category = recipeCategoryService.findRecipeCategoryByName(categoryName);
+        recipeCategoryService.findRecipeCategoryByName(categoryName);
         return recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, group);
+    }
+
+    public RecipeProductQty createRecipe(CreateRecipeRequest request, Group group) {
+
+        Recipe recipe = new Recipe();
+        recipe.setTitle(request.getTitle());
+        recipe.setLevel( Level.valueOf(request.getLevel()));
+        recipe.setTime(request.getTime());
+        recipe.setSteps(request.getSteps());
+        recipe.setPortions(request.getPortions());
+        recipe.setVege(request.isVege());
+        recipe.setCategory(recipeCategoryService.findRecipeCategoryById(request.getCategory()));
+        recipe.setOwnerGroup(group);
+
+        recipeRepository.save(recipe);
+
+        long recipeId = recipe.getId();
+        Map<Product, Float> ingredientQuantity = new HashMap<>();
+
+        for(IngredientQtyRequest ingredientQtyRequest: request.getIngredients()){
+
+            Product product = productService.findById(ingredientQtyRequest.getId());
+            RecipeIngredientId id = new RecipeIngredientId();
+            id.setRecipeId(recipeId);
+            id.setIngredientId(product.getId());
+
+            RecipeIngredient ingredient = new RecipeIngredient();
+            ingredient.setId(id);
+            ingredient.setQty(ingredientQtyRequest.getQty());
+            ingredient.setIngredient(product);
+            ingredient.setRecipe(recipe);
+
+            ingredientQuantity.put(product, ingredientQtyRequest.getQty());
+            recipeIngredientRepository.save(ingredient);
+        }
+
+        return new RecipeProductQty(recipe, ingredientQuantity);
+
+    }
+
+    public void deleteRecipe(long recipeId, Group group) {
+
+        Recipe recipe = this.findById(recipeId);
+        long groupOwnedRecipe = recipe.getOwnerGroup().getId();
+        if(groupOwnedRecipe != group.getId())
+            throw new WrongRequestData("Recipe [" + recipeId +"] not owned by user's group");
+        List<RecipeIngredient> ingredients = recipeIngredientRepository.findAllByRecipe(recipe);
+        recipeIngredientRepository.deleteAll(ingredients);
+        recipeRepository.delete(recipe);
     }
 }

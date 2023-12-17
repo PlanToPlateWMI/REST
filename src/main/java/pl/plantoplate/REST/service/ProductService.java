@@ -15,6 +15,7 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
 import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.ProductRepository;
+import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 import pl.plantoplate.REST.repository.ShopProductRepository;
 
 import java.util.Arrays;
@@ -40,20 +42,14 @@ import java.util.stream.Stream;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ShopProductRepository shopProductService;
     private final CategoryService categoryService;
     private final GroupRepository groupRepository;
-
-
-    public ProductService(ProductRepository productRepository, ShopProductRepository shopProductService, CategoryService categoryService, GroupRepository groupRepository) {
-        this.productRepository = productRepository;
-        this.shopProductService = shopProductService;
-        this.categoryService = categoryService;
-        this.groupRepository = groupRepository;
-    }
+    private final RecipeIngredientRepository recipeIngredientRepository;
 
     public void save(Product product){
         productRepository.save(product);
@@ -79,8 +75,8 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Product findById(long productId) throws EntityNotFound {
-        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
-                + " not found."));
+        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [" + productId
+                + "] not found."));
     }
 
     /**
@@ -116,6 +112,7 @@ public class ProductService {
         }
 
 
+        recipeIngredientRepository.deleteFromRecipes(productId);
         shopProductService.deleteProductByGroupIdAndProductId(productId, groupId);
         productRepository.deleteById(productId);
 

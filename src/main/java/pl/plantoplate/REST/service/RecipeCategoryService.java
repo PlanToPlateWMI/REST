@@ -24,6 +24,12 @@ public class RecipeCategoryService {
     }
 
     @Transactional(readOnly = true)
+    public RecipeCategory findRecipeCategoryById(long categoryId){
+        return recipeCategoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFound("Category [ " + categoryId
+                + " ] not found."));
+    }
+
+    @Transactional(readOnly = true)
     public List<RecipeCategory> findAll(){
         return recipeCategoryRepository.findAll();
     }

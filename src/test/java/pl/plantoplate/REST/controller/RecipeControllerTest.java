@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.controller.dto.response.RecipeOverviewResponse;
 import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
+import pl.plantoplate.REST.controller.validator.RecipeValidator;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
@@ -55,6 +56,9 @@ public class RecipeControllerTest {
 
     @MockBean
     private RecipeCategoryService recipeCategoryService;
+
+    @MockBean
+    private RecipeValidator validator;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -197,7 +201,7 @@ public class RecipeControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(recipeService).addRecipeToSelectedByGroup(recipeId, groupOfUser);
+        verify(recipeService).addRecipeToSelectedByGroup(recipeId, groupOfUser, USER_EMAIL);
     }
 
     private List<Recipe> returnSpecificNumberOfRecipes(int number) {
@@ -246,4 +250,66 @@ public class RecipeControllerTest {
         verify(recipeService).deleteRecipeFromSelectedByGroup(recipeId, groupOfUser);
 
     }
+
+    @Test
+    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+    void shouldDeleteRecipe() throws Exception {
+
+        //given
+        long recipeId = 1L;
+        long groupId = 1L;
+        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null, null);
+        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/recipes/" + recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        //then
+        verify(recipeService).deleteRecipe(recipeId, groupOfUser);
+
+    }
+
+//    @Test
+//    @WithMockUser(value = USER_EMAIL, roles = {"ADMIN"})
+//    void shouldCreateRecipe() throws Exception {
+//
+//        //given
+//        long recipeId = 1L;
+//        long groupId = 1L;
+//        long categoryId = 1L;
+//        String title = "test";
+//        String level = "HARD";
+//        int time = 20;
+//        String steps = "steps";
+//        int portions = 10;
+//        Group groupOfUser = new Group(groupId, "test", null, null, List.of(), null, null);
+//        when(userService.findGroupOfUser(USER_EMAIL)).thenReturn(groupOfUser);
+//        CreateRecipeRequest request = new CreateRecipeRequest();
+//        request.setCategory(categoryId);
+//        request.setTitle(title);
+//        request.setLevel(level);
+//        request.setTime(time);
+//        request.setSteps(steps);
+//        request.setPortions(portions);
+//        request.setIngredients(List.of(new IngredientQtyRequest(1, 1)));
+//        Map<Product, Float> ingredientQuantity = new HashMap<>();
+//        Recipe recipe = Recipe.builder().id(recipeId).title(title).time(time).level(Level.HARD).portions(portions).steps(steps).build();
+//        when(recipeService.createRecipe(request, groupOfUser)).thenReturn(new RecipeProductQty(recipe, ingredientQuantity));
+//
+//
+//        //when
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/recipes")
+//                .content(mapper.writeValueAsString(request))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+//        //then
+//        verify(recipeService).createRecipe(request, groupOfUser);
+//
+//    }
+
 }

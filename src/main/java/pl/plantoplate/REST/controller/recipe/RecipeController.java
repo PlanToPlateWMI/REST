@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.plantoplate.REST.controller.dto.converter.RecipeMealDetailsConverter;
+import pl.plantoplate.REST.controller.dto.request.CreateRecipeRequest;
 import pl.plantoplate.REST.controller.dto.response.CulinaryDetailsResponse;
 import pl.plantoplate.REST.controller.dto.response.RecipeOverviewResponse;
 import pl.plantoplate.REST.controller.dto.response.SimpleResponse;
@@ -23,6 +24,7 @@ import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.service.RecipeService;
 import pl.plantoplate.REST.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,7 +126,7 @@ public class RecipeController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
 
-        recipeService.addRecipeToSelectedByGroup(recipeId, group);
+        recipeService.addRecipeToSelectedByGroup(recipeId, group, email);
 
         return new ResponseEntity<>(new SimpleResponse("Recipe was successfully added to selected"), HttpStatus.OK);
     }
@@ -147,6 +149,45 @@ public class RecipeController {
         recipeService.deleteRecipeFromSelectedByGroup(recipeId, group);
 
         return new ResponseEntity<>(new SimpleResponse("Recipe was successfully deleted from selected"), HttpStatus.OK);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create recipe (only with ADMIN role)",
+            description = "Create recipe (only with ADMIN role)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipe was created", content = @Content(
+                    schema = @Schema(implementation = CulinaryDetailsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Wrong request data", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<CulinaryDetailsResponse> createRecipe(@RequestBody @Valid CreateRecipeRequest request){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = userService.findGroupOfUser(email);
+        validator.validateCreateRecipe(request, group);
+
+        RecipeProductQty recipe = recipeService.createRecipe(request, group);
+
+        return ResponseEntity.ok(RecipeMealDetailsConverter.convertRecipeToCulinaryDetailsResponse(recipe));
+    }
+
+    @DeleteMapping("/{recipeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete recipe from added by user(only with ADMIN role)",
+            description = "Delete recipe from added by user(only with ADMIN role)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recipe was deleted", content = @Content(
+                    schema = @Schema(implementation = CulinaryDetailsResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Recipe not exists or recipe not from user's group", content = @Content(
+                    schema = @Schema(implementation = SimpleResponse.class)))})
+    public ResponseEntity<SimpleResponse> deleteRecipe(@PathVariable long recipeId){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Group group = userService.findGroupOfUser(email);
+
+        recipeService.deleteRecipe(recipeId, group);
+
+        return ResponseEntity.ok(new SimpleResponse("Recipe with id [" + recipeId +"] was deleted."));
     }
 
 }

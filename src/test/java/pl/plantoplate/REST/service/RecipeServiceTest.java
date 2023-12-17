@@ -35,6 +35,7 @@ public class RecipeServiceTest {
     private RecipeIngredientRepository recipeIngredientRepository;
     private GroupService groupService;
     private UserService userService;
+    private ProductService productService;
 
     @BeforeEach
     void init() {
@@ -43,7 +44,8 @@ public class RecipeServiceTest {
         recipeIngredientRepository = mock(RecipeIngredientRepository.class);
         groupService = mock(GroupService.class);
         userService = mock(UserService.class);
-        recipeService = new RecipeService(recipeRepository, recipeCategoryService, recipeIngredientRepository, groupService, userService);
+        productService = mock(ProductService.class);
+        recipeService = new RecipeService(recipeRepository, recipeCategoryService, recipeIngredientRepository, groupService, userService, productService);
     }
 
     @Test
@@ -62,14 +64,17 @@ public class RecipeServiceTest {
     void shouldAddRecipeToSelected() {
 
         //given
+        String email = "anonymousUser";
         long recipeId = 1L;
         Group group = new Group(1L, "name", null, null, null, null, null);
         List<Group> groupsSelectedRecipe = new ArrayList<>();
         Recipe recipe = Recipe.builder().id(recipeId).groupsSelectedRecipe(groupsSelectedRecipe).build();
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.ofNullable(recipe));
+        when(recipeRepository.findAllByOwnerGroup(group)).thenReturn(List.of(recipe));
+        when(groupService.findById(1L)).thenReturn(group);
 
         //when
-        recipeService.addRecipeToSelectedByGroup(recipeId, group);
+        recipeService.addRecipeToSelectedByGroup(recipeId, group, email);
 
         //then
         assertThat(recipe.getGroupsSelectedRecipe().size()).isEqualTo(1);
@@ -79,12 +84,13 @@ public class RecipeServiceTest {
     void shouldThrowException_RecipeNotFound_TryToAddToSelected() {
 
         //given
+        String email = "test";
         long recipeId = 1L;
         Group group = new Group(1L, "name", null, null, null, null,null);
         when(recipeRepository.findById(recipeId)).thenReturn(Optional.empty());
 
         //when then
-        EntityNotFound exception = assertThrows(EntityNotFound.class, () -> recipeService.addRecipeToSelectedByGroup(recipeId, group));
+        EntityNotFound exception = assertThrows(EntityNotFound.class, () -> recipeService.addRecipeToSelectedByGroup(recipeId, group, email));
         assertEquals(exception.getMessage(), "Recipe with id [" + recipeId + "] was not found.");
     }
 
@@ -93,6 +99,7 @@ public class RecipeServiceTest {
     void shouldThrowException_RecipeAlreadyAddedToSelected() {
 
         //given
+        String email = "test";
         long recipeId = 1L;
         Group group = new Group(1L, "name", null, null, null, null, null);
         List<Group> groupsSelectedRecipe = new ArrayList<>(List.of(group));
@@ -100,7 +107,7 @@ public class RecipeServiceTest {
         when(recipeRepository.findById(recipeId)).thenReturn(java.util.Optional.ofNullable(recipe));
 
         //when then
-        DuplicateObject exception = assertThrows(DuplicateObject.class, () -> recipeService.addRecipeToSelectedByGroup(recipeId, group));
+        DuplicateObject exception = assertThrows(DuplicateObject.class, () -> recipeService.addRecipeToSelectedByGroup(recipeId, group, email));
         assertEquals(exception.getMessage(), "Recipe [" + recipeId + "] was already added to selected of group [" + group.getId() + "]");
     }
 
