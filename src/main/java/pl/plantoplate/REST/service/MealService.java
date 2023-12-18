@@ -103,7 +103,15 @@ public class MealService {
             this.synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
         }
         List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
-        this.pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
+        this.pushNotificationService.sendAll(tokens, "Posiłek " + recipe.getTitle() + " został zaplanowany na " + convertMealType(MealType.valueOf(planMeal.getMealType())) + " " + planMeal.getDate().toString());
+    }
+
+    private String convertMealType(MealType mealType){
+        Map<MealType, String> convert = new HashMap<>();
+        convert.put(MealType.BREAKFAST, "śniadanie");
+        convert.put(MealType.DINNER, "kolację");
+        convert.put(MealType.LUNCH, "obiad");
+        return convert.get(mealType);
     }
 
     public void planMealV2(PlanMealBasedOnRecipeRequestV2 planMeal, Group group, String email) {
@@ -168,7 +176,7 @@ public class MealService {
             this.shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
         }
         List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
-        this.pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
+        this.pushNotificationService.sendAll(tokens, "Posiłek " + recipe.getTitle() + " został zaplanowany na " + convertMealType(MealType.valueOf(planMeal.getMealType())) + " " + planMeal.getDate().toString());
     }
 
     public List<MealOverviewResponse> getMealOverviewByDate(LocalDate localDate, Group userGroup) {
