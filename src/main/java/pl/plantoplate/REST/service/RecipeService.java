@@ -198,7 +198,12 @@ public class RecipeService {
         if(groupOwnedRecipe != group.getId())
             throw new WrongRequestData("Recipe [" + recipeId +"] not owned by user's group");
         List<RecipeIngredient> ingredients = recipeIngredientRepository.findAllByRecipe(recipe);
+        // delete recipe ingredients
         recipeIngredientRepository.deleteAll(ingredients);
+        // delete meals
+        recipeRepository.deleteMealIngredientsByRecipe(recipeId);
+        recipeRepository.deleteMealByRecipe(recipeId);
+        // delete from selected recipes
         recipeRepository.delete(recipe);
     }
 }

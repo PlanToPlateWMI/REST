@@ -27,10 +27,7 @@ import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
-import pl.plantoplate.REST.repository.GroupRepository;
-import pl.plantoplate.REST.repository.ProductRepository;
-import pl.plantoplate.REST.repository.RecipeIngredientRepository;
-import pl.plantoplate.REST.repository.ShopProductRepository;
+import pl.plantoplate.REST.repository.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +47,8 @@ public class ProductService {
     private final CategoryService categoryService;
     private final GroupRepository groupRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
+    private final MealIngredientRepository mealIngredientRepository;
+    private final SynchronizationRepository synchronizationRepository;
 
     public void save(Product product){
         productRepository.save(product);
@@ -113,6 +112,8 @@ public class ProductService {
 
 
         recipeIngredientRepository.deleteFromRecipes(productId);
+        mealIngredientRepository.deleteByIngredient(product);
+        synchronizationRepository.deleteByProduct(product);
         shopProductService.deleteProductByGroupIdAndProductId(productId, groupId);
         productRepository.deleteById(productId);
 

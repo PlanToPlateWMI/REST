@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
@@ -32,4 +33,14 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long>, JpaSpecif
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM group_recipe gr where gr.recipe_id =:recipeId and gr.group_id=:groupId")
     void deleteRecipeFromSelected(@Param("groupId")Long groupId, @Param("recipeId")long recipeId);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM meal where recipe_id =:recipeId")
+    void deleteMealByRecipe(@Param("recipeId")long recipeId);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM meal_ingredient m where m.meal_id in (select id from meal where recipe_id =:recipeId)")
+    void deleteMealIngredientsByRecipe(@Param("recipeId")long recipeId);
 }

@@ -241,4 +241,8 @@ public class MealService {
     public void deleteAll(List<Meal> meal){
         mealsRepository.deleteAll(meal);
     }
+
+    public void deleteByRecipe(Recipe recipe) {
+        mealsRepository.deleteByRecipe(recipe);
+    }
 }

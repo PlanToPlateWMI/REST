@@ -14,10 +14,7 @@ import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
-import pl.plantoplate.REST.repository.GroupRepository;
-import pl.plantoplate.REST.repository.ProductRepository;
-import pl.plantoplate.REST.repository.RecipeIngredientRepository;
-import pl.plantoplate.REST.repository.ShopProductRepository;
+import pl.plantoplate.REST.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +35,8 @@ public class ProductServiceTest {
     private ProductService productService;
     private GroupRepository groupRepository;
     private RecipeIngredientRepository recipeIngredientRepository;
+    private MealIngredientRepository mealIngredientRepository;
+    private SynchronizationRepository synchronizationRepository;
 
 
     @BeforeEach
@@ -47,7 +46,9 @@ public class ProductServiceTest {
         categoryService = mock(CategoryService.class);
         groupRepository = mock(GroupRepository.class);
         recipeIngredientRepository = mock(RecipeIngredientRepository.class);
-        productService = new ProductService(productRepository, shopProductRepository, categoryService, groupRepository, recipeIngredientRepository);
+        mealIngredientRepository = mock(MealIngredientRepository.class);
+        synchronizationRepository = mock(SynchronizationRepository.class);
+        productService = new ProductService(productRepository, shopProductRepository, categoryService, groupRepository, recipeIngredientRepository, mealIngredientRepository, synchronizationRepository);
     }
 
 
