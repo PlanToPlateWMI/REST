@@ -59,8 +59,4 @@ public class SynchronizationService {
     public Optional<Synchronization> getByProductAndGroup(Product product, Group group){
         return repository.getSynchronizationByGroupAndProduct(group, product);
     }
-
-    public void flush(){
-        repository.flush();
-    }
 }

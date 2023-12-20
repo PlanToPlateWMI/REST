@@ -193,7 +193,7 @@ public class RecipeService {
 
     public void deleteRecipe(long recipeId, Group group) {
 
-        Recipe recipe = this.findById(recipeId);
+        Recipe recipe = findById(recipeId);
         long groupOwnedRecipe = recipe.getOwnerGroup().getId();
         if(groupOwnedRecipe != group.getId())
             throw new WrongRequestData("Recipe [" + recipeId +"] not owned by user's group");

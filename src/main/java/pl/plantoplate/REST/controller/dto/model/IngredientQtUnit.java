@@ -9,9 +9,7 @@ import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import java.util.Objects;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class IngredientQtUnit {
 
     private float qty;

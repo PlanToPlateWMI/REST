@@ -63,12 +63,12 @@ public class MealService {
         addRecipeToShoppingList.setRecipeId(recipeId);
         addRecipeToShoppingList.setPortions(planMeal.getPortions());
         addRecipeToShoppingList.setIngredientsId(planMeal.getIngredients());
-        this.shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
+        shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
 
         if (planMeal.getDate() == null)
             return;
 
-        Recipe recipe = this.recipeService.findById(recipeId);
+        Recipe recipe = recipeService.findById(recipeId);
         if (planMeal.getDate().isBefore(LocalDate.now()))
             throw new WrongRequestData("Wrong date");
         try {
@@ -83,10 +83,10 @@ public class MealService {
         meal.setDate(planMeal.getDate());
         meal.setRecipe(recipe);
         meal.setGroup(group);
-        this.mealsRepository.save(meal);
+        mealsRepository.save(meal);
         long mealId = meal.getId();
 
-        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = this.recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
+        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
         List<Long> ingredientIdsList = planMeal.getIngredients();
         long portionsInOriginalRecipe = recipe.getPortions();
         long portionsPlanned = planMeal.getPortions();
@@ -99,8 +99,8 @@ public class MealService {
             float calculatedQty = CalculateIngredientsService.calculateIngredientsQty(proportionIngredientQty, originalQtyUnit);
             mealIngredient.setQty(calculatedQty);
             mealIngredient.setMealIngredientId(new MealIngredientId(mealId, ingredientToPlanId));
-            this.mealIngredientRepository.save(mealIngredient);
-            this.synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
+            mealIngredientRepository.save(mealIngredient);
+            synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
         }
         List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
         this.pushNotificationService.sendAll(tokens, "Posiłek " + recipe.getTitle() + " został zaplanowany na " + convertMealType(MealType.valueOf(planMeal.getMealType())) + " " + planMeal.getDate().toString());
@@ -222,22 +222,22 @@ public class MealService {
             throw new NotValidGroup("Meal with id [" + mealId + "] have been already prepared");
         meal.setPrepared(true);
         this.mealsRepository.save(meal);
-        for (MealIngredient mealIngredient : this.mealIngredientRepository.findAllByMeal(meal))
-            this.synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
-        List<MealIngredient> mealIngredients = this.mealIngredientRepository.findAllByMeal(meal);
+        List<MealIngredient> mealIngredients = mealIngredientRepository.findAllByMeal(meal);
+        for (MealIngredient mealIngredient : mealIngredients)
+            synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
         for (MealIngredient mealIngredient : mealIngredients) {
-            Optional<ShopProduct> pantryProduct = this.shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
+            Optional<ShopProduct> pantryProduct = shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
             float qtyPantry = 0.0F;
             float qtyMeal = mealIngredient.getQty();
             if (pantryProduct.isPresent()) {
                 qtyPantry = pantryProduct.get().getAmount();
                 ShopProduct shopProduct = pantryProduct.get();
                 if (qtyPantry <= qtyMeal) {
-                    this.shoppingListService.deleteProduct(shopProduct.getId(), email);
+                    shoppingListService.deleteProduct(shopProduct.getId(), email);
                     continue;
                 }
                 shopProduct.setAmount(qtyPantry - qtyMeal);
-                this.shoppingListService.save(shopProduct);
+                shoppingListService.save(shopProduct);
             }
         }
     }
@@ -250,7 +250,4 @@ public class MealService {
         mealsRepository.deleteAll(meal);
     }
 
-    public void deleteByRecipe(Recipe recipe) {
-        mealsRepository.deleteByRecipe(recipe);
-    }
 }

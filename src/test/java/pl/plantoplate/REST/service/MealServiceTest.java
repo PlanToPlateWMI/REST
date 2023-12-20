@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
 import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV1;
+import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV2;
 import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
 import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.entity.auth.Group;
@@ -15,10 +17,12 @@ import pl.plantoplate.REST.entity.product.Category;
 import pl.plantoplate.REST.entity.product.Product;
 import pl.plantoplate.REST.entity.recipe.Level;
 import pl.plantoplate.REST.entity.recipe.Recipe;
+import pl.plantoplate.REST.entity.recipe.RecipeIngredient;
+import pl.plantoplate.REST.entity.shoppinglist.ProductState;
+import pl.plantoplate.REST.entity.shoppinglist.ShopProduct;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NotValidGroup;
-import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.MealIngredientRepository;
 import pl.plantoplate.REST.repository.MealsRepository;
@@ -26,10 +30,10 @@ import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Meal Service Test")
@@ -269,6 +273,115 @@ public class MealServiceTest {
 
         //then
         assertThrows(NotValidGroup.class, () -> mealService.deleteMealById(mealId, usersGroup));
+    }
+
+
+    @Test
+    void shouldPrepareMealPantryLessThanInMeal(){
+
+        //given
+        long mealId = 1L;
+        long groupId = 1L;
+        float mealQty = 20;
+        float shopProductQty = 10;
+        long shoProductId = 1L;
+        long productId = 1L;
+        Group group = new Group();
+        group.setId(groupId);
+        String email = "email";
+        Product product = new Product();
+        product.setId(productId);
+        MealIngredient mealIngredient = new MealIngredient();
+        mealIngredient.setQty(mealQty);
+        mealIngredient.setIngredient(product);
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setId(shoProductId);
+        shopProduct.setAmount(shopProductQty);
+        shopProduct.setProduct(product);
+        Meal meal = Meal.builder().group(group).isPrepared(false).build();
+        when(mealsRepository.findById(mealId)).thenReturn(Optional.of(meal));
+        when(mealIngredientRepository.findAllByMeal(meal)).thenReturn(List.of(mealIngredient));
+        when(shoppingListService.getProducts(email, ProductState.PANTRY)).thenReturn(List.of(shopProduct));
+
+        //when
+        mealService.prepareMeal(mealId, group, email);
+
+        //then
+        assertTrue(meal.isPrepared());
+        verify(mealsRepository).save(meal);
+        verify(synchronizationService).deleteSynchronizationIngredient(group, mealIngredient);
+        verify(shoppingListService).deleteProduct(shoProductId, email);
+    }
+
+    @Test
+    void shouldPlanMealV1(){
+
+        //given
+        long recipeId = 1L;
+        int portions = 2;
+        long ingredientId = 1L;
+        Unit unit = Unit.KG;
+        float qtyInRecipe = 10;
+        Group group = new Group();
+        String email = "email";
+        List<Long> ingredients = List.of(ingredientId);
+        String mealType = MealType.LUNCH.name();
+        LocalDate date = LocalDate.now().plusDays(1);
+
+        PlanMealBasedOnRecipeRequestV1 recipeRequestV1 = new PlanMealBasedOnRecipeRequestV1(
+                recipeId, portions, ingredients, mealType, date);
+        Recipe recipe = new Recipe();
+        Product product = new Product();
+        product.setId(ingredientId);
+        product.setUnit(unit);
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setIngredient(product);
+        recipeIngredient.setQty(qtyInRecipe);
+
+        when(recipeService.findById(recipeId)).thenReturn(recipe);
+        when( recipeIngredientRepository.findAllByRecipe(recipe)).thenReturn(List.of(recipeIngredient));
+
+        //then
+        mealService.planMealV1(recipeRequestV1,group, email );
+
+        //when
+        verify(mealIngredientRepository).save(any());
+    }
+
+
+    @Test
+    void shouldPlanMealV2(){
+
+        //given
+        long recipeId = 1L;
+        int portions = 2;
+        long ingredientId = 1L;
+        Unit unit = Unit.KG;
+        float qtyInRecipe = 10;
+        Group group = new Group();
+        String email = "email";
+        List<Long> ingredients = List.of(ingredientId);
+        String mealType = MealType.LUNCH.name();
+        LocalDate date = LocalDate.now().plusDays(1);
+
+        PlanMealBasedOnRecipeRequestV2 recipeRequestV2 = new PlanMealBasedOnRecipeRequestV2(
+                recipeId, portions, mealType, date, ingredients, true, true);
+        Recipe recipe = new Recipe();
+        Product product = new Product();
+        product.setId(ingredientId);
+        product.setUnit(unit);
+        RecipeIngredient recipeIngredient = new RecipeIngredient();
+        recipeIngredient.setIngredient(product);
+        recipeIngredient.setQty(qtyInRecipe);
+
+        when(recipeService.findById(recipeId)).thenReturn(recipe);
+        when( recipeIngredientRepository.findAllByRecipe(recipe)).thenReturn(List.of(recipeIngredient));
+
+        //then
+        mealService.planMealV2(recipeRequestV2,group, email );
+
+        //when
+        verify(mealIngredientRepository).save(any());
     }
 
 
