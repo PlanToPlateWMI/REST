@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Service Layer of Product JPA Repository
+ * Service Layer of Product JPA Repository {@link pl.plantoplate.REST.repository.ProductRepository}
  */
 @Service
 @Slf4j

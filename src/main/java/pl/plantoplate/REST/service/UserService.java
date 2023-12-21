@@ -30,7 +30,7 @@ import pl.plantoplate.REST.repository.UserRepository;
 import java.util.List;
 
 /**
- * Service Layer of User JPA Repository
+ * Service Layer of User JPA Repository {@link pl.plantoplate.REST.repository.UserRepository}
  */
 @Service
 public class UserService {

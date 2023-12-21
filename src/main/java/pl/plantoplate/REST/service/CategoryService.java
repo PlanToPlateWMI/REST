@@ -23,7 +23,7 @@ import pl.plantoplate.REST.repository.CategoryRepository;
 import java.util.List;
 
 /**
- * Service Layer of Category JPA Repository
+ * Service Layer of Category JPA Repository {@link pl.plantoplate.REST.repository.CategoryRepository}
  */
 @Service
 public class CategoryService {

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Service Layer of ShopProduct JPA Repository
+ * Service Layer of ShopProduct JPA Repository {@link pl.plantoplate.REST.repository.ShopProductRepository}
  */
 @Service
 @Slf4j

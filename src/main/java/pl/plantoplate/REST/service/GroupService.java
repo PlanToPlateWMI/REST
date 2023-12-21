@@ -27,7 +27,7 @@ import pl.plantoplate.REST.repository.GroupRepository;
 import pl.plantoplate.REST.repository.UserRepository;
 
 /**
- * Service Layer of Group JPA Repository
+ * Service Layer of Group JPA Repository {@link pl.plantoplate.REST.repository.GroupRepository}
  */
 @Service
 @Slf4j
@@ -44,9 +44,6 @@ public class GroupService {
 
     /**
      * Creates new group and add user with {@link pl.plantoplate.REST.entity.auth.Role#ROLE_ADMIN} to this group.
-     * Add custom product - "miód wielokwiatowy", 2 product to {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY}
-     * list - "Mleko" and "Boczek", 1 product {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} list - "Piwo jasne"
-     * to created group
      * @param email email of user who wants to create new group
      */
     public void createGroupAndAddAdmin(String email) {
