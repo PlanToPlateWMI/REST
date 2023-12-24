@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("UserRepository Test")
 @Sql("/schema-test.sql")
-public class UserRepositoryTest {
+class UserRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

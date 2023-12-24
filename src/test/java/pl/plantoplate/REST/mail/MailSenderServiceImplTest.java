@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @DisplayName("Mail Sender Test")
-public class MailSenderServiceImplTest {
+class MailSenderServiceImplTest {
 
 
     private MailSenderServiceImpl mailSenderService;

@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 /**
  * REST controller with Endpoints connected Products {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct}
- * with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} and {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGT} states
+ * with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BUY} and {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} states
  */
 @RestController
 @RequestMapping("/api/shopping")

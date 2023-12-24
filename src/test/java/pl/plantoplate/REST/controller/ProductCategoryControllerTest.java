@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @DisplayName("ProductCategoryController test")
-public class ProductCategoryControllerTest {
+class ProductCategoryControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Recipe Service Test")
-public class RecipeServiceTest {
+class RecipeServiceTest {
 
     private RecipeRepository recipeRepository;
     private RecipeCategoryService recipeCategoryService;

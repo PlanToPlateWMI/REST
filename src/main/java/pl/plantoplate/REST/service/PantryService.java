@@ -60,7 +60,6 @@ public class PantryService {
      * If product not from user's group or doesn't have required state throws {@link pl.plantoplate.REST.exception.NoValidProductWithAmount}
      * @param email - email of user
      * @param productId - idis of products with {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT} state
-     * @exception {@link pl.plantoplate.REST.exception.NoValidProductWithAmount} -if product not from user's group or doesn't have state {@link pl.plantoplate.REST.entity.shoppinglist.ProductState#BOUGHT}
      * @return list of products in user's pantry
      */
     public List<ShopProduct> transferProductToPantry(String email, long[] productId ) {

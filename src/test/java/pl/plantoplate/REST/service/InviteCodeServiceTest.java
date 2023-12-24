@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Invite code Test")
-public class InviteCodeServiceTest {
+class InviteCodeServiceTest {
 
     private InviteCodeService inviteCodeService;
     private UserService userService;

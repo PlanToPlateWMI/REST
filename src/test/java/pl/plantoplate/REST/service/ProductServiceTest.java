@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Product Service Test")
-public class ProductServiceTest {
+class ProductServiceTest {
 
     private ProductRepository productRepository;
     private ShopProductRepository shopProductRepository;

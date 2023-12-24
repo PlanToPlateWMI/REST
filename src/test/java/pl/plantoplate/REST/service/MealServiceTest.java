@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
-import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV1;
 import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV2;
 import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
@@ -37,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Meal Service Test")
-public class MealServiceTest {
+class MealServiceTest {
 
     private MealsRepository mealsRepository;
     private RecipeService recipeService;
@@ -382,12 +381,6 @@ public class MealServiceTest {
 
         //when
         verify(mealIngredientRepository).save(any());
-    }
-
-
-
-    private PlanMealBasedOnRecipeRequest createPlanMeaRequest(String mealType, long recipeId, LocalDate date){
-        return PlanMealBasedOnRecipeRequest.builder().mealType(mealType).recipeId(recipeId).date(date).portions(2).ingredientsId(List.of()).build();
     }
 
 }

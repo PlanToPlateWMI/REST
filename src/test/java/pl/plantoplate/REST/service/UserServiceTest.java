@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("User Service Test")
-public class UserServiceTest {
+class UserServiceTest {
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
