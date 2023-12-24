@@ -10,7 +10,4 @@ public class DuplicateObject extends RuntimeException{
         super(message);
     }
 
-    public DuplicateObject(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

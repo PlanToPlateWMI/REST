@@ -1,0 +1,1 @@
+UPDATE recipe SET group_id = 1;

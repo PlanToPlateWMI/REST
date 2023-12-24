@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class MealDetailsResponse extends CulinaryDetailsResponse{
     private long recipeId;

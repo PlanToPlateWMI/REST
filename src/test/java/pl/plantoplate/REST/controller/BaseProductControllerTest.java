@@ -75,6 +75,7 @@ class BaseProductControllerTest {
 
         Product p = new Product();
         p.setUnit(Unit.L);
+        p.setName("test");
         Category category = new Category();
         category.setCategory("Inne");
         p.setCategory(category);
@@ -114,6 +115,7 @@ class BaseProductControllerTest {
 
         Product p = new Product();
         p.setUnit(Unit.L);
+        p.setName("test");
         Category category = new Category();
         category.setCategory("Inne");
         p.setCategory(category);

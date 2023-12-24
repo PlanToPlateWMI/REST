@@ -6,8 +6,6 @@ import pl.plantoplate.REST.entity.auth.User;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class UsernameRoleEmailResponse {
 
     private String username;

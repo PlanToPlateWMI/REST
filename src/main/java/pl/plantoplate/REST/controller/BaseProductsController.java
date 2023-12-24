@@ -37,6 +37,8 @@ import pl.plantoplate.REST.service.GroupService;
 import pl.plantoplate.REST.service.ProductService;
 import pl.plantoplate.REST.service.UserService;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -184,17 +186,20 @@ public class BaseProductsController {
     private ResponseEntity<List<ProductResponse>> generateListOfProductDtoDependsOnTypeOfProducts(Group usersGroup, BaseProductType productsType) {
 
         List<Product> productsOfGroup = productService.getProductsOfGroup(usersGroup);
+        List<Product> modifiedProductsOfGroup = new ArrayList<>(productsOfGroup);
+        modifiedProductsOfGroup.sort(Comparator.comparing(Product::getName));
 
         // if group == 1 it means that it is group of moderators and return always general products
         if(usersGroup.getId() == 1L){
-            return new ResponseEntity<>(productsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity<>(modifiedProductsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }
 
         if(productsType.equals(BaseProductType.all)){
             List<Product> generalProducts = productService.getProductsOfGroup(groupService.findById(1L));
+            Stream<Product> allProductsSorted = Stream.concat(generalProducts.stream(), productsOfGroup.stream()).sorted(Comparator.comparing(Product::getName));
 
-            return new ResponseEntity<>(Stream.concat(productsOfGroup.stream(), generalProducts.stream()).map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity<>(allProductsSorted.map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
         }
-        return new ResponseEntity<>(productsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
+        return new ResponseEntity<>(modifiedProductsOfGroup.stream().map(ProductResponse::new).collect(Collectors.toList()), HttpStatus.OK);
     }
 }

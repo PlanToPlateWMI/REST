@@ -33,7 +33,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
- * Service Layer of InviteCode JPA Repository
+ * Service Layer of InviteCode JPA Repository {@link pl.plantoplate.REST.repository.InviteCodeRepository}
  */
 @Service
 @Slf4j
