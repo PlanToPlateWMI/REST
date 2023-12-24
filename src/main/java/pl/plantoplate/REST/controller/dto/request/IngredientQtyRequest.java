@@ -14,4 +14,11 @@ public class IngredientQtyRequest {
     private long id;
     private float qty;
 
+    @Override
+    public String toString() {
+        return "IngredientQtyRequest{" +
+                "id=" + id +
+                ", qty=" + qty +
+                '}';
+    }
 }

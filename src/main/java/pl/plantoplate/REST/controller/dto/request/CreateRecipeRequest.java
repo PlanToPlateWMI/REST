@@ -28,4 +28,17 @@ public class CreateRecipeRequest {
     @NotNull(message = "Should pass ingredients of recipe")
     private List<IngredientQtyRequest> ingredients;
 
+    @Override
+    public String toString() {
+        return "CreateRecipeRequest{" +
+                "title='" + title + '\'' +
+                ", level='" + level + '\'' +
+                ", time=" + time +
+                ", steps='" + steps + '\'' +
+                ", portions=" + portions +
+                ", isVege=" + isVege +
+                ", category=" + category +
+                ", ingredients=" + ingredients +
+                '}';
+    }
 }

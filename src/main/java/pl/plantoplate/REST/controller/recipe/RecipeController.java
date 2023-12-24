@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/recipes")
 @RequiredArgsConstructor
+@Slf4j
 public class RecipeController {
 
     private final RecipeService recipeService;
@@ -180,6 +182,7 @@ public class RecipeController {
                     schema = @Schema(implementation = SimpleResponse.class)))})
     public ResponseEntity<CulinaryDetailsResponse> createRecipe(@RequestBody @Valid CreateRecipeRequest request){
 
+        log.info(String.valueOf(request));
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Group group = userService.findGroupOfUser(email);
         validator.validateCreateRecipe(request, group);
