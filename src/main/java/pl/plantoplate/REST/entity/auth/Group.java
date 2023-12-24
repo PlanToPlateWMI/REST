@@ -54,7 +54,10 @@ public class Group {
     private List<ShopProduct> shopProductList = new ArrayList<>();
 
     @ManyToMany(mappedBy = "groupsSelectedRecipe")
-    private List<Recipe> selectedRecipes  = new ArrayList<>();;
+    private List<Recipe> selectedRecipes  = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ownerGroup")
+    private List<Recipe> ownedRecipes  = new ArrayList<>();;
 
     @OneToMany(mappedBy = "group")
     private List<Meal> plannedMeals = new ArrayList<>();

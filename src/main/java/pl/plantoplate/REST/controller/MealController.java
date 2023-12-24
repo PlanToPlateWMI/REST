@@ -43,6 +43,9 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * REST controller with Endpoints connected Meals {@link pl.plantoplate.REST.entity.meal.Meal}
+ */
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/meals")

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service Layer of Pantry JPA Repository
+ * Service Layer of Pantry JPA Repository {@link pl.plantoplate.REST.repository.PantryRepository}
  */
 @Service
 @Slf4j

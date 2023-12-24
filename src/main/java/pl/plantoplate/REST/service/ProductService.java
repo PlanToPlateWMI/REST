@@ -15,6 +15,7 @@ governing permissions and limitations under the License.
 
 package pl.plantoplate.REST.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +27,7 @@ import pl.plantoplate.REST.exception.DuplicateObject;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.ModifyGeneralProduct;
 import pl.plantoplate.REST.exception.NoValidProductWithAmount;
-import pl.plantoplate.REST.repository.GroupRepository;
-import pl.plantoplate.REST.repository.ProductRepository;
-import pl.plantoplate.REST.repository.ShopProductRepository;
+import pl.plantoplate.REST.repository.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,24 +35,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Service Layer of Product JPA Repository
+ * Service Layer of Product JPA Repository {@link pl.plantoplate.REST.repository.ProductRepository}
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ShopProductRepository shopProductService;
     private final CategoryService categoryService;
     private final GroupRepository groupRepository;
-
-
-    public ProductService(ProductRepository productRepository, ShopProductRepository shopProductService, CategoryService categoryService, GroupRepository groupRepository) {
-        this.productRepository = productRepository;
-        this.shopProductService = shopProductService;
-        this.categoryService = categoryService;
-        this.groupRepository = groupRepository;
-    }
+    private final RecipeIngredientRepository recipeIngredientRepository;
+    private final MealIngredientRepository mealIngredientRepository;
+    private final SynchronizationRepository synchronizationRepository;
 
     public void save(Product product){
         productRepository.save(product);
@@ -79,8 +74,8 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Product findById(long productId) throws EntityNotFound {
-        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [ " + productId
-                + " not found."));
+        return productRepository.findById(productId).orElseThrow(() -> new EntityNotFound("Product [" + productId
+                + "] not found."));
     }
 
     /**
@@ -116,6 +111,9 @@ public class ProductService {
         }
 
 
+        recipeIngredientRepository.deleteFromRecipes(productId);
+        mealIngredientRepository.deleteByIngredient(product);
+        synchronizationRepository.deleteByProduct(product);
         shopProductService.deleteProductByGroupIdAndProductId(productId, groupId);
         productRepository.deleteById(productId);
 

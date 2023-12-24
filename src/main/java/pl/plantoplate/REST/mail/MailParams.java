@@ -20,10 +20,7 @@ import lombok.*;
  * Contains all required parametr to send email
  */
 @Getter
-@Setter
-@Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class MailParams {
     private Integer code;
     private String emailTo;

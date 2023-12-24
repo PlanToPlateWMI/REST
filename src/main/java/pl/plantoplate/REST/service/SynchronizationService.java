@@ -1,3 +1,19 @@
+/*
+Copyright 2023 the original author or authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You
+may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ */
+
+
 package pl.plantoplate.REST.service;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +36,12 @@ public class SynchronizationService {
         this.productService = productService;
     }
 
+    /**
+     * Save synchronization {@link pl.plantoplate.REST.entity.Synchronization}
+     * @param qty - qty of saved product
+     * @param group - user's group
+     * @param productId - product to save
+     */
     public void saveSynchronizationIngredient(float qty, Group group, long productId){
 
         Product product = productService.findById(productId);
@@ -39,6 +61,12 @@ public class SynchronizationService {
         }
     }
 
+    /**
+     * Delete or reduce amount of Synchronization {@link pl.plantoplate.REST.entity.Synchronization} by Product {@link pl.plantoplate.REST.entity.product.Product}
+     * and group {@link pl.plantoplate.REST.entity.auth.Group}
+     * @param group - user's group
+     * @param mealIngredient - product of meal to delete
+     */
     public void deleteSynchronizationIngredient(Group group, MealIngredient mealIngredient){
         Optional<Synchronization> synchronization = getByProductAndGroup(mealIngredient.getIngredient(), group);
         if(synchronization.isPresent()){
@@ -58,9 +86,5 @@ public class SynchronizationService {
 
     public Optional<Synchronization> getByProductAndGroup(Product product, Group group){
         return repository.getSynchronizationByGroupAndProduct(group, product);
-    }
-
-    public void flush(){
-        repository.flush();
     }
 }

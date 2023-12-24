@@ -1,3 +1,18 @@
+/*
+Copyright 2023 the original author or authors
+
+Licensed under the Apache License, Version 2.0 (the "License"); you
+may not use this file except in compliance with the License. You
+may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ */
+
 package pl.plantoplate.REST.service;
 
 import org.springframework.stereotype.Service;
@@ -31,6 +46,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service Layer of Meal JPA Repository {@link pl.plantoplate.REST.repository.MealsRepository}
+ */
 @Service
 public class MealService {
 
@@ -56,6 +74,14 @@ public class MealService {
         this.synchronizationService = synchronizationService;
     }
 
+    /**
+     * Save meal based on request {@link pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV1},
+     * add products to {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state BUY
+     * Send notification to firebase of user's group members
+     * @param planMeal
+     * @param group
+     * @param email
+     */
     public void planMealV1(PlanMealBasedOnRecipeRequestV1 planMeal, Group group, String email) {
 
         long recipeId = planMeal.getRecipeId();
@@ -63,12 +89,12 @@ public class MealService {
         addRecipeToShoppingList.setRecipeId(recipeId);
         addRecipeToShoppingList.setPortions(planMeal.getPortions());
         addRecipeToShoppingList.setIngredientsId(planMeal.getIngredients());
-        this.shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
+        shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
 
         if (planMeal.getDate() == null)
             return;
 
-        Recipe recipe = this.recipeService.findById(recipeId);
+        Recipe recipe = recipeService.findById(recipeId);
         if (planMeal.getDate().isBefore(LocalDate.now()))
             throw new WrongRequestData("Wrong date");
         try {
@@ -83,10 +109,10 @@ public class MealService {
         meal.setDate(planMeal.getDate());
         meal.setRecipe(recipe);
         meal.setGroup(group);
-        this.mealsRepository.save(meal);
+        mealsRepository.save(meal);
         long mealId = meal.getId();
 
-        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = this.recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
+        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
         List<Long> ingredientIdsList = planMeal.getIngredients();
         long portionsInOriginalRecipe = recipe.getPortions();
         long portionsPlanned = planMeal.getPortions();
@@ -99,13 +125,30 @@ public class MealService {
             float calculatedQty = CalculateIngredientsService.calculateIngredientsQty(proportionIngredientQty, originalQtyUnit);
             mealIngredient.setQty(calculatedQty);
             mealIngredient.setMealIngredientId(new MealIngredientId(mealId, ingredientToPlanId));
-            this.mealIngredientRepository.save(mealIngredient);
-            this.synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
+            mealIngredientRepository.save(mealIngredient);
+            synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
         }
         List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
-        this.pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
+        this.pushNotificationService.sendAll(tokens, "Posiłek " + recipe.getTitle() + " został zaplanowany na " + convertMealType(MealType.valueOf(planMeal.getMealType())) + " " + planMeal.getDate().toString());
     }
 
+    private String convertMealType(MealType mealType){
+        Map<MealType, String> convert = new HashMap<>();
+        convert.put(MealType.BREAKFAST, "śniadanie");
+        convert.put(MealType.DINNER, "kolację");
+        convert.put(MealType.LUNCH, "obiad");
+        return convert.get(mealType);
+    }
+
+    /**
+     * Save meal based on request {@link pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequestV2}, add products to
+     * {@link pl.plantoplate.REST.entity.shoppinglist.ShopProduct} with state BUY based on isProductsAdd of request model and add products
+     * to {@link pl.plantoplate.REST.entity.Synchronization} based on isSynchronize of request.
+     * Send notification to firebase of user's group members
+     * @param planMeal - request data of meal to plan
+     * @param group - user's group
+     * @param email - user's email
+     */
     public void planMealV2(PlanMealBasedOnRecipeRequestV2 planMeal, Group group, String email) {
 
         long recipeId = planMeal.getRecipeId();
@@ -168,15 +211,27 @@ public class MealService {
             this.shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
         }
         List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
-        this.pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
+        this.pushNotificationService.sendAll(tokens, "Posiłek " + recipe.getTitle() + " został zaplanowany na " + convertMealType(MealType.valueOf(planMeal.getMealType())) + " " + planMeal.getDate().toString());
     }
 
+    /**
+     * Get meals {@link pl.plantoplate.REST.entity.meal.Meal} of specific Date
+     * @param localDate - date of meal
+     * @param userGroup - user's group
+     * @return List of meal overview {@link pl.plantoplate.REST.controller.dto.response.MealOverviewResponse} by selected date and user's group
+     */
     public List<MealOverviewResponse> getMealOverviewByDate(LocalDate localDate, Group userGroup) {
         List<Meal> mealsPlannedProvidedDate = userGroup.getPlannedMeals().stream().filter(m -> m.getDate().isEqual(localDate)).collect(Collectors.toList());
         return mealsPlannedProvidedDate.stream().map(m -> new MealOverviewResponse(m.getId(), m.getRecipe().getTitle(), m.getRecipe().getTime(), m.getMealType(), m.getRecipe().getImage_source(), m.getRecipe().isVege(), m.isPrepared()))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get meal {@link pl.plantoplate.REST.entity.meal.Meal} details by meal id
+     * @param id - id of meal
+     * @param group - user's group
+     * @return model of meal details {@link pl.plantoplate.REST.controller.dto.model.MealProductQty}
+     */
     public MealProductQty findMealDetailById(long id, Group group) {
         Meal meal = findMealById(id);
         long mealGroupId = meal.getGroup().getId();
@@ -193,6 +248,12 @@ public class MealService {
         return this.mealsRepository.findById(mealId).orElseThrow(() -> new EntityNotFound("Meal with id [" + mealId + "] was not found."));
     }
 
+    /**
+     * Delete selected meal {@link pl.plantoplate.REST.entity.meal.Meal} and delete products {@link pl.plantoplate.REST.entity.product.Product} from synchronization
+     * {@link pl.plantoplate.REST.entity.Synchronization}. Checks if meal planned to user's group
+     * @param mealId - meal id to delete
+     * @param group - group od user
+     */
     @Transactional
     public void deleteMealById(long mealId, Group group) {
         Meal meal = findMealById(mealId);
@@ -205,6 +266,14 @@ public class MealService {
         this.mealsRepository.delete(meal);
     }
 
+    /**
+     * Set meal {@link pl.plantoplate.REST.entity.meal.Meal} as prepared, delete products {@link pl.plantoplate.REST.entity.product.Product} from synchronization
+     * {@link pl.plantoplate.REST.entity.Synchronization} and products {@link pl.plantoplate.REST.entity.product.Product} with state PANTRY {{@link pl.plantoplate.REST.entity.shoppinglist.ProductState}}
+     * depends on prepared recipe. Checks if meal exists and if it ha been already prepared
+     * @param mealId - meal to prepare
+     * @param group - group of user
+     * @param email - email of user
+     */
     public void prepareMeal(long mealId, Group group, String email) {
         Meal meal = findMealById(mealId);
         long mealGroupId = meal.getGroup().getId();
@@ -214,26 +283,31 @@ public class MealService {
             throw new NotValidGroup("Meal with id [" + mealId + "] have been already prepared");
         meal.setPrepared(true);
         this.mealsRepository.save(meal);
-        for (MealIngredient mealIngredient : this.mealIngredientRepository.findAllByMeal(meal))
-            this.synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
-        List<MealIngredient> mealIngredients = this.mealIngredientRepository.findAllByMeal(meal);
+        List<MealIngredient> mealIngredients = mealIngredientRepository.findAllByMeal(meal);
+        for (MealIngredient mealIngredient : mealIngredients)
+            synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
         for (MealIngredient mealIngredient : mealIngredients) {
-            Optional<ShopProduct> pantryProduct = this.shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
+            Optional<ShopProduct> pantryProduct = shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
             float qtyPantry = 0.0F;
             float qtyMeal = mealIngredient.getQty();
             if (pantryProduct.isPresent()) {
                 qtyPantry = pantryProduct.get().getAmount();
                 ShopProduct shopProduct = pantryProduct.get();
                 if (qtyPantry <= qtyMeal) {
-                    this.shoppingListService.deleteProduct(shopProduct.getId(), email);
+                    shoppingListService.deleteProduct(shopProduct.getId(), email);
                     continue;
                 }
                 shopProduct.setAmount(qtyPantry - qtyMeal);
-                this.shoppingListService.save(shopProduct);
+                shoppingListService.save(shopProduct);
             }
         }
     }
 
+    /**
+     * Find meals {@link pl.plantoplate.REST.entity.meal.Meal} planned before provided Date
+     * @param localDate - date before find meals
+     * @return Meals
+     */
     public List<Meal> getMealsByBeforePlannedDate(LocalDate localDate){
         return mealsRepository.findAllByDateBefore(localDate);
     }
@@ -241,4 +315,5 @@ public class MealService {
     public void deleteAll(List<Meal> meal){
         mealsRepository.deleteAll(meal);
     }
+
 }

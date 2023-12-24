@@ -3,6 +3,7 @@ package pl.plantoplate.REST.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pl.plantoplate.REST.entity.meal.Meal;
+import pl.plantoplate.REST.entity.recipe.Recipe;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,4 +12,6 @@ import java.util.List;
 public interface MealsRepository extends JpaRepository<Meal, Long> {
 
     List<Meal> findAllByDateBefore(LocalDate localDate);
+
+    void deleteByRecipe(Recipe recipe);
 }
