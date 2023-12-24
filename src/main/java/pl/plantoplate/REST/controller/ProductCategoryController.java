@@ -54,13 +54,12 @@ public class ProductCategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "list of categories",  content = @Content(
                     array = @ArraySchema ( schema = @Schema(implementation = String.class))))})
-    public ResponseEntity getAllCategories(){
+    public ResponseEntity<List<String>> getAllCategories(){
 
         List<Category> categoryList = categoryService.findAll();
         List<String> categoriesName = categoryList.stream().map(e -> e.getCategory()).collect(Collectors.toList());
 
         return ResponseEntity.ok(categoriesName);
     }
-
-
+    
 }

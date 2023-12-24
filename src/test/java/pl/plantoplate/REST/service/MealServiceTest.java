@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
-import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.controller.dto.response.MealOverviewResponse;
 import pl.plantoplate.REST.controller.utils.MealType;
 import pl.plantoplate.REST.entity.auth.Group;
@@ -18,7 +17,6 @@ import pl.plantoplate.REST.entity.recipe.Recipe;
 import pl.plantoplate.REST.entity.shoppinglist.Unit;
 import pl.plantoplate.REST.exception.EntityNotFound;
 import pl.plantoplate.REST.exception.NotValidGroup;
-import pl.plantoplate.REST.exception.WrongRequestData;
 import pl.plantoplate.REST.firebase.PushNotificationService;
 import pl.plantoplate.REST.repository.MealIngredientRepository;
 import pl.plantoplate.REST.repository.MealsRepository;
@@ -26,14 +24,13 @@ import pl.plantoplate.REST.repository.RecipeIngredientRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Meal Service Test")
-public class MealServiceTest {
+class MealServiceTest {
 
     private MealsRepository mealsRepository;
     private RecipeService recipeService;
@@ -269,12 +266,6 @@ public class MealServiceTest {
 
         //then
         assertThrows(NotValidGroup.class, () -> mealService.deleteMealById(mealId, usersGroup));
-    }
-
-
-
-    private PlanMealBasedOnRecipeRequest createPlanMeaRequest(String mealType, long recipeId, LocalDate date){
-        return PlanMealBasedOnRecipeRequest.builder().mealType(mealType).recipeId(recipeId).date(date).portions(2).ingredientsId(List.of()).build();
     }
 
 }

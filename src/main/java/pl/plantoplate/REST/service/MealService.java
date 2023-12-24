@@ -68,7 +68,7 @@ public class MealService {
         if (planMeal.getDate() == null)
             return;
 
-        Recipe recipe = this.recipeService.findById(recipeId);
+        Recipe recipe = recipeService.findById(recipeId);
         if (planMeal.getDate().isBefore(LocalDate.now()))
             throw new WrongRequestData("Wrong date");
         try {
@@ -86,7 +86,7 @@ public class MealService {
         this.mealsRepository.save(meal);
         long mealId = meal.getId();
 
-        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = this.recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
+        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
         List<Long> ingredientIdsList = planMeal.getIngredients();
         long portionsInOriginalRecipe = recipe.getPortions();
         long portionsPlanned = planMeal.getPortions();
@@ -126,7 +126,7 @@ public class MealService {
 
         this.mealsRepository.save(meal);
         long mealId = meal.getId();
-        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = this.recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> Long.valueOf(r.getIngredient().getId()), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
+        Map<Long, IngredientQtUnit> ingredientIdToUnitQtyInOriginalRecipe = recipeIngredientRepository.findAllByRecipe(recipe).stream().collect(Collectors.toMap(r -> r.getIngredient().getId(), r -> new IngredientQtUnit(r.getQty(), r.getIngredient().getUnit())));
         List<Long> ingredientIdsList = planMeal.getIngredients();
         long portionsInOriginalRecipe = recipe.getPortions();
         long portionsPlanned = planMeal.getPortions();
@@ -136,15 +136,15 @@ public class MealService {
             IngredientQtUnit originalQtyUnit = ingredientIdToUnitQtyInOriginalRecipe.get(ingredientToPlanId);
             MealIngredient mealIngredient = new MealIngredient();
             mealIngredient.setMeal(meal);
-            mealIngredient.setIngredient(this.productService.findById(ingredientToPlanId));
+            mealIngredient.setIngredient(productService.findById(ingredientToPlanId));
             float calculatedQty = CalculateIngredientsService.calculateIngredientsQty(proportionIngredientQty, originalQtyUnit);
             mealIngredient.setQty(calculatedQty);
             mealIngredient.setMealIngredientId(new MealIngredientId(mealId, ingredientToPlanId));
             this.mealIngredientRepository.save(mealIngredient);
             if (planMeal.isProductsAdd() && planMeal.isSynchronize()) {
                 float qtyOfPlannedMeal = calculatedQty;
-                Optional<ShopProduct> pantryProduct = this.shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == ingredientToPlanId)).findFirst();
-                Optional<Synchronization> synchronization = this.synchronizationService.getByProductAndGroup(this.productService.findById(ingredientToPlanId), group);
+                Optional<ShopProduct> pantryProduct = shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == ingredientToPlanId)).findFirst();
+                Optional<Synchronization> synchronization = synchronizationService.getByProductAndGroup(productService.findById(ingredientToPlanId), group);
                 float qtyPantry = 0.0F;
                 float qtySynchronization = 0.0F;
                 if (pantryProduct.isPresent())
@@ -153,9 +153,9 @@ public class MealService {
                     qtySynchronization = synchronization.get().getQty();
                 if (qtyPantry < qtyOfPlannedMeal + qtySynchronization)
                     if (qtyOfPlannedMeal + qtySynchronization - qtyPantry > qtyOfPlannedMeal) {
-                        this.shoppingListService.addProductToShoppingList(ingredientToPlanId, qtyOfPlannedMeal, email);
+                        shoppingListService.addProductToShoppingList(ingredientToPlanId, qtyOfPlannedMeal, email);
                     } else {
-                        this.shoppingListService.addProductToShoppingList(ingredientToPlanId, qtyOfPlannedMeal + qtySynchronization - qtyPantry, email);
+                        shoppingListService.addProductToShoppingList(ingredientToPlanId, qtyOfPlannedMeal + qtySynchronization - qtyPantry, email);
                     }
             }
             this.synchronizationService.saveSynchronizationIngredient(calculatedQty, group, ingredientToPlanId);
@@ -165,9 +165,9 @@ public class MealService {
             addRecipeToShoppingList.setRecipeId(recipeId);
             addRecipeToShoppingList.setPortions(planMeal.getPortions());
             addRecipeToShoppingList.setIngredientsId(planMeal.getIngredients());
-            this.shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
+            shoppingListService.addProductsToShoppingList(addRecipeToShoppingList, email);
         }
-        List<String> tokens = this.userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
+        List<String> tokens = userService.getUserOfTheSameGroup(email).stream().map(User::getFcmToken).collect(Collectors.toList());
         this.pushNotificationService.sendAll(tokens, "Meal " + recipe.getTitle() + " was planned to " + planMeal.getMealType() + " " + planMeal.getDate().toString());
     }
 
@@ -183,7 +183,7 @@ public class MealService {
         if (mealGroupId != group.getId())
             throw new NotValidGroup("Meal with id [" + id + "] not found in lists of meals of user's group");
         Map<Product, Float> ingredientQuantity = new HashMap<>();
-        List<MealIngredient> mealIngredients = this.mealIngredientRepository.findAllByMeal(meal);
+        List<MealIngredient> mealIngredients = mealIngredientRepository.findAllByMeal(meal);
         for (MealIngredient mealIngredient : mealIngredients)
             ingredientQuantity.put(mealIngredient.getIngredient(), mealIngredient.getQty());
         return new MealProductQty(meal, ingredientQuantity);
@@ -198,11 +198,11 @@ public class MealService {
         Meal meal = findMealById(mealId);
         if (!meal.getGroup().getId().equals(group.getId()))
             throw new NotValidGroup("Meal with id [" + mealId + "] not found in lists of meals of user's group");
-        for (MealIngredient mealIngredient : this.mealIngredientRepository.findAllByMeal(meal))
+        for (MealIngredient mealIngredient : mealIngredientRepository.findAllByMeal(meal))
             this.synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
-        this.mealIngredientRepository.deleteByMeal(meal);
-        this.mealIngredientRepository.flush();
-        this.mealsRepository.delete(meal);
+        mealIngredientRepository.deleteByMeal(meal);
+        mealIngredientRepository.flush();
+        mealsRepository.delete(meal);
     }
 
     public void prepareMeal(long mealId, Group group, String email) {
@@ -213,23 +213,23 @@ public class MealService {
         if (meal.isPrepared())
             throw new NotValidGroup("Meal with id [" + mealId + "] have been already prepared");
         meal.setPrepared(true);
-        this.mealsRepository.save(meal);
-        for (MealIngredient mealIngredient : this.mealIngredientRepository.findAllByMeal(meal))
+        mealsRepository.save(meal);
+        for (MealIngredient mealIngredient : mealIngredientRepository.findAllByMeal(meal))
             this.synchronizationService.deleteSynchronizationIngredient(group, mealIngredient);
-        List<MealIngredient> mealIngredients = this.mealIngredientRepository.findAllByMeal(meal);
+        List<MealIngredient> mealIngredients = mealIngredientRepository.findAllByMeal(meal);
         for (MealIngredient mealIngredient : mealIngredients) {
-            Optional<ShopProduct> pantryProduct = this.shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
+            Optional<ShopProduct> pantryProduct = shoppingListService.getProducts(email, ProductState.PANTRY).stream().filter(p -> (p.getProduct().getId() == mealIngredient.getIngredient().getId())).findFirst();
             float qtyPantry = 0.0F;
             float qtyMeal = mealIngredient.getQty();
             if (pantryProduct.isPresent()) {
                 qtyPantry = pantryProduct.get().getAmount();
                 ShopProduct shopProduct = pantryProduct.get();
                 if (qtyPantry <= qtyMeal) {
-                    this.shoppingListService.deleteProduct(shopProduct.getId(), email);
+                    shoppingListService.deleteProduct(shopProduct.getId(), email);
                     continue;
                 }
                 shopProduct.setAmount(qtyPantry - qtyMeal);
-                this.shoppingListService.save(shopProduct);
+                shoppingListService.save(shopProduct);
             }
         }
     }

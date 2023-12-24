@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @DisplayName("ShoppingListController test")
-public class ShoppingListControllerTest {
+class ShoppingListControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

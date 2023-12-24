@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("InviteCodeRepository Test")
 @Sql("/schema-test.sql")
-public class InviteCodeRepositoryTest {
+class InviteCodeRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

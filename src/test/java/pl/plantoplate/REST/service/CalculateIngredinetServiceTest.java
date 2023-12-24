@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CalculateIngredinetServiceTest {
+class CalculateIngredinetServiceTest {
 
     @ParameterizedTest
     @MethodSource("methodSource_L_KG")

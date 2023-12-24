@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Pantry Service Test")
-public class PantryServiceTest {
+class PantryServiceTest {
 
     private PantryRepository pantryRepository;
     private UserService userService;

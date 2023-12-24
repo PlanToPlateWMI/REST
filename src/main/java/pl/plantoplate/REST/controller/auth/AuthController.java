@@ -85,7 +85,7 @@ public class AuthController {
 
         if(userService.existsByEmailAndActiveTrue(userSignupInfo.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new SimpleResponse(String.format("User with email already exists", userSignupInfo.getEmail())));
+                    .body(new SimpleResponse(String.format("User with email %s already exists", userSignupInfo.getEmail())));
         }
 
         userService.registerUser(userSignupInfo.getEmail(),
@@ -144,7 +144,7 @@ public class AuthController {
                                                                     schema = @Schema(implementation = JwtResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                                                                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity createGroup(@RequestBody EmailPasswordRequest emailPasswordRequest){
+    public ResponseEntity<JwtResponse> createGroup(@RequestBody EmailPasswordRequest emailPasswordRequest){
 
         groupService.createGroupAndAddAdmin(emailPasswordRequest.getEmail());
 
@@ -163,7 +163,7 @@ public class AuthController {
                     schema = @Schema(implementation = SimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "Account with this email doesn't exist",  content = @Content(
                     schema = @Schema(implementation = SimpleResponse.class)))})
-    public ResponseEntity resetPassword(@RequestBody EmailPasswordRequest emailPasswordRequest){
+    public ResponseEntity<SimpleResponse> resetPassword(@RequestBody EmailPasswordRequest emailPasswordRequest){
 
         String encodedPassword = encoder.encode(emailPasswordRequest.getPassword());
 

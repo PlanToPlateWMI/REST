@@ -1,12 +1,9 @@
 package pl.plantoplate.REST.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +15,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.plantoplate.REST.controller.dto.model.MealProductQty;
-import pl.plantoplate.REST.controller.dto.model.RecipeProductQty;
-import pl.plantoplate.REST.controller.dto.request.PlanMealBasedOnRecipeRequest;
 import pl.plantoplate.REST.entity.auth.Group;
 import pl.plantoplate.REST.entity.meal.Meal;
 import pl.plantoplate.REST.entity.recipe.Level;
@@ -30,7 +25,6 @@ import pl.plantoplate.REST.service.UserService;
 import java.time.LocalDate;
 import java.util.HashMap;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -203,17 +197,5 @@ public class MealControllerTest {
         verify(mealService).prepareMeal(mealId, group, USER_EMAIL);
 
     }
-
-    private PlanMealBasedOnRecipeRequest createPlanMeaRequest(){
-        return PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(2).build();
-    }
-
-    private static Object[] createPlanMealInvalidPortionsRequest(){
-        return new Object[]{
-                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(0).build(),
-                PlanMealBasedOnRecipeRequest.builder().mealType("LUNCH").recipeId(1L).date(LocalDate.now()).portions(-2).build()
-        };
-    }
-
 
 }

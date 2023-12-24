@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @DisplayName("MailController Test")
-public class MailControllerTest {
+class MailControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

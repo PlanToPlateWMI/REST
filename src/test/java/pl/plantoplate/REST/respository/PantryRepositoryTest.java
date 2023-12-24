@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DataJpaTest
 @DisplayName("PantryRepository Test")
 @Sql("/schema-test.sql")
-public class PantryRepositoryTest {
+class PantryRepositoryTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Group Service Test")
-public class GroupServiceTest {
+class GroupServiceTest {
 
     private GroupRepository groupRepository;
     private UserRepository userRepository;
