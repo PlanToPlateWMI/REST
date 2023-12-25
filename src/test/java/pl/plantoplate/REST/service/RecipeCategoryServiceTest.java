@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @DisplayName("RecipeCategory Service Test")
-public class RecipeCategoryServiceTest {
+class RecipeCategoryServiceTest {
 
     private RecipeCategoryRepository recipeCategoryRepository;
     private RecipeCategoryService recipeCategoryService;

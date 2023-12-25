@@ -38,14 +38,14 @@ class TestControllerTest {
     }
 
     @Test
-    public void endpointForAllUsers() throws Exception {
+    void endpointForAllUsers() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.
                 get("/api/test/all")).andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser
-    public void endpointForAllUsersWithRoleUser() throws Exception {
+    void endpointForAllUsersWithRoleUser() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.
                 get("/api/test/user")).andExpect(status().isOk());
     }
@@ -53,7 +53,7 @@ class TestControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void endpointForUsersWithRoleAdmin() throws Exception {
+    void endpointForUsersWithRoleAdmin() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.
                 get("/api/test/admin")).andExpect(status().isOk());
     }

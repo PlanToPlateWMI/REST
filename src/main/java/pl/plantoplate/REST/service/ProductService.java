@@ -206,6 +206,14 @@ public class ProductService {
     }
 
 
+    /**
+     * Removes product with provided productId from list of all products of user's group and
+     * checks if exists product in this list (after removing) with provided name and unit
+     * @param name - name of product to check
+     * @param unit - unit of product to check
+     * @param userGroup
+     * @param productId - product id to remove from list of user's group
+     */
     private void existsProductWithNameAndUnit(String name, String unit, Group userGroup, long productId) {
 
         List<Product> allProducts = generalAndProductsOfGroup(userGroup);

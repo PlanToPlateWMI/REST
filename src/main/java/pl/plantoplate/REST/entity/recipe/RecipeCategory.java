@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
 
 /**
  * Entity that represents Recipe {@link pl.plantoplate.REST.entity.recipe.Recipe} category

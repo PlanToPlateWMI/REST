@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Group Service Test")
-public class CategoryServiceTest {
+class CategoryServiceTest {
 
     private CategoryRepository categoryRepository;
     private CategoryService categoryService;
