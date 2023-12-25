@@ -86,22 +86,26 @@ public class RecipeService {
                 return Stream.of(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName, Level.valueOf(level), adminGroup),
                         recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName, Level.valueOf(level), authorizedGroup))
                         .flatMap(Collection::stream)
+                        .distinct()
                         .collect(Collectors.toList());
 
             if (StringUtils.hasLength(level))
                 return Stream.of(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level),adminGroup),
                         recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), authorizedGroup))
                         .flatMap(Collection::stream)
+                        .distinct()
                         .collect(Collectors.toList());
 
             if (StringUtils.hasLength(categoryName))
                 return Stream.of(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName,adminGroup),
                         recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, authorizedGroup))
                         .flatMap(Collection::stream)
+                        .distinct()
                         .collect(Collectors.toList());
 
             return Stream.of(recipeRepository.findAllByOwnerGroup(adminGroup), recipeRepository.findAllByOwnerGroup(authorizedGroup))
                         .flatMap(Collection::stream)
+                        .distinct()
                         .collect(Collectors.toList());
         }
     }
