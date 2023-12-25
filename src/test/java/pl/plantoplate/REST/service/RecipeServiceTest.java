@@ -221,6 +221,14 @@ class RecipeServiceTest {
     void shouldGetAllRecipesByCategoryNameAuthorize(){
 
         //given
+        Recipe recipe1 = new Recipe();
+        recipe1.setId(1L);
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(2L);
+        Recipe recipe3 = new Recipe();
+        recipe3.setId(3L);
+        Recipe recipe4 = new Recipe();
+        recipe4.setId(4L);
         long groupId = 1L;
         long userGroupId = 2L;
         Group group = new Group();
@@ -233,15 +241,16 @@ class RecipeServiceTest {
         when(userService.findGroupOfUser(email)).thenReturn(userGroup);
         String categoryName = "test";
         String level = Level.HARD.name();
-        List<Recipe> recipes = List.of(new Recipe(), new Recipe());
-        when(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName,  Level.valueOf(level), group)).thenReturn(recipes);
-        when(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName,  Level.valueOf(level), userGroup)).thenReturn(recipes);
+        List<Recipe> recipesOfAdmin = List.of(recipe3, recipe4);
+        List<Recipe> recipesOfUser = List.of(recipe1, recipe2);
+        when(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName,  Level.valueOf(level), group)).thenReturn(recipesOfAdmin);
+        when(recipeRepository.findAllByCategoryTitleAndLevelAndOwnerGroup(categoryName,  Level.valueOf(level), userGroup)).thenReturn(recipesOfUser);
 
         //then
         List<Recipe> actualRecipes = recipeService.getAllRecipes(categoryName, level, email);
 
         //when
-        assertEquals(actualRecipes.size(), recipes.size() + recipes.size());
+        assertEquals(actualRecipes.size(), recipesOfAdmin.size() + recipesOfUser.size());
     }
 
 
@@ -249,6 +258,14 @@ class RecipeServiceTest {
     void shouldGetAllRecipesByLevelAuthorize(){
 
         //given
+        Recipe recipe1 = new Recipe();
+        recipe1.setId(1L);
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(2L);
+        Recipe recipe3 = new Recipe();
+        recipe3.setId(3L);
+        Recipe recipe4 = new Recipe();
+        recipe4.setId(4L);
         long groupId = 1L;
         long userGroupId = 2L;
         Group group = new Group();
@@ -261,15 +278,16 @@ class RecipeServiceTest {
         when(userService.findGroupOfUser(email)).thenReturn(userGroup);
         String categoryName = "";
         String level = Level.HARD.name();
-        List<Recipe> recipes = List.of(new Recipe(), new Recipe());
-        when(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), group)).thenReturn(recipes);
-        when(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), userGroup)).thenReturn(recipes);
+        List<Recipe> recipesOfAdmin = List.of(recipe3, recipe4);
+        List<Recipe> recipesOfUser = List.of(recipe1, recipe2);
+        when(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), group)).thenReturn(recipesOfAdmin);
+        when(recipeRepository.findAllByLevelAndOwnerGroup(Level.valueOf(level), userGroup)).thenReturn(recipesOfUser);
 
         //then
         List<Recipe> actualRecipes = recipeService.getAllRecipes(categoryName, level, email);
 
         //when
-        assertEquals(actualRecipes.size(), recipes.size() + recipes.size());
+        assertEquals(actualRecipes.size(), recipesOfAdmin.size() + recipesOfUser.size());
     }
 
 
@@ -277,6 +295,14 @@ class RecipeServiceTest {
     void shouldGetAllRecipesByLevelAndCategoryNameAuthorize(){
 
         //given
+        Recipe recipe1 = new Recipe();
+        recipe1.setId(1L);
+        Recipe recipe2 = new Recipe();
+        recipe2.setId(2L);
+        Recipe recipe3 = new Recipe();
+        recipe3.setId(3L);
+        Recipe recipe4 = new Recipe();
+        recipe4.setId(4L);
         long groupId = 1L;
         long userGroupId = 2L;
         Group group = new Group();
@@ -289,15 +315,16 @@ class RecipeServiceTest {
         when(userService.findGroupOfUser(email)).thenReturn(userGroup);
         String categoryName = "test";
         String level = "";
-        List<Recipe> recipes = List.of(new Recipe(), new Recipe());
-        when(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, group)).thenReturn(recipes);
-        when(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, userGroup)).thenReturn(recipes);
+        List<Recipe> recipesOfAdmin = List.of(recipe3, recipe4);
+        List<Recipe> recipesOfUser = List.of(recipe1, recipe2);
+        when(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, group)).thenReturn(recipesOfAdmin);
+        when(recipeRepository.findAllByCategoryTitleAndOwnerGroup(categoryName, userGroup)).thenReturn(recipesOfUser);
 
         //then
         List<Recipe> actualRecipes = recipeService.getAllRecipes(categoryName, level, email);
 
         //when
-        assertEquals(actualRecipes.size(), recipes.size() + recipes.size());
+        assertEquals(actualRecipes.size(), recipesOfAdmin.size() + recipesOfUser.size());
 
     }
 
